@@ -10,7 +10,7 @@ inherit toolchain-funcs mysql
 IUSE="$IUSE"
 
 # Define the mysql-extras source
-EGIT_REPO_URI="file:///home/gentoo-scm/mysql-extras"
+EGIT_REPO_URI="git://git.overlays.gentoo.org/proj/mysql-extras.git"
 
 # REMEMBER: also update eclass/mysql*.eclass before committing!
 KEYWORDS="~alpha amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc x86 ~sparc-fbsd ~x86-fbsd"
