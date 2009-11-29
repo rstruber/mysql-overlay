@@ -1,0 +1,4 @@
+# Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org> (29 Nov 2009)
+# Initial bump to mysql-5.1.41.
+# This is not ready for use yet.
+~dev-db/mysql-5.1.41
