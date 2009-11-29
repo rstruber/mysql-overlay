@@ -58,11 +58,11 @@ src_test() {
 			mysql_disable_test "archive_gis" "Totally broken in 5.0.42"
 			;;
 
-			5.0.4[3-9]|5.0.[56]*|5.0.70)
+			5.0.4[3-9]|5.0.[56]*|5.0.70|5.0.87)
 			[ "$(tc-endian)" == "big" ] && \
 			mysql_disable_test \
 				"archive_gis" \
-				"Broken in 5.0.43-70 on big-endian boxes only"
+				"Broken in 5.0.43-70 and 5.0.87 on big-endian boxes only"
 			;;
 		esac
 
