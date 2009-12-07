@@ -94,12 +94,12 @@ fi
 # @ECLASS-VARIABLE: XTRADB_VER
 # @DESCRIPTION:
 # Version of the XTRADB storage engine
-XTRADB_VER="${XTRADB_VER:-none}"
+XTRADB_VER="${XTRADB_VER}"
 
 # @ECLASS-VARIABLE: PERCONA_VER
 # @DESCRIPTION:
 # Designation by PERCONA for a MySQL version to apply an XTRADB release
-PERCONA_VER="${PERCONA_VER:-none}"
+PERCONA_VER="${PERCONA_VER}"
 
 # Be warned, *DEPEND are version-dependant
 # These are used for both runtime and compiletime
