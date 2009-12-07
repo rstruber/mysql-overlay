@@ -5,6 +5,9 @@
 MY_EXTRAS_VER="live"
 EAPI=2
 
+XTRADB_VER="1.0.4-8"
+PERCONA_VER="5.1.39-8"
+
 inherit toolchain-funcs mysql
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
