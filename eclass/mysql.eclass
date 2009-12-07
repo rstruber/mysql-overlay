@@ -565,7 +565,7 @@ mysql_src_unpack() {
 	case ${EAPI:-0} in
         	2) : ;;
         	0 | 1) mysql_src_prepare ;;
-	seac
+	esac
 }
 
 # @FUNCTION: mysql_src_prepare
@@ -716,7 +716,7 @@ mysql_src_compile() {
         case ${EAPI:-0} in
                 2) : ;;
                 0 | 1) mysql_src_configure ;;
-        seac
+        esac
 
 	emake || die "emake failed"
 
