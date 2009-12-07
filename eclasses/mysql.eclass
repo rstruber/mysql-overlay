@@ -156,7 +156,7 @@ mysql_version_is_at_least "5.1.12" \
 && SRC_URI="${SRC_URI} pbxt? ( mirror://sourceforge/pbxt/pbxt-${PBXT_VERSION}.tar.gz )"
 
 # Get the percona tarball if XTRADB_VER and PERCONA_VER are both set
-[[ -n XTRADB_VER && -n PERCONA_VER ]] &&  SRC_URI="${SRC_URI}
+[[ -z ${XTRADB_VER} || -z ${PERCONA_VER} ]] || SRC_URI="${SRC_URI}
 	http://www.percona.com/${PN}/xtradb/${PERCONA_VER}/source/percona-xtradb-${XTRADB_VER}.tar.gz"
 
 DESCRIPTION="A fast, multi-threaded, multi-user SQL database server."
