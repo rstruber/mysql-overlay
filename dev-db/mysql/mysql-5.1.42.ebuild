@@ -43,8 +43,9 @@ src_test() {
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 		cd "${S}"
 		einfo ">>> Test phase [test]: ${CATEGORY}/${PF}"
-		local retstatus1
-		local retstatus2
+		local retstatus_unit
+		local retstatus_ns
+		local retstatus_ps
 		local t
 		addpredict /this-dir-does-not-exist/t9.MYI
 
@@ -106,39 +107,60 @@ src_test() {
 				"status2" \
 				"Broken in 5.0.72, new test is broken, upstream bug #41066"
 
-		# SSL certs expired shortly after the release of 5.0.76. Affects older
-		# versions as well.
+		# The entire 5.0 series has pre-generated SSL certificates, they have
+		# mostly expired now. ${S}/mysql-tests/std-data/*.pem
+		# The certs really SHOULD be generated for the tests, so that they are
+		# not expiring like this. We cannot do so ourselves as the tests look
+		# closely as the cert path data, and we do not have the CA key to regen
+		# ourselves. Alternatively, upstream should generate them with at least
+		# 50-year validity.
+		#
+		# Known expiry points:
+		# 4.1.*, 5.0.0-5.0.22, 5.1.7: Expires 2013/09/09
+		# 5.0.23-5.0.77, 5.1.7-5.1.22?: Expires 2009/01/27
+		# 5.0.78-5.0.90, 5.1.??-5.1.42: Expires 2010/01/28
+		#
+		# mysql-test/std_data/untrusted-cacert.pem is MEANT to be
+		# expired/invalid.
 		case ${PV} in
-			5.0.?|5.0.[1-6]*|5.0.7[0-6])
+			5.0.*|5.1.*)
 				for t in openssl_1 rpl_openssl rpl_ssl ssl ssl_8k_key \
 					ssl_compress ssl_connect ; do \
 					mysql_disable_test \
 						"$t" \
-						"OpenSSL tests broken in 5.0.76 due to expired certificates"
+						"These OpenSSL tests break due to expired certificates"
 				done
 			;;
 		esac
 
 		# create directories because mysqladmin might right out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
-
+		
 		# We run the test protocols seperately
+		make -j1 test-unit
+		retstatus_unit=$?
+		[[ $retstatus_unit -eq 0 ]] || eerror "test-unit failed"
+
 		make -j1 test-ns force="--force --vardir=${S}/mysql-test/var-ns"
-		retstatus1=$?
-		[[ $retstatus1 -eq 0 ]] || eerror "test-ns failed"
+		retstatus_ns=$?
+		[[ $retstatus_ns -eq 0 ]] || eerror "test-ns failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 
 		make -j1 test-ps force="--force --vardir=${S}/mysql-test/var-ps"
-		retstatus2=$?
-		[[ $retstatus2 -eq 0 ]] || eerror "test-ps failed"
+		retstatus_ps=$?
+		[[ $retstatus_ps -eq 0 ]] || eerror "test-ps failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
+
+		# TODO:
+		# When upstream enables the pr and nr testsuites, we need those as well.
 
 		# Cleanup is important for these testcases.
 		pkill -9 -f "${S}/ndb" 2>/dev/null
 		pkill -9 -f "${S}/sql" 2>/dev/null
 		failures=""
-		[[ $retstatus1 -eq 0 ]] || failures="test-ns"
-		[[ $retstatus2 -eq 0 ]] || failures="${failures} test-ps"
+		[[ $retstatus_unit -eq 0 ]] || failures="${failures} test-unit"
+		[[ $retstatus_ns -eq 0 ]] || failures="${failures} test-ns"
+		[[ $retstatus_ps -eq 0 ]] || failures="${failures} test-ps"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 		[[ -z "$failures" ]] || die "Test failures: $failures"
 		einfo "Tests successfully completed"
