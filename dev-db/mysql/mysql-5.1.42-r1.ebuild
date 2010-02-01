@@ -2,8 +2,12 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.84-r1.ebuild,v 1.7 2009/11/09 18:00:20 fauli Exp $
 
-MY_EXTRAS_VER="20100201-0104Z"
+MY_EXTRAS_VER="live"
 EAPI=2
+
+# Broken, does not compile
+#XTRADB_VER="1.0.6-9"
+#PERCONA_VER="5.1.42-9"
 
 inherit toolchain-funcs mysql
 # only to make repoman happy. it is really set in the eclass

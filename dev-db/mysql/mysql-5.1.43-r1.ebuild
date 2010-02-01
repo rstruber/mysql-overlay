@@ -1,12 +1,9 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.84-r1.ebuild,v 1.7 2009/11/09 18:00:20 fauli Exp $
 
-MY_EXTRAS_VER="20100201-0104Z"
+MY_EXTRAS_VER="live"
 EAPI=2
-
-XTRADB_VER="1.0.4-8"
-PERCONA_VER="5.1.39-8"
 
 inherit toolchain-funcs mysql
 # only to make repoman happy. it is really set in the eclass
@@ -46,8 +43,9 @@ src_test() {
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 		cd "${S}"
 		einfo ">>> Test phase [test]: ${CATEGORY}/${PF}"
-		local retstatus1
-		local retstatus2
+		local retstatus_unit
+		local retstatus_ns
+		local retstatus_ps
 		local t
 		addpredict /this-dir-does-not-exist/t9.MYI
 
@@ -126,7 +124,7 @@ src_test() {
 		# expired/invalid.
 		case ${PV} in
 			5.0.*|5.1.*)
-				for t in openssl_1 rpl_openssl rpl_ssl ssl ssl_8k_key \
+				for t in openssl_1 rpl_openssl rpl.rpl_ssl rpl.rpl_ssl1 ssl ssl_8k_key \
 					ssl_compress ssl_connect ; do \
 					mysql_disable_test \
 						"$t" \
@@ -135,26 +133,50 @@ src_test() {
 			;;
 		esac
 
+		# These are also failing in MySQL 5.1 for now, and are believed to be
+		# false positives:
+		#
+		# main.mysql_comment, main.mysql_upgrade:
+		# fails due to USE=-latin1 / utf8 default
+		#
+		# main.mysql_client_test:
+		# segfaults at random under Portage only, suspect resource limits.
+		case ${PV} in
+			5.1.*) 
+			for t in main.mysql_client_test main.mysql_comments main.mysql_upgrade; do 
+				mysql_disable_test  "$t" "False positives in Gentoo"
+			done
+			;;
+		esac
+
 		# create directories because mysqladmin might right out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
-
+		
 		# We run the test protocols seperately
+		make -j1 test-unit
+		retstatus_unit=$?
+		[[ $retstatus_unit -eq 0 ]] || eerror "test-unit failed"
+
 		make -j1 test-ns force="--force --vardir=${S}/mysql-test/var-ns"
-		retstatus1=$?
-		[[ $retstatus1 -eq 0 ]] || eerror "test-ns failed"
+		retstatus_ns=$?
+		[[ $retstatus_ns -eq 0 ]] || eerror "test-ns failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 
 		make -j1 test-ps force="--force --vardir=${S}/mysql-test/var-ps"
-		retstatus2=$?
-		[[ $retstatus2 -eq 0 ]] || eerror "test-ps failed"
+		retstatus_ps=$?
+		[[ $retstatus_ps -eq 0 ]] || eerror "test-ps failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
+
+		# TODO:
+		# When upstream enables the pr and nr testsuites, we need those as well.
 
 		# Cleanup is important for these testcases.
 		pkill -9 -f "${S}/ndb" 2>/dev/null
 		pkill -9 -f "${S}/sql" 2>/dev/null
 		failures=""
-		[[ $retstatus1 -eq 0 ]] || failures="test-ns"
-		[[ $retstatus2 -eq 0 ]] || failures="${failures} test-ps"
+		[[ $retstatus_unit -eq 0 ]] || failures="${failures} test-unit"
+		[[ $retstatus_ns -eq 0 ]] || failures="${failures} test-ns"
+		[[ $retstatus_ps -eq 0 ]] || failures="${failures} test-ps"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 		[[ -z "$failures" ]] || die "Test failures: $failures"
 		einfo "Tests successfully completed"
