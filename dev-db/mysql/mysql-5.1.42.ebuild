@@ -2,8 +2,12 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.84-r1.ebuild,v 1.7 2009/11/09 18:00:20 fauli Exp $
 
-MY_EXTRAS_VER="live"
+MY_EXTRAS_VER="20100201-0104Z"
 EAPI=2
+
+# Broken, does not compile
+#XTRADB_VER="1.0.6-9"
+#PERCONA_VER="5.1.42-9"
 
 inherit toolchain-funcs mysql
 # only to make repoman happy. it is really set in the eclass
@@ -136,15 +140,15 @@ src_test() {
 		# These are also failing in MySQL 5.1 for now, and are believed to be
 		# false positives:
 		#
-		# main.mysql_comment:
-		# fails w/ USE=-latin1.
+		# main.mysql_comment, main.mysql_upgrade:
+		# fails due to USE=-latin1 / utf8 default
 		#
 		# main.mysql_client_test:
 		# segfaults at random under Portage only, suspect resource limits.
 		case ${PV} in
 			5.1.*) 
-			for t in main.mysql_client_test main.mysql_comments ; do 
-				mysql_disable_test  "$t" "False positives"
+			for t in main.mysql_client_test main.mysql_comments main.mysql_upgrade; do 
+				mysql_disable_test  "$t" "False positives in Gentoo"
 			done
 			;;
 		esac
