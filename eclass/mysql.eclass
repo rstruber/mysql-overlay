@@ -211,12 +211,13 @@ mysql_version_is_at_least "5.1.26" \
 mysql_disable_test() {
 	local rawtestname testname testsuite reason mysql_disable_file
 	rawtestname="${1}" ; shift
+	reason="${@}"
 	ewarn "test '${rawtestname}' disabled: '${reason}'"
 	
-	testsuite="${rawtestname/\/*}"
-	testname="${rawtestname/*\/}"
-	reason="${@}"
+	testsuite="${rawtestname/.*}"
+	testname="${rawtestname/*.}"
 	mysql_disable_file="${S}/mysql-test/t/disabled.def"
+	einfo "rawtestname=${rawtestname} testname=${testname} testsuite=${testsuite}"
 	echo ${testname} : ${reason} >> "${mysql_disable_file}"
 
 	# ${S}/mysql-tests/t/disabled.def
