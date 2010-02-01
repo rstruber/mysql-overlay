@@ -18,7 +18,7 @@
 WANT_AUTOCONF="latest"
 WANT_AUTOMAKE="latest"
 
-inherit eutils flag-o-matic gnuconfig autotools mysql_fx versionator
+inherit eutils flag-o-matic gnuconfig autotools mysql_fx versionator toolchain-funcs
 
 # Shorten the path because the socket path length must be shorter than 107 chars
 # and we will run a mysql server during test phase
@@ -586,7 +586,7 @@ mysql_pkg_setup() {
 
 	# Bug #290570 fun. Upstream made us need a fairly new GCC4.
 	if mysql_version_is_at_least "5.0.83" ; then
-		GCC_VER=$(gcc_version)
+		GCC_VER=$(gcc-version)
 		case ${GCC_VER} in
 			2*|3*|4.0|4.1|4.2) die "Active GCC too old! Must have at least GCC4.3" ;;
 		esac
