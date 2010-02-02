@@ -87,6 +87,8 @@ elif [ "${PV#5.1}" != "${PV}" ] && mysql_version_is_at_least "5.1.28"; then
 	MYSQL_COMMUNITY_FEATURES=1
 elif [ "${PV#5.4}" != "${PV}" ]; then
 	MYSQL_COMMUNITY_FEATURES=1
+elif [ "${PV#5.5}" != "${PV}" ]; then
+	MYSQL_COMMUNITY_FEATURES=1
 else
 	MYSQL_COMMUNITY_FEATURES=0
 fi
@@ -217,7 +219,7 @@ mysql_disable_test() {
 	testsuite="${rawtestname/.*}"
 	testname="${rawtestname/*.}"
 	mysql_disable_file="${S}/mysql-test/t/disabled.def"
-	einfo "rawtestname=${rawtestname} testname=${testname} testsuite=${testsuite}"
+	#einfo "rawtestname=${rawtestname} testname=${testname} testsuite=${testsuite}"
 	echo ${testname} : ${reason} >> "${mysql_disable_file}"
 
 	# ${S}/mysql-tests/t/disabled.def
@@ -489,14 +491,20 @@ configure_51() {
 	local plugins="csv,myisam,myisammrg,heap"
 	if use extraengine ; then
 		# like configuration=max-no-ndb, archive and example removed in 5.1.11
-		plugins="${plugins},archive,blackhole,example,federated,partition"
+		# not added yet: ibmdb2i
+		# Not supporting as examples: example,daemon_example,ftexample 
+		plugins="${plugins},archive,blackhole,federated,partition"
 
 		elog "Before using the Federated storage engine, please be sure to read"
 		elog "http://dev.mysql.com/doc/refman/5.1/en/federated-limitations.html"
 	fi
 
-	# Upstream specifically requests that InnoDB always be built.
-	plugins="${plugins},innobase"
+	# Upstream specifically requests that InnoDB always be built:
+	# - innobase, innodb_plugin
+	# Build falcon if available for 6.x series.
+	for i in innobase innodb_plugin falcon ; do
+		[ -e "${S}"/storage/${i} ] && plugins="${plugins},${i}"
+	done
 
 	# like configuration=max-no-ndb
 	if use cluster ; then
