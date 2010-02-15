@@ -19,7 +19,7 @@ KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~spar
 EPATCH_EXCLUDE=''
 
 DEPEND="|| ( >=sys-devel/gcc-4 >=sys-devel/gcc-apple-4 )"
-RDEPEND=""
+RDEPEND="!media-sound/amarok[embedded]"
 
 # Please do not add a naive src_unpack to this ebuild
 # If you want to add a single patch, copy the ebuild to an overlay
