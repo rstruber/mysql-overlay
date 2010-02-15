@@ -124,7 +124,7 @@ src_test() {
 		# expired/invalid.
 		case ${PV} in
 			5.0.*|5.1.*)
-				for t in openssl_1 rpl_openssl rpl_ssl ssl ssl_8k_key \
+				for t in openssl_1 rpl_openssl rpl.rpl_ssl rpl.rpl_ssl1 ssl ssl_8k_key \
 					ssl_compress ssl_connect ; do \
 					mysql_disable_test \
 						"$t" \
