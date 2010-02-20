@@ -189,7 +189,7 @@ mysql_version_is_at_least "5.1.12" \
 && [[ -n "${PBXT_VERSION}" ]] \
 && PBXT_P="pbxt-${PBXT_VERSION}" \
 && PBXT_SRC_URI="mirror://sourceforge/pbxt/${PBXT_P}.tar.gz" \
-&& SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )"
+&& SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )" \
 && IUSE="${IUSE} pbxt"
 
 # Get the percona tarball if XTRADB_VER and PERCONA_VER are both set
@@ -197,7 +197,7 @@ mysql_version_is_at_least "5.1.26" \
 && [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
 && XTRADB_P="percona-xtradb-${XTRADB_VER}" \
 && XTRADB_SRC_URI="http://www.percona.com/${PN}/xtradb/${PERCONA_VER}/source/${XTRADB_P}.tar.gz" \
-&& SRC_URI="${SRC_URI} xtradb? ( ${XTRADB_SRC_URI} )"
+&& SRC_URI="${SRC_URI} xtradb? ( ${XTRADB_SRC_URI} )" \
 && IUSE="${IUSE} xtradb"
 
 #
