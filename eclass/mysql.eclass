@@ -478,8 +478,7 @@ configure_51() {
 	myconf="${myconf} --enable-assembler"
 	myconf="${myconf} --with-geometry"
 	myconf="${myconf} --with-readline"
-	myconf="${myconf} --with-row-based-replication"
-	myconf="${myconf} --with-zlib=/usr/$(get_libdir)"
+	myconf="${myconf} --with-zlib-dir=/usr/$(get_libdir)"
 	myconf="${myconf} --without-pstack"
 	use max-idx-128 && myconf="${myconf} --with-max-indexes=128"
 
