@@ -160,20 +160,6 @@ SRC_URI="${SERVER_URI}"
 		http://g3nt8.org/patches/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
 		http://dev.gentoo.org/~robbat2/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2"
 
-# PBXT engine
-mysql_version_is_at_least "5.1.12" \
-&& [[ -n "${PBXT_VERSION}" ]] \
-&& PBXT_P="pbxt-${PBXT_VERSION}" \
-&& PBXT_SRC_URI="mirror://sourceforge/pbxt/${PBXT_P}.tar.gz" \
-&& SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )"
-
-# Get the percona tarball if XTRADB_VER and PERCONA_VER are both set
-mysql_version_is_at_least "5.1.26" \
-&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
-&& XTRADB_P="percona-xtradb-${XTRADB_VER}" \
-&& XTRADB_SRC_URI="http://www.percona.com/${PN}/xtradb/${PERCONA_VER}/source/${XTRADB_P}.tar.gz" \
-&& SRC_URI="${SRC_URI} xtradb? ( ${XTRADB_SRC_URI} )"
-
 DESCRIPTION="A fast, multi-threaded, multi-user SQL database server."
 HOMEPAGE="http://www.mysql.com/"
 LICENSE="GPL-2"
@@ -195,16 +181,24 @@ mysql_version_is_at_least "5.0.18" \
 mysql_version_is_at_least "5.1" \
 || IUSE="${IUSE} berkdb"
 
-mysql_version_is_at_least "5.1.12" \
-&& [[ -n "${PBXT_VERSION}" ]] \
-&& IUSE="${IUSE} pbxt"
-
-mysql_version_is_at_least "5.1.26" \
-&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
-&& IUSE="${IUSE} xtradb"
-
 [ "${MYSQL_COMMUNITY_FEATURES}" == "1" ] \
 && IUSE="${IUSE} ${IUSE_DEFAULT_ON}community profiling"
+
+# PBXT engine
+mysql_version_is_at_least "5.1.12" \
+&& [[ -n "${PBXT_VERSION}" ]] \
+&& PBXT_P="pbxt-${PBXT_VERSION}" \
+&& PBXT_SRC_URI="mirror://sourceforge/pbxt/${PBXT_P}.tar.gz" \
+&& SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )"
+&& IUSE="${IUSE} pbxt"
+
+# Get the percona tarball if XTRADB_VER and PERCONA_VER are both set
+mysql_version_is_at_least "5.1.26" \
+&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
+&& XTRADB_P="percona-xtradb-${XTRADB_VER}" \
+&& XTRADB_SRC_URI="http://www.percona.com/${PN}/xtradb/${PERCONA_VER}/source/${XTRADB_P}.tar.gz" \
+&& SRC_URI="${SRC_URI} xtradb? ( ${XTRADB_SRC_URI} )"
+&& IUSE="${IUSE} xtradb"
 
 #
 # HELPER FUNCTIONS:
@@ -518,6 +512,20 @@ configure_51() {
 	myconf="${myconf} --with-plugins=${plugins}"
 }
 
+xtradb_applicable() {
+	mysql_version_is_at_least "5.1.26" \
+	&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
+	&& use xtradb
+	return $?
+}
+
+pbxt_applicable() {
+	mysql_version_is_at_least "5.1.12" \
+	&& [[ -n "${PBXT_VERSION}" ]] \
+	&& use pbxt
+	return $?
+}
+
 pbxt_src_configure() {
 	mysql_init_vars
 
@@ -666,7 +674,7 @@ mysql_src_prepare() {
 
 	local rebuilddirlist d
 
-	if mysql_version_is_at_least "5.1.26" && use xtradb ; then
+	if xtradb_applicable ; then
 		einfo "Replacing InnoDB with Percona XtraDB"
 		pushd "${S}"/storage
 		i="innobase"
@@ -780,7 +788,7 @@ mysql_src_configure() {
 	-e 's|^pkglibdir *= *$(libdir)/mysql|pkglibdir = $(libdir)|;s|^pkgincludedir *= *$(includedir)/mysql|pkgincludedir = $(includedir)|'
 
 	if [[ $EAPI == 2 ]]; then
-		mysql_version_is_at_least "5.1.12" && use pbxt && pbxt_src_configure
+		pbxt_applicable && pbxt_src_configure
 	fi
 }
 
@@ -796,7 +804,7 @@ mysql_src_compile() {
 
 	emake || die "emake failed"
 
-	mysql_version_is_at_least "5.1.12" && use pbxt && pbxt_src_compile
+	pbxt_applicable && pbxt_src_compile
 }
 
 # @FUNCTION: mysql_src_install
@@ -808,7 +816,7 @@ mysql_src_install() {
 
 	emake install DESTDIR="${D}" benchdir_root="${MY_SHAREDSTATEDIR}" || die "emake install failed"
 
-	mysql_version_is_at_least "5.1.12" && use pbxt && pbxt_src_install
+	pbxt_applicable && pbxt_src_install
 
 	# Convenience links
 	einfo "Making Convenience links for mysqlcheck multi-call binary"
@@ -872,7 +880,7 @@ mysql_src_install() {
 
 	# Docs
 	einfo "Installing docs"
-	dodoc README COPYING ChangeLog EXCEPTIONS-CLIENT INSTALL-SOURCE
+	dodoc README ChangeLog EXCEPTIONS-CLIENT INSTALL-SOURCE
 	doinfo "${S}"/Docs/mysql.info
 
 	# Minimal builds don't have the MySQL server
@@ -948,7 +956,7 @@ mysql_pkg_postinst() {
 		einfo
 	fi
 
-	if mysql_version_is_at_least "5.1.12" && use pbxt ; then
+	if pbxt_applicable ; then
 		# TODO: explain it better
 		elog "    mysql> INSTALL PLUGIN pbxt SONAME 'libpbxt.so';"
 		elog "    mysql> CREATE TABLE t1 (c1 int, c2 text) ENGINE=pbxt;"
