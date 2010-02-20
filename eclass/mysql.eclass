@@ -164,7 +164,7 @@ DESCRIPTION="A fast, multi-threaded, multi-user SQL database server."
 HOMEPAGE="http://www.mysql.com/"
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="big-tables debug embedded minimal ${IUSE_DEFAULT_ON}perl selinux ssl static"
+IUSE="big-tables debug embedded minimal ${IUSE_DEFAULT_ON}perl selinux ssl static test"
 
 mysql_version_is_at_least "4.1" \
 && IUSE="${IUSE} latin1"
@@ -651,6 +651,11 @@ mysql_src_prepare() {
 	# And apply
 	epatch
 
+	# last -fPIC fixup, per bug #305873
+	sed -i \
+		-e '/CFLAGS/s,-prefer-non-pic,,g' \
+		"${S}"/storage/innodb_plugin/plug.in
+
 	# Additional checks, remove bundled zlib
 	rm -f "${S}/zlib/"*.[ch]
 	sed -i -e "s/zlib\/Makefile dnl/dnl zlib\/Makefile/" "${S}/configure.in"
@@ -813,7 +818,11 @@ mysql_src_install() {
 	# Make sure the vars are correctly initialized
 	mysql_init_vars
 
-	emake install DESTDIR="${D}" benchdir_root="${MY_SHAREDSTATEDIR}" || die "emake install failed"
+	emake install \
+		DESTDIR="${D}" \
+		benchdir_root="${MY_SHAREDSTATEDIR}" \
+		testroot="${MY_SHAREDSTATEDIR}" \
+		|| die "emake install failed"
 
 	pbxt_applicable && pbxt_src_install
 
@@ -829,7 +838,7 @@ mysql_src_install() {
 	for removeme in  "mysql-log-rotate" mysql.server* \
 		binary-configure* my-*.cnf mi_test_all*
 	do
-		rm -f "${D}"/usr/share/mysql/${removeme}
+		rm -f "${D}"/${MY_SHAREDSTATEDIR}/${removeme}
 	done
 
 	# Clean up stuff for a minimal build
@@ -839,6 +848,13 @@ mysql_src_install() {
 		rm -f "${D}"/usr/bin/{mysql{_install_db,manager*,_secure_installation,_fix_privilege_tables,hotcopy,_convert_table_format,d_multi,_fix_extensions,_zap,_explain_log,_tableinfo,d_safe,_install,_waitpid,binlog,test},myisam*,isam*,pack_isam}
 		rm -f "${D}/usr/sbin/mysqld"
 		rm -f "${D}${MY_LIBDIR}"/lib{heap,merge,nisam,my{sys,strings,sqld,isammrg,isam},vio,dbug}.a
+	fi
+
+	# Unless they explicitly specific USE=test, then do not install the
+	# testsuite. It DOES have a use to be installed, esp. when you want to do a
+	# validation of your database configuration after tuning it.
+	if use !test ; then
+		rm -rf "${D}"/${MY_SHAREDSTATEDIR}/mysql-test
 	fi
 
 	# Configuration stuff
