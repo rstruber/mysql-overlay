@@ -146,8 +146,8 @@ src_test() {
 		# main.mysql_client_test:
 		# segfaults at random under Portage only, suspect resource limits.
 		case ${PV} in
-			5.1.*) 
-			for t in main.mysql_client_test main.mysql_comments main.mysql_upgrade; do 
+			5.1.*)
+			for t in main.mysql_client_test main.mysql_comments main.mysql_upgrade; do
 				mysql_disable_test  "$t" "False positives in Gentoo"
 			done
 			;;
@@ -155,7 +155,7 @@ src_test() {
 
 		# create directories because mysqladmin might right out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
-		
+
 		# We run the test protocols seperately
 		make -j1 test-unit
 		retstatus_unit=$?
