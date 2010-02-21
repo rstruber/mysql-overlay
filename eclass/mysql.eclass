@@ -613,6 +613,16 @@ mysql_pkg_setup() {
 	mysql_check_version_range "4.0 to 5.0.99.99" \
 	&& use berkdb \
 	&& elog "Berkeley DB support is deprecated and will be removed in future versions!"
+
+	if [ "${PN}" != "mysql-cluster" ] && use cluster; then
+		ewarn "Upstream has noted that the NDB cluster support in the 5.0 and"
+		ewarn "5.1 series should NOT be put into production. In the near"
+		ewarn "future, it will be disabled from building."
+		ewarn ""
+		ewarn "If you need NDB support, you should instead move to the new"
+		ewarn "mysql-cluster package that represents that upstream NDB"
+		ewarn "development."
+	fi
 }
 
 # @FUNCTION: mysql_src_unpack
