@@ -652,9 +652,8 @@ mysql_src_prepare() {
 	epatch
 
 	# last -fPIC fixup, per bug #305873
-	sed -i \
-		-e '/CFLAGS/s,-prefer-non-pic,,g' \
-		"${S}"/storage/innodb_plugin/plug.in
+	i="${S}"/storage/innodb_plugin/plug.in	
+	[ -f "${i}" ] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
 
 	# Additional checks, remove bundled zlib
 	rm -f "${S}/zlib/"*.[ch]
