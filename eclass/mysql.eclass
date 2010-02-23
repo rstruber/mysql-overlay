@@ -188,7 +188,7 @@ mysql_version_is_at_least "5.1" \
 mysql_version_is_at_least "5.1.12" \
 && [[ -n "${PBXT_VERSION}" ]] \
 && PBXT_P="pbxt-${PBXT_VERSION}" \
-&& PBXT_SRC_URI="mirror://sourceforge/pbxt/${PBXT_P}.tar.gz" \
+&& PBXT_SRC_URI="http://www.primebase.org/download/${PBXT_P}.tar.gz mirror://sourceforge/pbxt/${PBXT_P}.tar.gz" \
 && SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )" \
 && IUSE="${IUSE} pbxt"
 
@@ -196,8 +196,10 @@ mysql_version_is_at_least "5.1.12" \
 mysql_version_is_at_least "5.1.26" \
 && [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
 && XTRADB_P="percona-xtradb-${XTRADB_VER}" \
-&& XTRADB_SRC_URI="http://www.percona.com/${PN}/xtradb/${PERCONA_VER}/source/${XTRADB_P}.tar.gz" \
-&& SRC_URI="${SRC_URI} xtradb? ( ${XTRADB_SRC_URI} )" \
+&& XTRADB_SRC_URI_COMMON="${PERCONA_VER}/source/${XTRADB_P}.tar.gz" \
+&& XTRADB_SRC_URI1="http://www.percona.com/percona-builds/xtradb/${XTRADB_SRC_URI_COMMON}" \
+&& XTRADB_SRC_URI2="http://www.percona.com/${PN}/xtradb/${XTRADB_SRC_URI_COMMON}" \
+&& SRC_URI="${SRC_URI} xtradb? ( ${XTRADB_SRC_URI1} ${XTRADB_SRC_URI2} )" \
 && IUSE="${IUSE} xtradb"
 
 #
@@ -534,7 +536,7 @@ pbxt_src_configure() {
 	AT_GNUCONF_UPDATE="yes" eautoreconf
 
 	local myconf=""
-	myconf="${myconf} --with-mysql=${S} --libdir=${D}/${MY_LIBDIR}"
+	myconf="${myconf} --with-mysql=${S} --libdir=${MY_LIBDIR}"
 	use debug && myconf="${myconf} --with-debug=full"
 	# TODO: is it safe/needed to use econf here ?
 	./configure ${myconf} || die "Problem configuring PBXT storage engine"
@@ -554,7 +556,7 @@ pbxt_src_compile() {
 
 pbxt_src_install() {
 	pushd "${WORKDIR}/pbxt-${PBXT_VERSION}" &>/dev/null
-		make install || die "Failed to install PBXT"
+		emake install DESTDIR="${D}" || die "Failed to install PBXT"
 	popd
 }
 
@@ -693,21 +695,22 @@ mysql_src_prepare() {
 		i="innobase"
 		o="${WORKDIR}/storage-${i}.mysql-upstream"
 		# Have we been here already?
-		[ -h "${i}" ] && rm -f "${i}"
+		[ -d "${o}" ] && rm -f "${i}"
 		# Or maybe we haven't
 		[ -d "${i}" -a ! -d "${o}" ] && mv "${i}" "${o}"
-		ln -s "${WORKDIR}/${XTRADB_P}" "${i}"
+		cp -ra "${WORKDIR}/${XTRADB_P}" "${i}"
 		popd
 	fi
 
 	if mysql_version_is_at_least "5.1.12" ; then
-		einfo "Updating innobase cmake"
 		rebuilddirlist="."
-		# TODO: check this with a cmake expert
-		cmake \
-			-DCMAKE_C_COMPILER=$(type -P $(tc-getCC)) \
-			-DCMAKE_CXX_COMPILER=$(type -P $(tc-getCXX)) \
-			"storage/innobase"
+		# This does not seem to be needed presently. robbat2 2010/02/23
+		#einfo "Updating innobase cmake"
+		## TODO: check this with a cmake expert
+		#cmake \
+		#	-DCMAKE_C_COMPILER=$(type -P $(tc-getCC)) \
+		#	-DCMAKE_CXX_COMPILER=$(type -P $(tc-getCXX)) \
+		#	"storage/innobase"
 	else
 		rebuilddirlist=". innobase"
 	fi
