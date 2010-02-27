@@ -919,12 +919,12 @@ mysql_src_install() {
 			"${S}"/support-files/magic \
 			"${S}"/support-files/ndb-config-2-node.ini
 		do
-			dodoc "${script}"
+			[[ -f "$script" ]] && dodoc "${script}"
 		done
 
 		docinto "scripts"
 		for script in "${S}"/scripts/mysql* ; do
-			[[ "${script%.sh}" == "${script}" ]] && dodoc "${script}"
+			[[ -f "$script" ]] && [[ "${script%.sh}" == "${script}" ]] && dodoc "${script}"
 		done
 
 	fi
