@@ -202,20 +202,34 @@ mysql_version_is_at_least "5.1" \
 [ "${MYSQL_COMMUNITY_FEATURES}" == "1" ] \
 && IUSE="${IUSE} ${IUSE_DEFAULT_ON}community profiling"
 
-# PBXT engine
-mysql_version_is_at_least "5.1.12" \
-&& [[ "${PN}" != "mariadb" ]] \
-&& [[ -n "${PBXT_VERSION}" ]] 
+# MariaDB has integrated PBXT
+# PBXT_VERSION means that we have a PBXT patch for this PV
+# PBXT was only introduced after 5.1.12
+pbxt_available() {
+	[[ "${PN}" != "mariadb" ]] \
+	&& mysql_version_is_at_least "5.1.12" \
+	&& [[ -n "${PBXT_VERSION}" ]]
+	return $?
+}
+
+# Get the percona tarball if XTRADB_VER and PERCONA_VER are both set
+# MariaDB has integrated XtraDB
+# XTRADB_VERS means that we have a XTRADB patch for this PV
+# XTRADB was only introduced after 5.1.26
+xtradb_available() {
+	[[ "${PN}" != "mariadb" ]] \
+	&& mysql_version_is_at_least "5.1.26" \
+	&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]]
+	return $?
+}
+
+pbxt_available \
 && PBXT_P="pbxt-${PBXT_VERSION}" \
 && PBXT_SRC_URI="http://www.primebase.org/download/${PBXT_P}.tar.gz mirror://sourceforge/pbxt/${PBXT_P}.tar.gz" \
 && SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )" \
 && IUSE="${IUSE} pbxt"
 
-# Get the percona tarball if XTRADB_VER and PERCONA_VER are both set
-# MariaDB includes XtraDB by default and cannot be disabled
-mysql_version_is_at_least "5.1.26" \
-&& [[ "${PN}" != "mariadb" ]] \
-&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
+xtradb_available \
 && XTRADB_P="percona-xtradb-${XTRADB_VER}" \
 && XTRADB_SRC_URI_COMMON="${PERCONA_VER}/source/${XTRADB_P}.tar.gz" \
 && XTRADB_SRC_URI1="http://www.percona.com/percona-builds/xtradb/${XTRADB_SRC_URI_COMMON}" \
@@ -550,17 +564,13 @@ configure_51() {
 }
 
 xtradb_applicable() {
-	[[ "${PN}" != "mariadb" ]] \
-	&& mysql_version_is_at_least "5.1.26" \
-	&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
+	xtradb_available \
 	&& use xtradb
 	return $?
 }
 
 pbxt_applicable() {
-	[[ "${PN}" != "mariadb" ]] \
-	&& mysql_version_is_at_least "5.1.12" \
-	&& [[ -n "${PBXT_VERSION}" ]] \
+	pbxt_available \
 	&& use pbxt
 	return $?
 }
