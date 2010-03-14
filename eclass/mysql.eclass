@@ -53,6 +53,14 @@ case "${EAPI:-0}" in
 		die "Unsupported EAPI: ${EAPI}" ;;
 esac
 
+
+# @ECLASS-VARIABLE: MYSQL_PV_MAJOR
+# @DESCRIPTION:
+# Upstream MySQL considers the first two parts of the version number to be the
+# major version. Upgrades that change major version should always run
+# mysql_upgrade.
+MYSQL_PV_MAJOR="$(get_version_component_range 1-2 ${PV})"
+
 # @ECLASS-VARIABLE: MYSQL_VERSION_ID
 # @DESCRIPTION:
 # MYSQL_VERSION_ID will be:
@@ -79,7 +87,7 @@ MYSQL_VERSION_ID=${MYSQL_VERSION_ID##"0"}
 # and 0 (no).
 # Community features are available in mysql-community
 # AND in the re-merged mysql-5.0.82 and newer
-if [ "${PN}" == "mysql-community" ]; then
+if [ "${PN}" == "mysql-community" -o "${PN}" == "mariadb" ]; then
 	MYSQL_COMMUNITY_FEATURES=1
 elif [ "${PV#5.0}" != "${PV}" ] && mysql_version_is_at_least "5.0.82"; then
 	MYSQL_COMMUNITY_FEATURES=1
@@ -114,10 +122,13 @@ DEPEND="ssl? ( >=dev-libs/openssl-0.9.6d )
 		>=sys-libs/readline-4.1
 		>=sys-libs/zlib-1.2.3"
 
+[[ "${PN}" == "mariadb" ]] \
+&& DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
+
 # Having different flavours at the same time is not a good idea
-for i in "" "-community" ; do
-	[[ "${i}" == ${PN#mysql} ]] ||
-	DEPEND="${DEPEND} !dev-db/mysql${i}"
+for i in "mysql" "mysql-community" "mariadb" ; do
+	[[ "${i}" == ${PN} ]] ||
+	DEPEND="${DEPEND} !dev-db/${i}"
 done
 
 RDEPEND="${DEPEND}
@@ -136,13 +147,16 @@ mysql_version_is_at_least "5.1.12" \
 PDEPEND="perl? ( >=dev-perl/DBD-mysql-2.9004 )"
 
 # For other stuff to bring us in
-PDEPEND="${PDEPEND} =virtual/mysql-$(get_version_component_range 1-2 ${PV})"
+PDEPEND="${PDEPEND} =virtual/mysql-${MYSQL_PV_MAJOR}"
 
 # Work out the default SERVER_URI correctly
 if [ -z "${SERVER_URI}" ]; then
 	[ -z "${MY_PV}" ] && MY_PV="${PV//_/-}"
+	if [ "${PN}" == "mariadb" ]; then
+		MARIA_FULL_PV="$(replace_version_separator 3 '-' ${PV})"
+		SERVER_URI="http://launchpad.net/maria/${MYSQL_PV_MAJOR}/ongoing/+download/mariadb-${MARIA_FULL_PV}.tar.gz"
 	# The community build is on the mirrors
-	if [ "${MYSQL_COMMUNITY_FEATURES}" == "1" ]; then
+	elif [ "${MYSQL_COMMUNITY_FEATURES}" == "1" ]; then
 		SERVER_URI="mirror://mysql/Downloads/MySQL-${PV%.*}/mysql-${MY_PV}.tar.gz"
 	# The (old) enterprise source is on the primary site only
 	elif [ "${PN}" == "mysql" ]; then
@@ -186,14 +200,17 @@ mysql_version_is_at_least "5.1" \
 
 # PBXT engine
 mysql_version_is_at_least "5.1.12" \
-&& [[ -n "${PBXT_VERSION}" ]] \
+&& [[ "${PN}" != "mariadb" ]] \
+&& [[ -n "${PBXT_VERSION}" ]] 
 && PBXT_P="pbxt-${PBXT_VERSION}" \
 && PBXT_SRC_URI="http://www.primebase.org/download/${PBXT_P}.tar.gz mirror://sourceforge/pbxt/${PBXT_P}.tar.gz" \
 && SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )" \
 && IUSE="${IUSE} pbxt"
 
 # Get the percona tarball if XTRADB_VER and PERCONA_VER are both set
+# MariaDB includes XtraDB by default and cannot be disabled
 mysql_version_is_at_least "5.1.26" \
+&& [[ "${PN}" != "mariadb" ]] \
 && [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
 && XTRADB_P="percona-xtradb-${XTRADB_VER}" \
 && XTRADB_SRC_URI_COMMON="${PERCONA_VER}/source/${XTRADB_P}.tar.gz" \
@@ -493,8 +510,13 @@ configure_51() {
 		# Not supporting as examples: example,daemon_example,ftexample 
 		plugins="${plugins},archive,blackhole,federated,partition"
 
-		elog "Before using the Federated storage engine, please be sure to read"
-		elog "http://dev.mysql.com/doc/refman/5.1/en/federated-limitations.html"
+		if [[ "${PN}" != "mariadb" ]] ; then
+			elog "Before using the Federated storage engine, please be sure to read"
+			elog "http://dev.mysql.com/doc/refman/5.1/en/federated-limitations.html"
+		else
+			elog "MariaDB includes the FederatedX engine. Be sure to read"
+			elog "http://askmonty.org/wiki/index.php/Manual:FederatedX_storage_engine"
+		fi
 	fi
 
 	# Upstream specifically requests that InnoDB always be built:
@@ -510,18 +532,30 @@ configure_51() {
 		myconf="${myconf} --with-ndb-binlog"
 	fi
 
+	if [[ "${PN}" == "mariadb" ]] ; then
+		plugins="${plugins},maria"
+		if use pbxt ; then
+			plugins="${plugins},pbxt"
+		else
+			myconf="${myconf} --without-plugin-pbxt"
+		fi
+		myconf="${myconf} $(use_with maria-tmp-tables) $(use_with libevent)"
+	fi
+
 	myconf="${myconf} --with-plugins=${plugins}"
 }
 
 xtradb_applicable() {
-	mysql_version_is_at_least "5.1.26" \
+	[[ "${PN}" != "mariadb" ]] \
+	&& mysql_version_is_at_least "5.1.26" \
 	&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]] \
 	&& use xtradb
 	return $?
 }
 
 pbxt_applicable() {
-	mysql_version_is_at_least "5.1.12" \
+	[[ "${PN}" != "mariadb" ]] \
+	&& mysql_version_is_at_least "5.1.12" \
 	&& [[ -n "${PBXT_VERSION}" ]] \
 	&& use pbxt
 	return $?
@@ -813,10 +847,10 @@ mysql_src_configure() {
 # Compile the mysql code.
 mysql_src_compile() {
 	# Be backwards compatible for now
-        case ${EAPI:-0} in
-                2) : ;;
-                0 | 1) mysql_src_configure ;;
-        esac
+	case ${EAPI:-0} in
+		2) : ;;
+		0 | 1) mysql_src_configure ;;
+	esac
 
 	emake || die "emake failed"
 
