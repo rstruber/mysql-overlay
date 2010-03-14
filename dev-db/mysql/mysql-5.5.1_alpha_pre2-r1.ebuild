@@ -161,16 +161,16 @@ src_test() {
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
 
 		# We run the test protocols seperately
-		make -j1 test-unit
+		emake test-unit
 		retstatus_unit=$?
 		[[ $retstatus_unit -eq 0 ]] || eerror "test-unit failed"
 
-		make -j1 test-ns force="--force --vardir=${S}/mysql-test/var-ns"
+		emake test-ns force="--force --vardir=${S}/mysql-test/var-ns"
 		retstatus_ns=$?
 		[[ $retstatus_ns -eq 0 ]] || eerror "test-ns failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 
-		make -j1 test-ps force="--force --vardir=${S}/mysql-test/var-ps"
+		emake test-ps force="--force --vardir=${S}/mysql-test/var-ps"
 		retstatus_ps=$?
 		[[ $retstatus_ps -eq 0 ]] || eerror "test-ps failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
