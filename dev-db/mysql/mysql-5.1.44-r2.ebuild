@@ -164,7 +164,11 @@ src_test() {
 			;;
 		esac
 
-		# create directories because mysqladmin might right out of order
+		# This test breaks on a trivial variable test that expects --with-maria-tmp-tables always on
+		[ "${PN}" == "mariadb" ] \
+		&& mysql_disable_test "maria.maria3" "Test Broken when USE=-maria-tmp-tables. Upstream bug #516148"
+
+		# create directories because mysqladmin might make out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
 
 		# We run the test protocols seperately
