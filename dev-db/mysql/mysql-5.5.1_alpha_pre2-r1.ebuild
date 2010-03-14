@@ -17,7 +17,7 @@ KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~spar
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
 EPATCH_EXCLUDE=''
 
-DEPEND="|| ( >=sys-devel/gcc-4 >=sys-devel/gcc-apple-4 )"
+DEPEND="|| ( >=sys-devel/gcc-4.3 >=sys-devel/gcc-apple-4.2 )"
 RDEPEND="!media-sound/amarok[embedded]"
 
 # Please do not add a naive src_unpack to this ebuild
