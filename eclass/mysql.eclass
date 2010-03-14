@@ -176,6 +176,10 @@ SRC_URI="${SERVER_URI}"
 
 DESCRIPTION="A fast, multi-threaded, multi-user SQL database server."
 HOMEPAGE="http://www.mysql.com/"
+if [[ "${PN}" == "mariadb" ]]; then
+	HOMEPAGE="http://askmonty.org/"
+	DESCRIPTION="MariaDB is a MySQL fork with 3rd-party patches and additional storage engines merged."
+fi
 LICENSE="GPL-2"
 SLOT="0"
 IUSE="big-tables debug embedded minimal ${IUSE_DEFAULT_ON}perl selinux ssl static test"
