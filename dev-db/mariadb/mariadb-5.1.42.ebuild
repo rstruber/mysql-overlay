@@ -164,12 +164,17 @@ src_test() {
 			;;
 		esac
 
-		[ "${PN}" == "mariadb" ] \
-		&& for t in \
-			parts.part_supported_sql_func_ndb \
-			parts.partition_auto_increment_ndb ; do
-				mysql_disable_test $t "ndb not supported in mariadb"
-		done
+		if [ "${PN}" == "mariadb" ]; then
+			use profiling \
+			|| mysql_disable_test main.profiling \
+			"Profiling test needs profiling support"
+
+			for t in \
+				parts.part_supported_sql_func_ndb \
+				parts.partition_auto_increment_ndb ; do
+					mysql_disable_test $t "ndb not supported in mariadb"
+			done
+		fi
 
 		# create directories because mysqladmin might make out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
