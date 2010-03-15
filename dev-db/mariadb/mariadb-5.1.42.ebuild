@@ -5,15 +5,6 @@
 MY_EXTRAS_VER="live"
 EAPI=2
 
-# PBXT
-PBXT_VERSION='1.0.10-rc'
-# XtraDB
-# handler/i_s.cc: In function 'int i_s_innodb_buffer_pool_pages_index_fill(THD*, TABLE_LIST*, COND*)':
-# handler/i_s.cc:801: error: invalid conversion from 'const char*' to 'char*'
-# handler/i_s.cc: In function 'int i_s_innodb_admin_command_fill(THD*, TABLE_LIST*, COND*)':
-# handler/i_s.cc:2995: warning: deprecated conversion from string constant to 'char*'
-# PERCONA_VER='5.1.42-9' XTRADB_VER='1.0.6-9'
-
 inherit toolchain-funcs mysql
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"

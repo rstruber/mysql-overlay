@@ -164,9 +164,17 @@ src_test() {
 			;;
 		esac
 
-		# This test breaks on a trivial variable test that expects --with-maria-tmp-tables always on
-		[ "${PN}" == "mariadb" ] \
-		&& mysql_disable_test "maria.maria3" "Test Broken when USE=-maria-tmp-tables. Upstream bug #516148"
+		if [ "${PN}" == "mariadb" ]; then
+			use profiling \
+			|| mysql_disable_test main.profiling \
+			"Profiling test needs profiling support"
+
+			for t in \
+				parts.part_supported_sql_func_ndb \
+				parts.partition_auto_increment_ndb ; do
+					mysql_disable_test $t "ndb not supported in mariadb"
+			done
+		fi
 
 		# create directories because mysqladmin might make out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
