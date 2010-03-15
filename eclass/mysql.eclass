@@ -559,9 +559,9 @@ configure_51() {
 	fi
 
 	if [[ "${PN}" == "mariadb" ]] ; then
-		# In MariaDB, InnoDB is directly packaged as xtradb, without the normal
-		# innobase/innodb_plugin directories
-		plugins="${plugins},maria,xtradb"
+		# In MariaDB, InnoDB is packaged in the xtradb directory, so it's not
+		# caught above.
+		plugins="${plugins},maria,innobase
 		if use pbxt ; then
 			plugins="${plugins},pbxt"
 		else
