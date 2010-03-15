@@ -123,7 +123,8 @@ DEPEND="ssl? ( >=dev-libs/openssl-0.9.6d )
 		>=sys-libs/zlib-1.2.3"
 
 [[ "${PN}" == "mariadb" ]] \
-&& DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
+&& DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )" \
+&& IUSE="${IUSE} libevent"
 
 # Having different flavours at the same time is not a good idea
 for i in "mysql" "mysql-community" "mariadb" ; do
@@ -205,10 +206,15 @@ mysql_version_is_at_least "5.1" \
 # MariaDB has integrated PBXT
 # PBXT_VERSION means that we have a PBXT patch for this PV
 # PBXT was only introduced after 5.1.12
-pbxt_available() {
+pbxt_patch_available() {
 	[[ "${PN}" != "mariadb" ]] \
 	&& mysql_version_is_at_least "5.1.12" \
 	&& [[ -n "${PBXT_VERSION}" ]]
+	return $?
+}
+
+pbxt_available() {
+	pbxt_patch_available || [[ "${PN}" == "mariadb" ]]
 	return $?
 }
 
@@ -216,20 +222,22 @@ pbxt_available() {
 # MariaDB has integrated XtraDB
 # XTRADB_VERS means that we have a XTRADB patch for this PV
 # XTRADB was only introduced after 5.1.26
-xtradb_available() {
+xtradb_patch_available() {
 	[[ "${PN}" != "mariadb" ]] \
 	&& mysql_version_is_at_least "5.1.26" \
 	&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]]
 	return $?
 }
 
-pbxt_available \
+pbxt_patch_available \
 && PBXT_P="pbxt-${PBXT_VERSION}" \
 && PBXT_SRC_URI="http://www.primebase.org/download/${PBXT_P}.tar.gz mirror://sourceforge/pbxt/${PBXT_P}.tar.gz" \
 && SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )" \
+
+pbxt_available \
 && IUSE="${IUSE} pbxt"
 
-xtradb_available \
+xtradb_patch_available \
 && XTRADB_P="percona-xtradb-${XTRADB_VER}" \
 && XTRADB_SRC_URI_COMMON="${PERCONA_VER}/source/${XTRADB_P}.tar.gz" \
 && XTRADB_SRC_URI1="http://www.percona.com/percona-builds/xtradb/${XTRADB_SRC_URI_COMMON}" \
@@ -566,18 +574,6 @@ configure_51() {
 	myconf="${myconf} --with-plugins=${plugins}"
 }
 
-xtradb_applicable() {
-	xtradb_available \
-	&& use xtradb
-	return $?
-}
-
-pbxt_applicable() {
-	pbxt_available \
-	&& use pbxt
-	return $?
-}
-
 pbxt_src_configure() {
 	mysql_init_vars
 
@@ -740,7 +736,7 @@ mysql_src_prepare() {
 
 	local rebuilddirlist d
 
-	if xtradb_applicable ; then
+	if xtradb_patch_available && use xtradb ; then
 		einfo "Replacing InnoDB with Percona XtraDB"
 		pushd "${S}"/storage
 		i="innobase"
@@ -855,7 +851,7 @@ mysql_src_configure() {
 	-e 's|^pkglibdir *= *$(libdir)/mysql|pkglibdir = $(libdir)|;s|^pkgincludedir *= *$(includedir)/mysql|pkgincludedir = $(includedir)|'
 
 	if [[ $EAPI == 2 ]]; then
-		pbxt_applicable && pbxt_src_configure
+		pbxt_patch_available && use pbxt && pbxt_src_configure
 	fi
 }
 
@@ -871,7 +867,7 @@ mysql_src_compile() {
 
 	emake || die "emake failed"
 
-	pbxt_applicable && pbxt_src_compile
+	pbxt_patch_available && use pbxt && pbxt_src_compile
 }
 
 # @FUNCTION: mysql_src_install
@@ -887,7 +883,7 @@ mysql_src_install() {
 		testroot="${MY_SHAREDSTATEDIR}" \
 		|| die "emake install failed"
 
-	pbxt_applicable && pbxt_src_install
+	pbxt_patch_available && use pbxt && pbxt_src_install
 
 	# Convenience links
 	einfo "Making Convenience links for mysqlcheck multi-call binary"
@@ -1019,12 +1015,15 @@ mysql_pkg_postinst() {
 			support-files/magic \
 			support-files/ndb-config-2-node.ini
 		do
-			dodoc "${script}"
+			[[ -f "${script}" ]] \
+			&& dodoc "${script}"
 		done
 
 		docinto "scripts"
 		for script in scripts/mysql* ; do
-			[[ "${script%.sh}" == "${script}" ]] && dodoc "${script}"
+			[[ -f "${script}" ]] \
+			&& [[ "${script%.sh}" == "${script}" ]] \
+			&& dodoc "${script}"
 		done
 
 		einfo
@@ -1034,7 +1033,7 @@ mysql_pkg_postinst() {
 		einfo
 	fi
 
-	if pbxt_applicable ; then
+	if pbxt_available && use pbxt ; then
 		# TODO: explain it better
 		elog "    mysql> INSTALL PLUGIN pbxt SONAME 'libpbxt.so';"
 		elog "    mysql> CREATE TABLE t1 (c1 int, c2 text) ENGINE=pbxt;"
