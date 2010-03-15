@@ -535,6 +535,7 @@ configure_51() {
 
 	# 5.1 introduces a new way to manage storage engines (plugins)
 	# like configuration=none
+	# This base set are required, and will always be statically built.
 	local plugins="csv,myisam,myisammrg,heap"
 	if use extraengine ; then
 		# like configuration=max-no-ndb, archive and example removed in 5.1.11
