@@ -123,8 +123,7 @@ DEPEND="ssl? ( >=dev-libs/openssl-0.9.6d )
 		>=sys-libs/zlib-1.2.3"
 
 [[ "${PN}" == "mariadb" ]] \
-&& DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )" \
-&& IUSE="${IUSE} libevent"
+&& DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
 
 # Having different flavours at the same time is not a good idea
 for i in "mysql" "mysql-community" "mariadb" ; do
@@ -202,6 +201,9 @@ mysql_version_is_at_least "5.1" \
 
 [ "${MYSQL_COMMUNITY_FEATURES}" == "1" ] \
 && IUSE="${IUSE} ${IUSE_DEFAULT_ON}community profiling"
+
+[[ "${PN}" == "mariadb" ]] \
+&& IUSE="${IUSE} libevent"
 
 # MariaDB has integrated PBXT
 # PBXT_VERSION means that we have a PBXT patch for this PV
