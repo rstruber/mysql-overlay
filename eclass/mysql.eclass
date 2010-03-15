@@ -557,7 +557,10 @@ configure_51() {
 		else
 			myconf="${myconf} --without-plugin-pbxt"
 		fi
-		myconf="${myconf} $(use_with maria-tmp-tables) $(use_with libevent)"
+		myconf="${myconf} $(use_with libevent)"
+		# This is not optional, without it several upstream testcases fail.
+		# Also strongly recommended by upstream.
+		myconf="${myconf} --with-maria-tmp-tables"
 	fi
 
 	myconf="${myconf} --with-plugins=${plugins}"
