@@ -40,8 +40,8 @@ src_test() {
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 		cd "${S}"
 		einfo ">>> Test phase [test]: ${CATEGORY}/${PF}"
-		local retstatus1
-		local retstatus2
+		local retstatus_ns
+		local retstatus_ps
 		local t
 		addpredict /this-dir-does-not-exist/t9.MYI
 
@@ -145,26 +145,38 @@ src_test() {
 			;;
 		esac
 
-		# create directories because mysqladmin might right out of order
+		if [ "${PN}" == "mariadb" ]; then
+			use profiling \
+			|| mysql_disable_test main.profiling \
+			"Profiling test needs profiling support"
+
+			for t in \
+				parts.part_supported_sql_func_ndb \
+				parts.partition_auto_increment_ndb ; do
+					mysql_disable_test $t "ndb not supported in mariadb"
+			done
+		fi
+
+		# create directories because mysqladmin might make out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
 
 		# We run the test protocols seperately
-		make test-ns force="--force --vardir=${S}/mysql-test/var-ns"
-		retstatus1=$?
-		[[ $retstatus1 -eq 0 ]] || eerror "test-ns failed"
+		emake test-ns force="--force --vardir=${S}/mysql-test/var-ns"
+		retstatus_ns=$?
+		[[ $retstatus_ns -eq 0 ]] || eerror "test-ns failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 
-		make test-ps force="--force --vardir=${S}/mysql-test/var-ps"
-		retstatus2=$?
-		[[ $retstatus2 -eq 0 ]] || eerror "test-ps failed"
+		emake test-ps force="--force --vardir=${S}/mysql-test/var-ps"
+		retstatus_ps=$?
+		[[ $retstatus_ps -eq 0 ]] || eerror "test-ps failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 
 		# Cleanup is important for these testcases.
 		pkill -9 -f "${S}/ndb" 2>/dev/null
 		pkill -9 -f "${S}/sql" 2>/dev/null
 		failures=""
-		[[ $retstatus1 -eq 0 ]] || failures="test-ns"
-		[[ $retstatus2 -eq 0 ]] || failures="${failures} test-ps"
+		[[ $retstatus_ns -eq 0 ]] || failures="${failures} test-ns"
+		[[ $retstatus_ps -eq 0 ]] || failures="${failures} test-ps"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 		[[ -z "$failures" ]] || die "Test failures: $failures"
 		einfo "Tests successfully completed"
