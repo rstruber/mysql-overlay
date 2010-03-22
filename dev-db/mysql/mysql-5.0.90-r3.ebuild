@@ -145,11 +145,11 @@ src_test() {
 			;;
 		esac
 
-		if [ "${PN}" == "mariadb" ]; then
-			use profiling \
-			|| mysql_disable_test main.profiling \
+		use profiling && use community \
+		|| mysql_disable_test main.profiling \
 			"Profiling test needs profiling support"
 
+		if [ "${PN}" == "mariadb" ]; then
 			for t in \
 				parts.part_supported_sql_func_ndb \
 				parts.partition_auto_increment_ndb ; do
