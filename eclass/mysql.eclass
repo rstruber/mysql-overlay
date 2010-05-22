@@ -367,8 +367,10 @@ mysql_init_vars() {
 		fi
 	fi
 
-	MY_SOURCEDIR=${SERVER_URI##*/}
-	MY_SOURCEDIR=${MY_SOURCEDIR%.tar*}
+	if [ "${MY_SOURCEDIR:-unset}" == "unset" ]; then
+		MY_SOURCEDIR=${SERVER_URI##*/}
+		MY_SOURCEDIR=${MY_SOURCEDIR%.tar*}
+	fi
 
 	export MY_SHAREDSTATEDIR MY_SYSCONFDIR
 	export MY_LIBDIR MY_LOCALSTATEDIR MY_LOGDIR
