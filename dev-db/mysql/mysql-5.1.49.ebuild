@@ -6,7 +6,7 @@ MY_EXTRAS_VER="live"
 EAPI=2
 
 # PBXT
-PBXT_VERSION='1.0.10-rc'
+PBXT_VERSION='1.0.11-6-pre-ga'
 # XtraDB
 PERCONA_VER='5.1.45-10' XTRADB_VER='1.0.6-10'
 
@@ -15,7 +15,7 @@ inherit toolchain-funcs mysql
 IUSE="$IUSE"
 
 # REMEMBER: also update eclass/mysql*.eclass before committing!
-KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x64-macos ~x86-solaris"
 
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
 # This is often broken still
@@ -180,7 +180,13 @@ src_test() {
 				main.information_schema_db main.mysqlshow \
 				main.innodb-autoinc main.innodb_bug21704 \
 				main.innodb_bug44369 main.innodb_bug46000 \
-				main.index_merge_innodb ; do
+				main.index_merge_innodb \
+				innodb.innodb innodb.innodb_misc1 innodb.innodb_bug52663 \
+				innodb.innodb-autoinc innodb.innodb-autoinc-44030 \
+				innodb.innodb_bug21704 innodb.innodb_bug44369 \
+				innodb.innodb_bug46000 innodb.innodb_bug48024 \
+				innodb.innodb_bug49164 \
+				; do
 					mysql_disable_test $t "tests broken in xtradb"
 			done
 		fi
