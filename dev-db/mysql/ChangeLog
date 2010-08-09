@@ -2,6 +2,11 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  09 Aug 2010; Robin H. Johnson <robbat2@gentoo.org>
+  -mysql-5.0.90-r3.ebuild, -mysql-5.1.44-r4.ebuild, -mysql-5.1.45-r2.ebuild,
+  -mysql-5.1.46.ebuild:
+  Cleanup.
+
   09 Aug 2010; Robin H. Johnson <robbat2@gentoo.org> mysql-5.0.90-r3.ebuild,
   mysql-5.0.91.ebuild:
   Add prefix keywords.
