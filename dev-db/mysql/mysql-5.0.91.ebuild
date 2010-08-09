@@ -20,15 +20,6 @@ EPATCH_EXCLUDE=''
 DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )"
 RDEPEND=""
 
-# This MUST be fixed before we can publish.
-# http://bugs.mysql.com/bug.php?id=53909
-pkg_setup() {
-	if use extraengine ; then
-		die "MySQL Bug #53909: Archive engine is critically broken in MySQL 5.0.91"
-	fi
-	mysql_pkg_setup
-}
-
 # Please do not add a naive src_unpack to this ebuild
 # If you want to add a single patch, copy the ebuild to an overlay
 # and create your own mysql-extras tarball, looking at 000_index.txt
@@ -170,8 +161,9 @@ src_test() {
 
 		case $PV in
 			5.0.91)
-			for i in main.archive main.archive_gis \
-				main.federated_archive main.mysqldump-max ; do
+			for t in archive archive_gis archive-big \
+				federated_archive mysqldump-max \
+				; do
 					mysql_disable_test $t "Broken in 5.0.91"
 				done
 			;;
