@@ -2,6 +2,11 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mysql-5.1.50 (20 Aug 2010)
+
+  20 Aug 2010; Robin H. Johnson <robbat2@gentoo.org> +mysql-5.1.50.ebuild:
+  Verbump.
+
   09 Aug 2010; Robin H. Johnson <robbat2@gentoo.org>
   -mysql-5.0.90-r3.ebuild, -mysql-5.1.44-r4.ebuild, -mysql-5.1.45-r2.ebuild,
   -mysql-5.1.46.ebuild:
