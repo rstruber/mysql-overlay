@@ -2,6 +2,9 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  21 Aug 2010; Robin H. Johnson <robbat2@gentoo.org> mysql-5.1.50.ebuild:
+  Some tests false-positive with XtraDB.
+
 *mysql-5.1.50 (20 Aug 2010)
 
   20 Aug 2010; Robin H. Johnson <robbat2@gentoo.org> +mysql-5.1.50.ebuild:

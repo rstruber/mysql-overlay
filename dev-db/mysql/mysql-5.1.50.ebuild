@@ -185,7 +185,8 @@ src_test() {
 				innodb.innodb-autoinc innodb.innodb-autoinc-44030 \
 				innodb.innodb_bug21704 innodb.innodb_bug44369 \
 				innodb.innodb_bug46000 innodb.innodb_bug48024 \
-				innodb.innodb_bug49164 \
+				innodb.innodb_bug49164 innodb.innodb_bug51920 \
+				innodb.innodb_bug54044 \
 				; do
 					mysql_disable_test $t "tests broken in xtradb"
 			done
