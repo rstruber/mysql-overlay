@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.147 2010/08/08 23:31:05 robbat2 Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.149 2010/08/20 23:52:51 robbat2 Exp $
 
 # @ECLASS: mysql.eclass
 # @MAINTAINER:
@@ -1059,20 +1059,19 @@ mysql_src_install() {
 	fi
 
 	# Configuration stuff
-	if mysql_version_is_at_least "5.1" ; then
-		mysql_mycnf_version="5.1"
-	elif mysql_version_is_at_least "4.1" ; then
-		mysql_mycnf_version="4.1"
-	else
-		mysql_mycnf_version="4.0"
-	fi
-	einfo "Building default my.cnf"
+	case ${MYSQL_PV_MAJOR} in
+		3*|4.0) mysql_mycnf_version="4.0" ;;
+		4.[1-9]|5.0) mysql_mycnf_version="4.1" ;;
+		5.[1-9]|6*|7*) mysql_mycnf_version="5.1" ;;
+	esac
+	einfo "Building default my.cnf (${mysql_mycnf_version})"
 	insinto "${MY_SYSCONFDIR}"
 	doins scripts/mysqlaccess.conf
+	mycnf_src="my.cnf-${mysql_mycnf_version}"
 	sed -e "s!@DATADIR@!${MY_DATADIR}!g" \
-		"${FILESDIR}/my.cnf-${mysql_mycnf_version}" \
+		"${FILESDIR}/${mycnf_src}" \
 		> "${TMPDIR}/my.cnf.ok"
-	if mysql_version_is_at_least "4.1" && use latin1 ; then
+	if use latin1 ; then
 		sed -i \
 			-e "/character-set/s|utf8|latin1|g" \
 			"${TMPDIR}/my.cnf.ok"
