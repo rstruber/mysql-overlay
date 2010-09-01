@@ -192,6 +192,13 @@ src_test() {
 			done
 		fi
 
+		# bug 332565
+		if use extraengine ; then
+			for t in main.partition_symlink ; do
+				mysql_disable_test $t "Test $t requires USE=extraengine"
+			done
+		fi
+
 		# create directories because mysqladmin might make out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
 
