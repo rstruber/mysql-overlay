@@ -2,6 +2,9 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  05 Sep 2010; Robin H. Johnson <robbat2@gentoo.org> mysql-5.1.50-r2.ebuild:
+  Refix bug #332565.
+
   01 Sep 2010; Robin H. Johnson <robbat2@gentoo.org> mysql-5.1.50-r2.ebuild:
   Block the new sharedlib patch since it doesn't work fully yet.
 

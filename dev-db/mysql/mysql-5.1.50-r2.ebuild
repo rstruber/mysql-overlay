@@ -194,7 +194,7 @@ src_test() {
 
 		# bug 332565
 		if use extraengine ; then
-			for t in main.partition_symlink ; do
+			for t in main.range ; do
 				mysql_disable_test $t "Test $t requires USE=extraengine"
 			done
 		fi
