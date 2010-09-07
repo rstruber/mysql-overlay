@@ -193,7 +193,7 @@ src_test() {
 		fi
 
 		# bug 332565
-		if use extraengine ; then
+		if ! use extraengine ; then
 			for t in main.range ; do
 				mysql_disable_test $t "Test $t requires USE=extraengine"
 			done
