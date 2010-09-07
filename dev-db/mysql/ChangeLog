@@ -2,6 +2,10 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  07 Sep 2010; Robin H. Johnson <robbat2@gentoo.org> -mysql-5.1.49.ebuild,
+  -mysql-5.5.1_alpha_pre2-r1.ebuild:
+  cleanup.
+
   07 Sep 2010; Robin H. Johnson <robbat2@gentoo.org> mysql-5.1.50-r2.ebuild:
   Hello again bug #332565.
 
