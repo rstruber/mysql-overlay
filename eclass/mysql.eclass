@@ -166,9 +166,12 @@ if [ -z "${SERVER_URI}" ]; then
 		MARIA_FULL_PV="$(replace_version_separator 3 '-' ${PV})"
 		MARIA_FULL_P="${PN}-${MARIA_FULL_PV}"
 		SERVER_URI="
+		http://ftp.osuosl.org/pub/mariadb/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		http://ftp.rediris.es/mirror/MariaDB/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		http://maria.llarian.net/download/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		http://launchpad.net/maria/${MYSQL_PV_MAJOR}/ongoing/+download/${MARIA_FULL_P}.tar.gz
+		http://mirrors.fe.up.pt/pub/${PN}/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
+		http://ftp-stud.hs-esslingen.de/pub/Mirrors/${PN}/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		"
 	# The community and cluster builds are on the mirrors
 	elif [[ "${MYSQL_COMMUNITY_FEATURES}" == "1" || ${PN} == "mysql-cluster" ]] ; then
