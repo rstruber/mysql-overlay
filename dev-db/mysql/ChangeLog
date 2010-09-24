@@ -2,6 +2,12 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mysql-5.1.50-r3 (24 Sep 2010)
+
+  24 Sep 2010; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  +mysql-5.1.50-r3.ebuild:
+  Bumped mysql to 5.1.50-r3 to add the embedded patch.
+
   07 Sep 2010; Robin H. Johnson <robbat2@gentoo.org> -mysql-5.1.49.ebuild,
   -mysql-5.5.1_alpha_pre2-r1.ebuild:
   cleanup.

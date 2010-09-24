@@ -760,7 +760,7 @@ mysql_pkg_setup() {
 		eerror "${M}"
 		die "${M}"
 	fi
-	
+
 	if mysql_version_is_at_least "5.1" \
 	&& xtradb_patch_available \
 	&& use xtradb \
