@@ -21,8 +21,6 @@ KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~spar
 # This is often broken still
 EPATCH_EXCLUDE=''
 
-EGIT_REPO_URI="file:///home/gentoo-scm/mysql-extras"
-
 DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )"
 RDEPEND="!media-sound/amarok[embedded]"
 
