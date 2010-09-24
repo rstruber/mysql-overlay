@@ -303,7 +303,7 @@ mysql_disable_test() {
 	rawtestname="${1}" ; shift
 	reason="${@}"
 	ewarn "test '${rawtestname}' disabled: '${reason}'"
-	
+
 	testsuite="${rawtestname/.*}"
 	testname="${rawtestname/*.}"
 	mysql_disable_file="${S}/mysql-test/t/disabled.def"
@@ -656,13 +656,21 @@ configure_51() {
 	if [[ "${PN}" == "mariadb" ]] ; then
 		# In MariaDB, InnoDB is packaged in the xtradb directory, so it's not
 		# caught above.
-		plugins_sta="${plugins_sta} maria xtradb"
+		plugins_sta="${plugins_sta} maria"
+
+		[ -e "${S}"/storage/innobase ] || [ -e "${S}"/storage/xtradb ] ||
+			die "The ${P} package doesn't provide innobase nor xtradb"
+
+		for i in innobase xtradb ; do
+			[ -e "${S}"/storage/${i} ] && plugins_sta="${plugins_sta} ${i}"
+		done
+
 		myconf="${myconf} $(use_with libevent)"
 		# This is not optional, without it several upstream testcases fail.
 		# Also strongly recommended by upstream.
 		myconf="${myconf} --with-maria-tmp-tables"
 	fi
-	
+
 	if pbxt_available && [[ "${PBXT_NEWSTYLE}" == "1" ]]; then
 		use pbxt \
 		&& plugins_dyn="${plugins_dyn} pbxt" \
@@ -672,7 +680,7 @@ configure_51() {
 	use static && \
 	plugins_sta="${plugins_sta} ${plugins_dyn}" && \
 	plugins_dyn=""
-	
+
 	einfo "Available plugins: ${plugins_avail}"
 	einfo "Dynamic plugins: ${plugins_dyn}"
 	einfo "Static plugins: ${plugins_sta}"
@@ -840,7 +848,7 @@ mysql_src_prepare() {
 	epatch
 
 	# last -fPIC fixup, per bug #305873
-	i="${S}"/storage/innodb_plugin/plug.in	
+	i="${S}"/storage/innodb_plugin/plug.in
 	[ -f "${i}" ] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
 
 	# Additional checks, remove bundled zlib (Cluster needs this, for static
@@ -880,7 +888,7 @@ mysql_src_prepare() {
 		cp -ral "${WORKDIR}/${XTRADB_P}" "${i}"
 		popd >/dev/null
 	fi
-	
+
 	if pbxt_available && [[ "${PBXT_NEWSTYLE}" == "1" ]] && use pbxt ; then
 		einfo "Adding storage engine: PBXT"
 		pushd "${S}"/storage >/dev/null
@@ -1321,7 +1329,7 @@ mysql_pkg_config() {
 			cat "${help_tables}" >> "${sqltmp}"
 		fi
 	fi
-	
+
 	einfo "Creating the mysql database and setting proper"
 	einfo "permissions on it ..."
 
