@@ -656,7 +656,7 @@ configure_51() {
 	if [[ "${PN}" == "mariadb" ]] ; then
 		# In MariaDB, InnoDB is packaged in the xtradb directory, so it's not
 		# caught above.
-		plugins_sta="${plugins_sta} maria innobase"
+		plugins_sta="${plugins_sta} maria xtradb"
 		myconf="${myconf} $(use_with libevent)"
 		# This is not optional, without it several upstream testcases fail.
 		# Also strongly recommended by upstream.
