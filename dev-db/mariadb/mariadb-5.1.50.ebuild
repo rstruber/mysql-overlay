@@ -160,6 +160,19 @@ src_test() {
 			;;
 		esac
 
+		# New failures in 5.1.50/5.1.51, reported by jmbsvicetto.
+		# These tests are picking up a 'connect-timeout' config from somewhere,
+		# which is not valid, and since it does not have 'loose-' in front of
+		# it, it's causing a failure
+		case ${PV} in
+			5.1.5*|5.4.*|5.5.*|6*)
+			for t in rpl.rpl_mysql_upgrade main.log_tables_upgrade ; do
+				mysql_disable_test  "$t" \
+					"False positives in Gentoo: connect-timeout"		
+			done
+			;;
+		esac
+
 		use profiling && use community \
 		|| mysql_disable_test main.profiling \
 			"Profiling test needs profiling support"

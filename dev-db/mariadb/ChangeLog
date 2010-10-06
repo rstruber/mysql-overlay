@@ -2,6 +2,9 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  06 Oct 2010; Robin H. Johnson <robbat2@gentoo.org> mariadb-5.1.50.ebuild:
+  Ready for release.
+
   27 Sep 2010; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
   mariadb-5.1.50.ebuild:
   Dropped the block on amarok[embedded].
