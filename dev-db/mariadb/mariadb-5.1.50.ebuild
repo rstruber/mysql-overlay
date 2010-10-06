@@ -168,7 +168,7 @@ src_test() {
 			5.1.5*|5.4.*|5.5.*|6*)
 			for t in rpl.rpl_mysql_upgrade main.log_tables_upgrade ; do
 				mysql_disable_test  "$t" \
-					"False positives in Gentoo: connect-timeout"		
+					"False positives in Gentoo: connect-timeout"
 			done
 			;;
 		esac
