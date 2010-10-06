@@ -1,6 +1,6 @@
 # Copyright 1999-2009 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.149 2010/08/20 23:52:51 robbat2 Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.151 2010/09/06 08:02:08 robbat2 Exp $
 
 # @ECLASS: mysql.eclass
 # @MAINTAINER:
@@ -700,7 +700,7 @@ pbxt_src_configure() {
 	pushd "${WORKDIR}/pbxt-${PBXT_VERSION}" &>/dev/null
 
 	einfo "Reconfiguring dir '${PWD}'"
-	AT_GNUCONF_UPDATE="yes" eautoreconf
+	eautoreconf
 
 	local myconf=""
 	myconf="${myconf} --with-mysql=${S} --libdir=/usr/$(get_libdir)"
@@ -914,7 +914,7 @@ mysql_src_prepare() {
 	for d in ${rebuilddirlist} ; do
 		einfo "Reconfiguring dir '${d}'"
 		pushd "${d}" &>/dev/null
-		AT_GNUCONF_UPDATE="yes" eautoreconf
+		eautoreconf
 		popd &>/dev/null
 	done
 
@@ -1186,6 +1186,11 @@ mysql_pkg_postinst() {
 		elog "You might want to run:"
 		elog "\"emerge --config =${CATEGORY}/${PF}\""
 		elog "if this is a new install."
+		einfo
+
+		einfo
+		elog "If you are upgrading major versions, you should run the"
+		elog "mysql_upgrade tool."
 		einfo
 	fi
 
