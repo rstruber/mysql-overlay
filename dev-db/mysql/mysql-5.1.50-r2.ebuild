@@ -27,6 +27,12 @@ RDEPEND="!media-sound/amarok[embedded]"
 # Please do not add a naive src_unpack to this ebuild
 # If you want to add a single patch, copy the ebuild to an overlay
 # and create your own mysql-extras tarball, looking at 000_index.txt
+src_prepare() {
+	sed -i \
+		-e '/^noinst_PROGRAMS/s/basic-t//g' \
+		"${S}"/unittest/mytap/t/Makefile.am
+	mysql_src_prepare
+}
 
 # Official test instructions:
 # USE='berkdb -cluster embedded extraengine perl ssl community' \
@@ -157,6 +163,19 @@ src_test() {
 				main.not_partition funcs_1.is_columns_mysql \
 				funcs_1.is_tables_mysql funcs_1.is_triggers; do
 				mysql_disable_test  "$t" "False positives in Gentoo"
+			done
+			;;
+		esac
+
+		# New failures in 5.1.50/5.1.51, reported by jmbsvicetto.
+		# These tests are picking up a 'connect-timeout' config from somewhere,
+		# which is not valid, and since it does not have 'loose-' in front of
+		# it, it's causing a failure
+		case ${PV} in
+			5.1.5*|5.4.*|5.5.*|6*)
+			for t in rpl.rpl_mysql_upgrade main.log_tables_upgrade ; do
+				mysql_disable_test  "$t" \
+					"False positives in Gentoo: connect-timeout"		
 			done
 			;;
 		esac
