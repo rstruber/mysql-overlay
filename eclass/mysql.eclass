@@ -979,6 +979,12 @@ mysql_src_configure() {
 
 	# bug #283926, with GCC4.4, this is required to get correct behavior.
 	append-flags -fno-strict-aliasing
+	
+	# bug #335185, with GCC4.5 on x86 only, omit-frame-pointer causes a
+	# mis-compile
+	use x86 && [[ "$(gcc-version)" == "4.5" ]] && \
+		append-flags -fno-omit-frame-pointer && \
+		filter-flags -fomit-frame-pointer
 
 	econf \
 		--libexecdir="/usr/sbin" \
