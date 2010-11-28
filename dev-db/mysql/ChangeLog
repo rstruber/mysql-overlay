@@ -2,6 +2,13 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mysql-5.1.53-r1 (28 Nov 2010)
+*mysql-5.1.52-r2 (28 Nov 2010)
+
+  28 Nov 2010; Robin H. Johnson <robbat2@gentoo.org> -mysql-5.1.52.ebuild,
+  +mysql-5.1.52-r2.ebuild, +mysql-5.1.53-r1.ebuild:
+  Add 5.1.53 ebuild and bump 5.1.52 to be ahead of main tree versions.
+
 *mysql-5.1.52 (03 Nov 2010)
 
   03 Nov 2010; Robin H. Johnson <robbat2@gentoo.org> +mysql-5.1.52.ebuild:
