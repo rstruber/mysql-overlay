@@ -2,6 +2,9 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  28 Nov 2010; Robin H. Johnson <robbat2@gentoo.org> mysql-5.1.53-r1.ebuild:
+  Add ~mips per main tree.
+
   28 Nov 2010; Robin H. Johnson <robbat2@gentoo.org> mysql-5.1.51-r1.ebuild,
   mysql-5.1.52-r2.ebuild, mysql-5.1.53-r1.ebuild:
   Update libtool changes from main tree.
