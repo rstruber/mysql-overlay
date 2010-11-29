@@ -2,6 +2,15 @@
 # Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mariadb-5.2.3 (29 Nov 2010)
+
+  29 Nov 2010; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  +mariadb-5.2.3.ebuild:
+  Added initial ebuild to test 5.2.3 release. Updated eclass as the maria
+  plugin was renamed to aria in the maria-5.2 tree.
+  This ebuild is currently dying on the configure run - it seems autoconf is
+  eating a case in the plugins.m4 file.
+
 *mariadb-5.1.50-r1 (06 Oct 2010)
 
   06 Oct 2010; Robin H. Johnson <robbat2@gentoo.org> mariadb-5.1.50.ebuild,
