@@ -659,7 +659,11 @@ configure_51() {
 	if [[ "${PN}" == "mariadb" ]] ; then
 		# In MariaDB, InnoDB is packaged in the xtradb directory, so it's not
 		# caught above.
-		plugins_sta="${plugins_sta} maria"
+		if [[ "${PV}" < "5.2.0" ]] ; then
+			plugins_sta="${plugins_sta} maria"
+		else
+			plugins_sta="${plugins_sta} aria"
+		fi
 
 		[ -e "${S}"/storage/innobase ] || [ -e "${S}"/storage/xtradb ] ||
 			die "The ${P} package doesn't provide innobase nor xtradb"
