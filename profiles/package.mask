@@ -1,10 +1,3 @@
-# Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org> (6 Dec 2009)
-# Initial bump to mysql-5.1.39.
-# This is not ready for use yet - starting the work to get the percona
-# xtradb replacing innobase in 5.1.39
-~dev-db/mysql-5.1.39
-
-# Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org> (29 Nov 2009)
-# Initial bump to mysql-5.1.41.
-# This is not ready for use yet - still fails 3 tests.
-~dev-db/mysql-5.1.41
+# Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org> (6 Dec 2010)
+# The embedded patch needs more updates to apply to this version.
+~dev-db/mariadb-5.2.3
