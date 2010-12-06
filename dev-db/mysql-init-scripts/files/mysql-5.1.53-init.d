@@ -102,5 +102,5 @@ stop() {
 		--pidfile "${pidfile}"
 	eend $?
 }
-vim: filetype=gentoo-init-d sw=2 ts=2 sts=2 noet:
+# vim: filetype=gentoo-init-d sw=2 ts=2 sts=2 noet:
 
