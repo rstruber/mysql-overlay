@@ -64,15 +64,17 @@ start() {
 		return 1
 	fi
 
-	tmpnice="${NICE:+"--nicelevel "}${NICE}"
-	tmpionice="${IONICE:+"--ionice "}${IONICE}"
+	local startup_timeout=${STARTUP_TIMEOUT:-900}
+	local startup_early_timeout=${STARTUP_EARLY_TIMEOUT:-1000}
+	local tmpnice="${NICE:+"--nicelevel "}${NICE}"
+	local tmpionice="${IONICE:+"--ionice "}${IONICE}"
 	start-stop-daemon \
 		${DEBUG/*/"--verbose"} \
 		--start \
 		--exec "${basedir}"/sbin/mysqld \
 		--pidfile "${pidfile}" \
 		--background \
-		--wait ${STARTUP_EARLY_TIMEOUT} \
+		--wait ${startup_early_timeout} \
 		${tmpnice} \
 		${tmpionice} \
 		-- --defaults-file="${MY_CNF}" ${MY_ARGS}
@@ -82,7 +84,7 @@ start() {
 		return ${ret}
 	fi
 
-	ewaitfile ${STARTUP_TIMEOUT} "${socket}"
+	ewaitfile ${startup_timeout} "${socket}"
 	eend $? || return 1
 
 	save_options pidfile "${pidfile}"
@@ -94,12 +96,14 @@ stop() {
 
 	local pidfile="$(get_options pidfile)"
 	local basedir="$(get_options basedir)"
+	local stop_timeout=${STOP_TIMEOUT:-120}
 
 	start-stop-daemon \
 		${DEBUG/*/"--verbose"} \
 		--stop \
 		--exec "${basedir}"/sbin/mysqld \
-		--pidfile "${pidfile}"
+		--pidfile "${pidfile}" \
+		--retry ${stop_timeout}
 	eend $?
 }
 # vim: filetype=gentoo-init-d sw=2 ts=2 sts=2 noet:

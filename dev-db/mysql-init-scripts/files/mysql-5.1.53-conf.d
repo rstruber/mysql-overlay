@@ -26,7 +26,10 @@ STARTUP_TIMEOUT="900"
 
 # This is how long, in milliseconds, we wait for pidfile to be created, early
 # in the startup.
-STARTUP_EARLY_TIMEOUT="200"
+STARTUP_EARLY_TIMEOUT="1000"
+
+# How long (in seconds) should we wait for shutdown?
+STOP_TIMEOUT=120
 
 # integer [-20 .. 19 ] default 0
 # change the priority of the server -20 (high) to 19 (low)
