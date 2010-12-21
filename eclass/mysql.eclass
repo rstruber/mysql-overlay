@@ -153,6 +153,12 @@ mysql_version_is_at_least "5.1" \
 mysql_version_is_at_least "5.1.12" \
 && DEPEND="${DEPEND} >=dev-util/cmake-2.4.3"
 
+[[ "${PN}" == "mariadb" ]] \
+&& mysql_version_is_at_least "5.2" \
+&& DEPEND="${DEPEND} oqgraph? ( >=dev-libs/boost-1.40.0 )"
+#SphinxSE is included but is not available in 5.2.4 due to a missing plug.in file
+#	sphinx? ( app-misc/sphinx )"
+
 # dev-perl/DBD-mysql is needed by some scripts installed by MySQL
 PDEPEND="perl? ( >=dev-perl/DBD-mysql-2.9004 )"
 
@@ -240,6 +246,12 @@ mysql_version_is_at_least "5.1" \
 
 [[ "${PN}" == "mariadb" ]] \
 && IUSE="${IUSE} libevent"
+
+[[ "${PN}" == "mariadb" ]] \
+&& mysql_version_is_at_least "5.2" \
+&& IUSE="${IUSE} oqgraph"
+#SphinxSE is included but is not available in 5.2.4 due to a missing plug.in file
+#&& IUSE="${IUSE} oqgraph sphinx"
 
 # MariaDB has integrated PBXT
 # PBXT_VERSION means that we have a PBXT patch for this PV
@@ -624,14 +636,15 @@ configure_51() {
 		# not added yet: ibmdb2i
 		# Not supporting as examples: example,daemon_example,ftexample 
 		plugins_sta="${plugins_sta} partition"
-		plugins_dyn="${plugins_sta} federated"
 
 		if [[ "${PN}" != "mariadb" ]] ; then
 			elog "Before using the Federated storage engine, please be sure to read"
 			elog "http://dev.mysql.com/doc/refman/5.1/en/federated-limitations.html"
+			plugins_dyn="${plugins_sta} federatedx"
 		else
 			elog "MariaDB includes the FederatedX engine. Be sure to read"
 			elog "http://askmonty.org/wiki/index.php/Manual:FederatedX_storage_engine"
+			plugins_dyn="${plugins_sta} federated"
 		fi
 	else
 		plugins_dis="${plugins_dis} partition federated"
@@ -659,9 +672,13 @@ configure_51() {
 	if [[ "${PN}" == "mariadb" ]] ; then
 		# In MariaDB, InnoDB is packaged in the xtradb directory, so it's not
 		# caught above.
+		# This is not optional, without it several upstream testcases fail.
+		# Also strongly recommended by upstream.
 		if [[ "${PV}" < "5.2.0" ]] ; then
+			myconf="${myconf} --with-maria-tmp-tables"
 			plugins_sta="${plugins_sta} maria"
 		else
+			myconf="${myconf} --with-aria-tmp-tables"
 			plugins_sta="${plugins_sta} aria"
 		fi
 
@@ -673,9 +690,16 @@ configure_51() {
 		done
 
 		myconf="${myconf} $(use_with libevent)"
-		# This is not optional, without it several upstream testcases fail.
-		# Also strongly recommended by upstream.
-		myconf="${myconf} --with-maria-tmp-tables"
+
+		if mysql_version_is_at_least "5.2" ; then
+			#This should include sphinx, but the 5.2.4 archive forgot the plug.in file
+			#for i in oqgraph sphinx ; do
+			for i in oqgraph ; do
+				use ${i} \
+				&& plugins_dyn="${plugins_dyn} ${i}" \
+				|| plugins_dis="${plugins_dis} ${i}"
+			done
+		fi
 	fi
 
 	if pbxt_available && [[ "${PBXT_NEWSTYLE}" == "1" ]]; then
