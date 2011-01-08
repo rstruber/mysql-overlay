@@ -18,5 +18,4 @@ RDEPEND="|| (
 	=dev-db/mysql-${PV}*[embedded=,static=]
 	=dev-db/mariadb-${PV}*[embedded=,static=]
 	=dev-db/mysql-cluster-7*[embedded=,static=]
-	=dev-db/mysql-community-${PV}*[embedded=,static=]
 )"
