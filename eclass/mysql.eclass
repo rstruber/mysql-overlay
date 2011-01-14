@@ -145,6 +145,10 @@ RDEPEND="${DEPEND}
 		!minimal? ( dev-db/mysql-init-scripts )
 		selinux? ( sec-policy/selinux-mysql )"
 
+if [ "${EAPI:-0}" = "2" ]; then
+	DEPEND="${DEPEND} static? ( sys-libs/ncurses[static-libs] )"
+fi
+
 # compile-time-only
 mysql_version_is_at_least "5.1" \
 || DEPEND="${DEPEND} berkdb? ( sys-apps/ed )"
@@ -634,17 +638,17 @@ configure_51() {
 	if use extraengine ; then
 		# like configuration=max-no-ndb, archive and example removed in 5.1.11
 		# not added yet: ibmdb2i
-		# Not supporting as examples: example,daemon_example,ftexample 
+		# Not supporting as examples: example,daemon_example,ftexample
 		plugins_sta="${plugins_sta} partition"
 
 		if [[ "${PN}" != "mariadb" ]] ; then
 			elog "Before using the Federated storage engine, please be sure to read"
 			elog "http://dev.mysql.com/doc/refman/5.1/en/federated-limitations.html"
-			plugins_dyn="${plugins_sta} federatedx"
+			plugins_dyn="${plugins_sta} federated"
 		else
 			elog "MariaDB includes the FederatedX engine. Be sure to read"
 			elog "http://askmonty.org/wiki/index.php/Manual:FederatedX_storage_engine"
-			plugins_dyn="${plugins_sta} federated"
+			plugins_dyn="${plugins_sta} federatedx"
 		fi
 	else
 		plugins_dis="${plugins_dis} partition federated"
@@ -777,6 +781,15 @@ mysql_pkg_setup() {
 		fi
 	fi
 
+	# bug 350844
+	case "${EAPI:-0}" in
+		0 | 1)
+			if use static && !built_with_use sys-libs/ncurses static-libs; then
+				die "To build MySQL statically you need to enable static-libs for sys-libs/ncurses"
+			fi
+			;;
+	esac
+
 	# Check for USE flag problems in pkg_setup
 	if use static && use ssl ; then
 		M="MySQL does not support being built statically with SSL support enabled!"
@@ -822,7 +835,7 @@ mysql_pkg_setup() {
 	if mysql_version_is_at_least "5.0.83"  && ! mysql_version_is_at_least 5.0.87 ; then
 		GCC_VER=$(gcc-version)
 		case ${GCC_VER} in
-			2*|3*|4.0|4.1|4.2) 
+			2*|3*|4.0|4.1|4.2)
 			eerror "Some releases of MySQL required a very new GCC, and then"
 			eerror "later release relaxed that requirement again. Either pick a"
 			eerror "MySQL >=5.0.87, or use a newer GCC."
