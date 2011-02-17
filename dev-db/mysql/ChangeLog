@@ -1,6 +1,13 @@
 # ChangeLog for dev-db/mysql
-# Copyright 1999-2010 Gentoo Foundation; Distributed under the GPL v2
+# Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
+
+*mysql-5.0.92 (17 Feb 2011)
+
+  17 Feb 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  +mysql-5.0.92.ebuild:
+  Bumped mysql to the 5.0.92 release.
+  This version is still breaking on a missing #endif at sql/sql_parse.cc.
 
   28 Nov 2010; Robin H. Johnson <robbat2@gentoo.org> mysql-5.1.53-r1.ebuild:
   Add ~mips per main tree.
