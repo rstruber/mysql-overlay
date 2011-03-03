@@ -1315,7 +1315,6 @@ mysql_pkg_config() {
 
 	local pwd1="a"
 	local pwd2="b"
-	local MYSQL_ROOT_PASSWORD=''
 	local maxtry=15
 
 	if [ -z "${MYSQL_ROOT_PASSWORD}" -a -f "${ROOT}/root/.my.cnf" ]; then
@@ -1335,8 +1334,8 @@ mysql_pkg_config() {
 
 	if [ -z "${MYSQL_ROOT_PASSWORD}" ]; then
 
-		einfo "Please provide a password for the mysql 'root' user now,"
-		einfo "or in the MYSQL_ROOT_PASSWORD env var."
+		einfo "Please provide a password for the mysql 'root' user now, in the"
+		einfo "MYSQL_ROOT_PASSWORD env var or through the /root/.my.cnf file."
 		ewarn "Avoid [\"'\\_%] characters in the password"
 		read -rsp "    >" pwd1 ; echo
 
