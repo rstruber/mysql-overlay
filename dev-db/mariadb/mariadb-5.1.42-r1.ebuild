@@ -1,4 +1,4 @@
-# Copyright 1999-2010 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.84-r1.ebuild,v 1.7 2009/11/09 18:00:20 fauli Exp $
 
@@ -25,7 +25,7 @@ RDEPEND="!media-sound/amarok[embedded]"
 # Official test instructions:
 # USE='berkdb -cluster embedded extraengine perl ssl community' \
 # FEATURES='test userpriv -usersandbox' \
-# ebuild mysql-X.X.XX.ebuild \
+# ebuild mariadb-X.X.XX.ebuild \
 # digest clean package
 src_test() {
 	# Bug #213475 - MySQL _will_ object strenously if your machine is named
