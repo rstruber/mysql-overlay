@@ -389,23 +389,23 @@ mysql-cmake_src_install() {
 	newins "${TMPDIR}/my.cnf.ok" my.cnf
 
 	# Minimal builds don't have the MySQL server
-#	if ! use minimal ; then
-#		einfo "Creating initial directories"
+	if ! use minimal ; then
+		einfo "Creating initial directories"
 		# Empty directories ...
-#		diropts "-m0750"
-#		if [[ "${PREVIOUS_DATADIR}" != "yes" ]] ; then
-#			dodir "${MY_DATADIR}"
-#			keepdir "${MY_DATADIR}"
-#			chown -R mysql:mysql "${D}/${MY_DATADIR}"
-#		fi
-#
-#		diropts "-m0755"
-#		for folder in "${MY_LOGDIR}" "/var/run/mysqld" ; do
-#			dodir "${folder}"
-#			keepdir "${folder}"
-#			chown -R mysql:mysql "${D}/${folder}"
-#		done
-#	fi
+		diropts "-m0750"
+		if [[ "${PREVIOUS_DATADIR}" != "yes" ]] ; then
+			dodir "${MY_DATADIR}"
+			keepdir "${MY_DATADIR}"
+			chown -R mysql:mysql "${D}/${MY_DATADIR}"
+		fi
+
+		diropts "-m0755"
+		for folder in "${MY_LOGDIR}" "/var/run/mysqld" ; do
+			dodir "${folder}"
+			keepdir "${folder}"
+			chown -R mysql:mysql "${D}/${folder}"
+		done
+	fi
 
 	# Docs
 #	einfo "Installing docs"
