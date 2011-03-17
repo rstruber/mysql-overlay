@@ -2,6 +2,14 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mysql-5.5.10 (17 Mar 2011)
+
+  17 Mar 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  +mysql-5.5.10.ebuild:
+  Introduce new eclasses and update mysql_fx.eclass to support the cmake based
+  mysql-5.5 ebuilds.
+  Add initial support for mysql-5.5.10 - this is still a work in progress.
+
 *mysql-5.0.92 (17 Feb 2011)
 
   17 Feb 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
