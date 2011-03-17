@@ -1,6 +1,6 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.156 2010/11/28 21:55:54 robbat2 Exp $
+# $Header: $
 
 # @ECLASS: mysql.cmake.eclass
 # @MAINTAINER:
@@ -122,7 +122,6 @@ configure_cmake_standard() {
 		-DMYSQL_USER=mysql
 		-DMYSQL_UNIX_ADDR=/var/run/mysqld/mysqld.sock
 		-DWITHOUT_READLINE=1
-		-DWITH_SSL=system
 		-DWITH_ZLIB=system
 		-DWITHOUT_LIBWRAP=1
 	)
@@ -139,11 +138,14 @@ configure_cmake_standard() {
 		$(cmake-utils_use_with profiling)
 	)
 
+	if use ssl; then
+		mycmakeargs+=( -DWITH_SSL=system )
+	else
+		mycmakeargs+=( -DWITH_SSL=0 )
+	fi
 }
 
 configure_51() {
-
-	myconf="${myconf} $(use_with ssl ssl /usr)"
 
 	# This is an explict die here, because if we just forcibly disable it, then the
 	# user's data is not accessible.

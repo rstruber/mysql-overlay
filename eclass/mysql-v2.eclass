@@ -1,6 +1,6 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.156 2010/11/28 21:55:54 robbat2 Exp $
+# $Header: $
 
 # @ECLASS: mysql.eclass
 # @MAINTAINER:
@@ -181,34 +181,27 @@ SLOT="0"
 
 case "${BUILD}" in
 	"autotools")
-		IUSE="big-tables debug embedded minimal ${IUSE_DEFAULT_ON}perl selinux ssl static test"
+		IUSE="big-tables debug embedded minimal +perl selinux ssl static test"
 		;;
 	"cmake")
-		IUSE="debug embedded minimal ${IUSE_DEFAULT_ON}perl selinux ssl static test"
+		IUSE="debug embedded minimal +perl selinux ssl static test"
 		;;
 esac
 
-mysql_version_is_at_least "4.1" \
-&& IUSE="${IUSE} latin1"
+IUSE="${IUSE} latin1"
 
-if mysql_version_is_at_least "4.1.3" ; then
-	IUSE="${IUSE} extraengine"
-	if [[ "${PN}" != "mysql-cluster" ]] ; then
-		IUSE="${IUSE} cluster"
-	fi
+IUSE="${IUSE} extraengine"
+if [[ "${PN}" != "mysql-cluster" ]] ; then
+	IUSE="${IUSE} cluster"
 fi
-
-mysql_version_is_at_least "5.0" \
-|| IUSE="${IUSE} raid"
 
 mysql_version_is_at_least "5.0.18" \
 && IUSE="${IUSE} max-idx-128"
 
-mysql_version_is_at_least "5.1" \
-|| IUSE="${IUSE} berkdb"
+IUSE="${IUSE} berkdb"
 
 [ "${MYSQL_COMMUNITY_FEATURES}" == "1" ] \
-&& IUSE="${IUSE} ${IUSE_DEFAULT_ON}community profiling"
+&& IUSE="${IUSE} +community profiling"
 
 [[ "${PN}" == "mariadb" ]] \
 && IUSE="${IUSE} libevent"
@@ -248,10 +241,6 @@ RDEPEND="${DEPEND}
 	!minimal? ( dev-db/mysql-init-scripts )
 	selinux? ( sec-policy/selinux-mysql )
 "
-
-# compile-time-only
-mysql_version_is_at_least "5.1" \
-|| DEPEND="${DEPEND} berkdb? ( sys-apps/ed )"
 
 # compile-time-only
 mysql_version_is_at_least "5.1.12" \
@@ -387,14 +376,6 @@ mysql-v2_pkg_setup() {
 	   die "Bug #344885: Upstream has broken USE=debug for 5.1 series >=5.1.51"
 	fi
 
-	if ! mysql_version_is_at_least "5.0" \
-	&& use raid \
-	&& use static ; then
-		eerror "USE flags 'raid' and 'static' conflict, you cannot build MySQL statically"
-		eerror "with RAID support enabled."
-		die "USE flags 'raid' and 'static' conflict!"
-	fi
-
 	if mysql_version_is_at_least "4.1.3" \
 	&& ( use cluster || use extraengine || use embedded ) \
 	&& use minimal ; then
@@ -412,27 +393,9 @@ mysql-v2_pkg_setup() {
 		die "${M}"
 	fi
 
-	# Bug #290570, 284946, 307251
-	# Upstream changes made us need a fairly new GCC4.
-	# But only for 5.0.8[3-6]!
-	if mysql_version_is_at_least "5.0.83"  && ! mysql_version_is_at_least 5.0.87 ; then
-		GCC_VER=$(gcc-version)
-		case ${GCC_VER} in
-			2*|3*|4.0|4.1|4.2)
-			eerror "Some releases of MySQL required a very new GCC, and then"
-			eerror "later release relaxed that requirement again. Either pick a"
-			eerror "MySQL >=5.0.87, or use a newer GCC."
-			die "Active GCC too old!" ;;
-		esac
-	fi
-
 	# This should come after all of the die statements
 	enewgroup mysql 60 || die "problem adding 'mysql' group"
 	enewuser mysql 60 -1 /dev/null mysql || die "problem adding 'mysql' user"
-
-	mysql_check_version_range "4.0 to 5.0.99.99" \
-	&& use berkdb \
-	&& elog "Berkeley DB support is deprecated and will be removed in future versions!"
 
 	if [ "${PN}" != "mysql-cluster" ] && use cluster; then
 		ewarn "Upstream has noted that the NDB cluster support in the 5.0 and"
