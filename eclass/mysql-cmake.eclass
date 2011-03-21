@@ -22,7 +22,7 @@ inherit cmake-utils
 # @FUNCTION: mysql_cmake_disable_test
 # @DESCRIPTION:
 # Helper function to disable specific tests.
-mysql_cmake_disable_test() {
+mysql-cmake_disable_test() {
 
 	local rawtestname testname testsuite reason mysql_disable_file
 	rawtestname="${1}" ; shift
@@ -250,6 +250,8 @@ configure_51() {
 # Apply patches to the source code and remove unneeded bundled libs.
 mysql-cmake_src_prepare() {
 
+	debug-print-function ${FUNCNAME} "$@"
+
 	cd "${S}"
 
 	# Apply the patches for this MySQL version
@@ -274,6 +276,8 @@ mysql-cmake_src_prepare() {
 # Configure mysql to build the code for Gentoo respecting the use flags.
 mysql-cmake_src_configure() {
 
+	debug-print-function ${FUNCNAME} "$@"
+
 	mycmakeargs=(
 		-DCMAKE_INSTALL_PREFIX=/usr
 		-DMYSQL_DATADIR=/var/lib/mysql
@@ -294,6 +298,7 @@ mysql-cmake_src_configure() {
 		-DINSTALL_SQLBENCHDIR=share/mysql
 		-DINSTALL_SUPPORTFILESDIR=/usr/share/mysql
 		-DWITH_COMMENT="Gentoo Linux ${PF}"
+		-DWITHOUT_UNIT_TESTS=1
 	)
 
 	configure_cmake_locale
@@ -323,6 +328,8 @@ mysql-cmake_src_configure() {
 # Compile the mysql code.
 mysql-cmake_src_compile() {
 
+	debug-print-function ${FUNCNAME} "$@"
+
 	cmake-utils_src_compile
 }
 
@@ -330,6 +337,8 @@ mysql-cmake_src_compile() {
 # @DESCRIPTION:
 # Install mysql.
 mysql-cmake_src_install() {
+
+	debug-print-function ${FUNCNAME} "$@"
 
 	# Make sure the vars are correctly initialized
 	mysql_init_vars

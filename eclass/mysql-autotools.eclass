@@ -24,7 +24,7 @@
 # @FUNCTION: mysql_disable_test
 # @DESCRIPTION:
 # Helper function to disable specific tests.
-disable_test() {
+mysql-autotools_disable_test() {
 
 	local rawtestname testname testsuite reason mysql_disable_file
 	rawtestname="${1}" ; shift

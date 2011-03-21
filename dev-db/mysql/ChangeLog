@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  21 Mar 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  mysql-5.5.10.ebuild:
+  A few more updates for mysql-5.5.10 including a reworked patch from upstream
+  ( http://lists.mysql.com/commits/102373 ) to build a shared libmysqld.
+
 *mysql-5.5.10 (17 Mar 2011)
 
   17 Mar 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
