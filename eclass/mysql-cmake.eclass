@@ -439,4 +439,6 @@ mysql-cmake_src_install() {
 #		done
 #
 #	fi
+
+	mysql_lib_symlinks "${D}"
 }
