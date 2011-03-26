@@ -2,8 +2,9 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.5.1_alpha_pre2.ebuild,v 1.8 2010/04/01 20:41:21 robbat2 Exp $
 
+EAPI="2"
+
 MY_EXTRAS_VER="live"
-EAPI=2
 MY_PV="${PV//_alpha_pre/-m}"
 MY_PV="${MY_PV//_/-}"
 
@@ -33,7 +34,9 @@ DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )"
 # digest clean package
 src_test() {
 
-	TESTDIR="${CMAKE_BUILD_DIR}/mysql-test"
+	local TESTDIR="${CMAKE_BUILD_DIR}/mysql-test"
+	local retstatus_unit
+	local retstatus_tests
 
 	# Bug #213475 - MySQL _will_ object strenously if your machine is named
 	# localhost. Also causes weird failures.
@@ -46,13 +49,42 @@ src_test() {
 		fi
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 
-		# Run CTest
+		einfo ">>> Test phase [test]: ${CATEGORY}/${PF}"
+		addpredict /this-dir-does-not-exist/t9.MYI
+
+		# Run CTest (test-units)
 		cmake-utils_src_test
+		retstatus_unit=$?
+		[[ $retstatus_unit -eq 0 ]] || eerror "test-unit failed"
+
+		# Ensure that parallel runs don't die
+		export MTR_BUILD_THREAD="$((${RANDOM} % 100))"
+
+		# create directories because mysqladmin might right out of order
+		mkdir -p "${S}"/mysql-test/var-{tests}{,/log}
 
 		# Run mysql tests
 		pushd "${TESTDIR}"
-		perl mysql-test-run.pl
+
+		# run mysql-test tests
+		perl mysql-test-run.pl --force --vardir="${S}/mysql-test/var-tests"
+		retstatus_tests=$?
+		[[ $retstatus_tests -eq 0 ]] || eerror "tests failed"
+		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
+
 		popd
+
+		# Cleanup is important for these testcases.
+		pkill -9 -f "${S}/ndb" 2>/dev/null
+		pkill -9 -f "${S}/sql" 2>/dev/null
+
+		failures=""
+		[[ $retstatus_unit -eq 0 ]] || failures="${failures} test-unit"
+		[[ $retstatus_tests -eq 0 ]] || failures="${failures} tests"
+		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
+
+		[[ -z "$failures" ]] || die "Test failures: $failures"
+		einfo "Tests successfully completed"
 
 	else
 

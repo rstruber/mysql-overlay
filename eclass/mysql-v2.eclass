@@ -26,7 +26,10 @@ else
 	WANT_AUTOMAKE="latest"
 fi
 
-inherit eutils flag-o-matic gnuconfig ${BUILD_INHERIT} mysql_fx versionator toolchain-funcs
+MYSQL_EXTRAS=""
+[[ "${MY_EXTRAS_VER}" == "live" ]] && MYSQL_EXTRAS="git"
+
+inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx versionator toolchain-funcs
 
 #
 # Supported EAPI versions and export functions
@@ -52,9 +55,7 @@ S="${WORKDIR}/mysql"
 if [[ "${MY_EXTRAS_VER}" == "live" ]]; then
 	EGIT_PROJECT=mysql-extras
 	EGIT_REPO_URI="git://git.overlays.gentoo.org/proj/mysql-extras.git"
-	inherit git
 fi
-
 
 # @ECLASS-VARIABLE: MYSQL_PV_MAJOR
 # @DESCRIPTION:
