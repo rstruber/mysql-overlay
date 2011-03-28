@@ -231,12 +231,14 @@ IUSE="${IUSE} berkdb"
 
 # Be warned, *DEPEND are version-dependant
 # These are used for both runtime and compiletime
-DEPEND="ssl? ( >=dev-libs/openssl-0.9.6d )
-		userland_GNU? ( sys-process/procps )
-		>=sys-apps/sed-4
-		>=sys-apps/texinfo-4.7-r1
-		>=sys-libs/readline-4.1
-		>=sys-libs/zlib-1.2.3"
+DEPEND="
+	ssl? ( >=dev-libs/openssl-0.9.6d )
+	userland_GNU? ( sys-process/procps )
+	>=sys-apps/sed-4
+	>=sys-apps/texinfo-4.7-r1
+	>=sys-libs/readline-4.1
+	>=sys-libs/zlib-1.2.3
+"
 
 [[ "${PN}" == "mariadb" ]] \
 && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
@@ -251,6 +253,8 @@ RDEPEND="${DEPEND}
 	!minimal? ( dev-db/mysql-init-scripts )
 	selinux? ( sec-policy/selinux-mysql )
 "
+
+DEPEND="${DEPEND} static? ( || ( sys-libs/ncurses[static-libs] <=sys-libs/ncurses-5.7-r3 ) )"
 
 # compile-time-only
 mysql_version_is_at_least "5.1.12" \
@@ -491,8 +495,8 @@ mysql-v2_pkg_postinst() {
 
 	# Secure the logfiles
 	touch "${ROOT}${MY_LOGDIR}"/mysql.{log,err}
-	chown root:mysql "${ROOT}${MY_LOGDIR}"/mysql*
-	chmod 0640 "${ROOT}${MY_LOGDIR}"/mysql*
+	chown mysql:mysql "${ROOT}${MY_LOGDIR}"/mysql*
+	chmod 0660 "${ROOT}${MY_LOGDIR}"/mysql*
 
 	# Minimal builds don't have the MySQL server
 	if ! use minimal ; then
