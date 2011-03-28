@@ -15,16 +15,25 @@
 # scr_install, pkg_preinst, pkg_postinst, pkg_config and pkg_postrm
 # phase hooks.
 
-if [[ "${PN}" == "mysql" ]]; then
-	BUILD="cmake"
-	BUILD_INHERIT="mysql-cmake"
-else
-	BUILD="autotools"
-	BUILD_INHERIT="mysql-autotools"
+# @ECLASS-VARIABLE: BUILD
+# @DESCRIPTION: Build type of the mysql version
+# The default value is autotools
+: ${BUILD:=autotools}
 
-	WANT_AUTOCONF="latest"
-	WANT_AUTOMAKE="latest"
-fi
+case ${BUILD} in
+	"cmake")
+		BUILD_INHERIT="mysql-cmake"
+		;;
+	"autotools")
+		BUILD_INHERIT="mysql-autotools"
+
+		WANT_AUTOCONF="latest"
+		WANT_AUTOMAKE="latest"
+		;;
+	*)
+		die "${BUILD} is not a valid build system for mysql"
+		;;
+esac
 
 MYSQL_EXTRAS=""
 [[ "${MY_EXTRAS_VER}" == "live" ]] && MYSQL_EXTRAS="git"

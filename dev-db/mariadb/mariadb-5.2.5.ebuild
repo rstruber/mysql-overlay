@@ -5,17 +5,21 @@
 MY_EXTRAS_VER="live"
 EAPI=2
 
-inherit toolchain-funcs mysql
+# Build system
+BUILD="autotools"
+
+inherit toolchain-funcs mysql-v2
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
 
 # REMEMBER: also update eclass/mysql*.eclass before committing!
-KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~amd64 ~s390 ~sh ~x86 ~sparc-fbsd ~x86-fbsd"
 
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
 EPATCH_EXCLUDE=''
 
 DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )"
+RDEPEND="${RDEPEND}"
 
 # Please do not add a naive src_unpack to this ebuild
 # If you want to add a single patch, copy the ebuild to an overlay

@@ -8,6 +8,9 @@ MY_EXTRAS_VER="live"
 MY_PV="${PV//_alpha_pre/-m}"
 MY_PV="${MY_PV//_/-}"
 
+# Build type
+BUILD="cmake"
+
 inherit toolchain-funcs mysql-v2
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
@@ -22,6 +25,7 @@ KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~spar
 EPATCH_EXCLUDE=''
 
 DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )"
+RDEPEND="${RDEPEND}"
 
 # Please do not add a naive src_unpack to this ebuild
 # If you want to add a single patch, copy the ebuild to an overlay

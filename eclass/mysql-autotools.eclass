@@ -17,6 +17,8 @@
 # scr_install, pkg_preinst, pkg_postinst, pkg_config and pkg_postrm
 # phase hooks.
 
+inherit autotools
+
 #
 # HELPER FUNCTIONS:
 #

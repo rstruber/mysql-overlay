@@ -2,23 +2,32 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.84-r1.ebuild,v 1.7 2009/11/09 18:00:20 fauli Exp $
 
-MY_EXTRAS_VER="live"
-EAPI=2
+EAPI="2"
 
-# Build system
+MY_EXTRAS_VER="live"
+# PBXT
+PBXT_VERSION='1.0.11-6-pre-ga'
+# XtraDB
+PERCONA_VER='5.1.45-10' XTRADB_VER='1.0.6-10'
+
+# Build type
 BUILD="autotools"
 
 inherit toolchain-funcs mysql-v2
+
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
 
 # REMEMBER: also update eclass/mysql*.eclass before committing!
-KEYWORDS="~alpha ~amd64 ~arm ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x64-macos ~x86-solaris"
 
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
+# This is often broken still
 EPATCH_EXCLUDE=''
 
-DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )"
+# Most of these are in the eclass
+DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )
+		>=sys-devel/libtool-2.2.10"
 RDEPEND="${RDEPEND}"
 
 # Please do not add a naive src_unpack to this ebuild
@@ -28,13 +37,13 @@ src_prepare() {
 	sed -i \
 		-e '/^noinst_PROGRAMS/s/basic-t//g' \
 		"${S}"/unittest/mytap/t/Makefile.am
-	mysql_src_prepare
+	mysql-v2_src_prepare
 }
 
 # Official test instructions:
 # USE='berkdb -cluster embedded extraengine perl ssl community' \
 # FEATURES='test userpriv -usersandbox' \
-# ebuild mariadb-X.X.XX.ebuild \
+# ebuild mysql-X.X.XX.ebuild \
 # digest clean package
 src_test() {
 	# Bug #213475 - MySQL _will_ object strenously if your machine is named
@@ -186,6 +195,32 @@ src_test() {
 				parts.part_supported_sql_func_ndb \
 				parts.partition_auto_increment_ndb ; do
 					mysql_disable_test $t "ndb not supported in mariadb"
+			done
+		fi
+
+		# This fail with XtraDB in place of normal InnoDB
+		# TODO: test if they are broken with the rest of the Percona patches
+		if xtradb_patch_available && use xtradb ; then
+			for t in main.innodb innodb.innodb_bug51378 \
+				main.information_schema_db main.mysqlshow \
+				main.innodb-autoinc main.innodb_bug21704 \
+				main.innodb_bug44369 main.innodb_bug46000 \
+				main.index_merge_innodb \
+				innodb.innodb innodb.innodb_misc1 innodb.innodb_bug52663 \
+				innodb.innodb-autoinc innodb.innodb-autoinc-44030 \
+				innodb.innodb_bug21704 innodb.innodb_bug44369 \
+				innodb.innodb_bug46000 innodb.innodb_bug48024 \
+				innodb.innodb_bug49164 innodb.innodb_bug51920 \
+				innodb.innodb_bug54044 \
+				; do
+					mysql_disable_test $t "tests broken in xtradb"
+			done
+		fi
+
+		# bug 332565
+		if ! use extraengine ; then
+			for t in main.range ; do
+				mysql_disable_test $t "Test $t requires USE=extraengine"
 			done
 		fi
 
