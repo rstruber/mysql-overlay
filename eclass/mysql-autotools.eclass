@@ -37,7 +37,7 @@ mysql-autotools_disable_test() {
 	testname="${rawtestname/*.}"
 	mysql_disable_file="${S}/mysql-test/t/disabled.def"
 	#einfo "rawtestname=${rawtestname} testname=${testname} testsuite=${testsuite}"
-	echo ${testname} : ${reason} >> "${mysql_disable_file}"
+	echo "${testname} : ${reason}" >> "${mysql_disable_file}"
 
 	# ${S}/mysql-tests/t/disabled.def
 	#
@@ -66,7 +66,7 @@ mysql-autotools_disable_test() {
 	fi
 }
 
-configure_minimal() {
+mysql-autotools_configure_minimal() {
 
 	# These are things we exclude from a minimal build, please
 	# note that the server actually does get built and installed,
@@ -95,7 +95,7 @@ configure_minimal() {
 	fi
 }
 
-configure_common() {
+mysql-autotools_configure_common() {
 
 	myconf="${myconf} $(use_with big-tables)"
 	myconf="${myconf} --enable-local-infile"
@@ -146,7 +146,7 @@ configure_common() {
 
 }
 
-configure_40_41_50() {
+mysql-autotools_configure_40_41_50() {
 
 	myconf="${myconf} $(use_with perl bench)"
 	myconf="${myconf} --enable-assembler"
@@ -225,7 +225,7 @@ configure_40_41_50() {
 	&& myconf="${myconf} --with-max-indexes=128"
 }
 
-configure_51() {
+mysql-autotools_configure_51() {
 
 	# TODO: !!!! readd --without-readline
 	# the failure depend upon config/ac-macros/readline.m4 checking into
@@ -539,13 +539,13 @@ mysql-autotools_src_configure() {
 	local myconf=""
 
 	if use minimal ; then
-		configure_minimal
+		mysql-autotools_configure_minimal
 	else
-		configure_common
+		mysql-autotools_configure_common
 		if mysql_version_is_at_least "5.1.10" ; then
-			configure_51
+			mysql-autotools_configure_51
 		else
-			configure_40_41_50
+			mysql-autotools_configure_40_41_50
 		fi
 	fi
 
