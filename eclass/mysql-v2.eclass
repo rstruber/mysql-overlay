@@ -341,18 +341,15 @@ xtradb_patch_available \
 # @DESCRIPTION:
 # Helper function to disable specific tests.
 mysql_disable_test() {
-
-	${BUILD_INHERIT}_disable_test
+	${BUILD_INHERIT}_disable_test "$@"
 }
 
 configure_minimal() {
-
-	${BUILD_INHERIT}_configure_minimal
+	${BUILD_INHERIT}_configure_minimal "$@"
 }
 
 configure_common() {
-
-	${BUILD_INHERIT}_configure_common
+	${BUILD_INHERIT}_configure_common "$@"
 }
 
 #
@@ -441,32 +438,28 @@ mysql-v2_src_unpack() {
 # @DESCRIPTION:
 # Apply patches to the source code and remove unneeded bundled libs.
 mysql-v2_src_prepare() {
-
-	${BUILD_INHERIT}_src_prepare
+	${BUILD_INHERIT}_src_prepare "$@"
 }
 
 # @FUNCTION: mysql-v2_src_configure
 # @DESCRIPTION:
 # Configure mysql to build the code for Gentoo respecting the use flags.
 mysql-v2_src_configure() {
-
-	${BUILD_INHERIT}_src_configure
+	${BUILD_INHERIT}_src_configure "$@"
 }
 
 # @FUNCTION: mysql-v2_src_compile
 # @DESCRIPTION:
 # Compile the mysql code.
 mysql-v2_src_compile() {
-
-	${BUILD_INHERIT}_src_compile
+	${BUILD_INHERIT}_src_compile "$@"
 }
 
 # @FUNCTION: mysql-v2_src_install
 # @DESCRIPTION:
 # Install mysql.
 mysql-v2_src_install() {
-
-	${BUILD_INHERIT}_src_install
+	${BUILD_INHERIT}_src_install "$@"
 }
 
 # @FUNCTION: mysql-v2_pkg_preinst
