@@ -591,6 +591,7 @@ mysql-autotools_src_configure() {
 		--enable-thread-safe-client \
 		--with-comment="Gentoo Linux ${PF}" \
 		--without-docs \
+		--with-LIBDIR="$(get_libdir)" \
 		${myconf} || die "econf failed"
 
 	# TODO: Move this before autoreconf !!!
