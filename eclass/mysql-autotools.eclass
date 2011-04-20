@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-# @ECLASS: mysql.eclass
+# @ECLASS: mysql-autotools.eclass
 # @MAINTAINER:
 # Author: Francesco Riosa (Retired) <vivo@gentoo.org>
 # Maintainers:
@@ -10,12 +10,12 @@
 #	- Robin H. Johnson <robbat2@gentoo.org>
 #	- Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
 #	- Luca Longinotti <chtekk@gentoo.org>
-# @BLURB: This eclass provides most of the functions for mysql ebuilds
+# @BLURB: This eclass provides support for autotools based mysql releases
 # @DESCRIPTION:
-# The mysql.eclass provides almost all the code to build the mysql ebuilds
-# including the src_unpack, src_prepare, src_configure, src_compile,
-# scr_install, pkg_preinst, pkg_postinst, pkg_config and pkg_postrm
-# phase hooks.
+# The mysql-autotools.eclass provides the support to build the mysql
+# ebuilds using the autotools build system. This eclass provides
+# the src_unpack, src_prepare, src_configure, src_compile, scr_install,
+# pkg_preinst, pkg_postinst, pkg_config and pkg_postrm phase hooks.
 
 inherit autotools
 
@@ -23,7 +23,7 @@ inherit autotools
 # HELPER FUNCTIONS:
 #
 
-# @FUNCTION: mysql_disable_test
+# @FUNCTION: mysql-autotools_disable_test
 # @DESCRIPTION:
 # Helper function to disable specific tests.
 mysql-autotools_disable_test() {
@@ -66,6 +66,9 @@ mysql-autotools_disable_test() {
 	fi
 }
 
+# @FUNCTION: mysql-autotools_configure_minimal
+# @DESCRIPTION:
+# Helper function to configure a minimal build
 mysql-autotools_configure_minimal() {
 
 	# These are things we exclude from a minimal build, please
@@ -95,6 +98,9 @@ mysql-autotools_configure_minimal() {
 	fi
 }
 
+# @FUNCTION: mysql-autotools_configure_common
+# @DESCRIPTION:
+# Helper function to configure the common builds
 mysql-autotools_configure_common() {
 
 	myconf="${myconf} $(use_with big-tables)"
@@ -146,6 +152,9 @@ mysql-autotools_configure_common() {
 
 }
 
+# @FUNCTION: mysql-autotools_configure_40_41_50
+# @DESCRIPTION:
+# Helper function to configure 4.0, 4.1 and 5.0 builds
 mysql-autotools_configure_40_41_50() {
 
 	myconf="${myconf} $(use_with perl bench)"
@@ -225,6 +234,9 @@ mysql-autotools_configure_40_41_50() {
 	&& myconf="${myconf} --with-max-indexes=128"
 }
 
+# @FUNCTION: mysql-autotools_configure_51
+# @DESCRIPTION:
+# Helper function to configure 5.1 and later builds
 mysql-autotools_configure_51() {
 
 	# TODO: !!!! readd --without-readline
