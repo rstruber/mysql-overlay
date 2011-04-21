@@ -2,16 +2,18 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-# @ECLASS: mysql.cmake.eclass
+# @ECLASS: mysql-cmake.eclass
 # @MAINTAINER:
 # Maintainers:
 #	- MySQL Team <mysql-bugs@gentoo.org>
 #	- Robin H. Johnson <robbat2@gentoo.org>
 #	- Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
-# @BLURB: This eclass provides the cmake supporting functions for mysql ebuilds
+# @BLURB: This eclass provides the support for cmake based mysql releases
 # @DESCRIPTION:
-# The mysql-cmake.eclass provides provides the cmake specific code
-# for mysql ebuilds.
+# The mysql-cmake.eclass provides the support to build the mysql
+# ebuilds using the cmake build system. This eclass provides
+# the src_unpack, src_prepare, src_configure, src_compile, scr_install,
+# pkg_preinst, pkg_postinst, pkg_config and pkg_postrm phase hooks.
 
 inherit cmake-utils
 
@@ -92,7 +94,7 @@ configure_cmake_locale() {
 
 # @FUNCTION: configure_cmake_minimal
 # @DESCRIPTION:
-# Helper function to configure minimal install
+# Helper function to configure minimal build
 configure_cmake_minimal() {
 
 	mycmakeargs+=(
@@ -113,7 +115,7 @@ configure_cmake_minimal() {
 
 # @FUNCTION: configure_cmake_standard
 # @DESCRIPTION:
-# Helper function to configure standard install
+# Helper function to configure standard build
 configure_cmake_standard() {
 
 	mycmakeargs+=(
@@ -145,6 +147,9 @@ configure_cmake_standard() {
 	fi
 }
 
+# @FUNCTION: configure_51
+# @DESCRIPTION:
+# Helper function to configure 5.1 and later builds
 configure_51() {
 
 	# This is an explict die here, because if we just forcibly disable it, then the

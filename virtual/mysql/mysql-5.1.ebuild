@@ -11,11 +11,11 @@ SRC_URI=""
 LICENSE=""
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x64-macos ~x86-solaris"
-IUSE="embedded static"
+IUSE="embedded minimal static"
 
 DEPEND=""
 RDEPEND="|| (
-	=dev-db/mysql-${PV}*[embedded=,static=]
-	=dev-db/mariadb-${PV}*[embedded=,static=]
-	=dev-db/mysql-cluster-7*[embedded=,static=]
+	=dev-db/mysql-${PV}*[embedded=,minimal=,static=]
+	=dev-db/mariadb-${PV}*[embedded=,minimal=,static=]
+	=dev-db/mysql-cluster-7*[embedded=,minimal=,static=]
 )"

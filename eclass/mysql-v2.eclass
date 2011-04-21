@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-# @ECLASS: mysql.eclass
+# @ECLASS: mysql-v2.eclass
 # @MAINTAINER:
 # Maintainers:
 #	- MySQL Team <mysql-bugs@gentoo.org>
@@ -10,8 +10,11 @@
 #	- Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
 # @BLURB: This eclass provides most of the functions for mysql ebuilds
 # @DESCRIPTION:
-# The mysql.eclass provides almost all the code to build the mysql ebuilds
-# including the src_unpack, src_prepare, src_configure, src_compile,
+# The mysql-v2.eclass is the base eclass to build the mysql and
+# alternative projects (mariadb) ebuilds.
+# This eclass uses the mysql-autotools and mysql-cmake eclasses for the
+# specific bits related to the build system.
+# It provides the src_unpack, src_prepare, src_configure, src_compile,
 # scr_install, pkg_preinst, pkg_postinst, pkg_config and pkg_postrm
 # phase hooks.
 
@@ -36,6 +39,9 @@ case ${BUILD} in
 esac
 
 MYSQL_EXTRAS=""
+
+# @ECLASS-VARIABLE: MYSQL_EXTRAS_VER
+# @DESCRIPTION: The version of the MYSQL_EXTRAS repo to use to build mysql
 [[ "${MY_EXTRAS_VER}" == "live" ]] && MYSQL_EXTRAS="git"
 
 inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx versionator toolchain-funcs
@@ -44,13 +50,12 @@ inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx 
 # Supported EAPI versions and export functions
 #
 
-MYSQL_EXPF="src_unpack src_compile src_install"
 case "${EAPI:-0}" in
-	2|3|4) MYSQL_EXPF+=" src_prepare src_configure" ;;
+	2|3|4) ;;
 	*) die "Unsupported EAPI: ${EAPI}" ;;
 esac
 
-EXPORT_FUNCTIONS ${MYSQL_EXPF}
+EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_install
 
 #
 # VARIABLES:
@@ -89,7 +94,6 @@ fi
 # depend on this variable.
 # In particular, the code below transforms a $PVR like "5.0.18-r3" in "5001803"
 # We also strip off upstream's trailing letter that they use to respin tarballs
-
 MYSQL_VERSION_ID=""
 tpv="${PV%[a-z]}"
 tpv=( ${tpv//[-._]/ } ) ; tpv[3]="${PVR:${#PV}}" ; tpv[3]="${tpv[3]##*-r}"
@@ -124,14 +128,12 @@ fi
 # @ECLASS-VARIABLE: XTRADB_VER
 # @DESCRIPTION:
 # Version of the XTRADB storage engine
-XTRADB_VER="${XTRADB_VER}"
-
+: ${XTRADB_VER:=}
 
 # @ECLASS-VARIABLE: PERCONA_VER
 # @DESCRIPTION:
 # Designation by PERCONA for a MySQL version to apply an XTRADB release
-PERCONA_VER="${PERCONA_VER}"
-
+: ${PERCONA_VER:=}
 
 # Work out the default SERVER_URI correctly
 if [ -z "${SERVER_URI}" ]; then
@@ -201,7 +203,7 @@ esac
 IUSE="${IUSE} latin1"
 
 IUSE="${IUSE} extraengine"
-if [[ "${PN}" != "mysql-cluster" ]] ; then
+if [[ ${PN} != "mysql-cluster" ]] ; then
 	IUSE="${IUSE} cluster"
 fi
 
@@ -210,17 +212,17 @@ mysql_version_is_at_least "5.0.18" \
 
 IUSE="${IUSE} berkdb"
 
-[ "${MYSQL_COMMUNITY_FEATURES}" == "1" ] \
+[[ ${MYSQL_COMMUNITY_FEATURES} == 1 ]] \
 && IUSE="${IUSE} +community profiling"
 
-[[ "${PN}" == "mariadb" ]] \
+[[ ${PN} == "mariadb" ]] \
 && IUSE="${IUSE} libevent"
 
-[[ "${PN}" == "mariadb" ]] \
+[[ ${PN} == "mariadb" ]] \
 && mysql_version_is_at_least "5.2" \
 && IUSE="${IUSE} oqgraph"
 
-[[ "${PN}" == "mariadb" ]] \
+[[ ${PN} == "mariadb" ]] \
 && mysql_version_is_at_least "5.2.5" \
 && IUSE="${IUSE} sphinx"
 
@@ -240,12 +242,12 @@ DEPEND="
 	>=sys-libs/zlib-1.2.3
 "
 
-[[ "${PN}" == "mariadb" ]] \
+[[ ${PN} == mariadb ]] \
 && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
 
 # Having different flavours at the same time is not a good idea
 for i in "mysql" "mysql-community" "mysql-cluster" "mariadb" ; do
-	[[ "${i}" == ${PN} ]] ||
+	[[ ${i} == ${PN} ]] ||
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
 
@@ -287,14 +289,14 @@ PDEPEND="${PDEPEND} =virtual/mysql-${MYSQL_PV_MAJOR}"
 # PBXT_VERSION means that we have a PBXT patch for this PV
 # PBXT was only introduced after 5.1.12
 pbxt_patch_available() {
-	[[ "${PN}" != "mariadb" ]] \
+	[[ ${PN} != "mariadb" ]] \
 	&& mysql_version_is_at_least "5.1.12" \
 	&& [[ -n "${PBXT_VERSION}" ]]
 	return $?
 }
 
 pbxt_available() {
-	pbxt_patch_available || [[ "${PN}" == "mariadb" ]]
+	pbxt_patch_available || [[ ${PN} == "mariadb" ]]
 	return $?
 }
 
@@ -303,51 +305,64 @@ pbxt_available() {
 # XTRADB_VERS means that we have a XTRADB patch for this PV
 # XTRADB was only introduced after 5.1.26
 xtradb_patch_available() {
-	[[ "${PN}" != "mariadb" ]] \
+	[[ ${PN} != "mariadb" ]] \
 	&& mysql_version_is_at_least "5.1.26" \
 	&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]]
 	return $?
 }
 
 
-pbxt_patch_available \
-&& PBXT_P="pbxt-${PBXT_VERSION}" \
-&& PBXT_SRC_URI="http://www.primebase.org/download/${PBXT_P}.tar.gz mirror://sourceforge/pbxt/${PBXT_P}.tar.gz" \
-&& SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )" \
+if pbxt_patch_available; then
 
-# PBXT_NEWSTYLE means pbxt is in storage/ and gets enabled as other plugins
-# vs. built outside the dir
-pbxt_available \
-&& IUSE="${IUSE} pbxt" \
-&& mysql_version_is_at_least "5.1.40" \
-&& PBXT_NEWSTYLE=1
+	PBXT_P="pbxt-${PBXT_VERSION}"
+	PBXT_SRC_URI="http://www.primebase.org/download/${PBXT_P}.tar.gz mirror://sourceforge/pbxt/${PBXT_P}.tar.gz"
+	SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )"
 
-xtradb_patch_available \
-&& XTRADB_P="percona-xtradb-${XTRADB_VER}" \
-&& XTRADB_SRC_URI_COMMON="${PERCONA_VER}/source/${XTRADB_P}.tar.gz" \
-&& XTRADB_SRC_B1="http://www.percona.com/" \
-&& XTRADB_SRC_B2="${XTRADB_SRC_B1}/percona-builds/" \
-&& XTRADB_SRC_URI1="${XTRADB_SRC_B2}/Percona-Server/Percona-Server-${XTRADB_SRC_URI_COMMON}" \
-&& XTRADB_SRC_URI2="${XTRADB_SRC_B2}/xtradb/${XTRADB_SRC_URI_COMMON}" \
-&& XTRADB_SRC_URI3="${XTRADB_SRC_B1}/${PN}/xtradb/${XTRADB_SRC_URI_COMMON}" \
-&& SRC_URI="${SRC_URI} xtradb? ( ${XTRADB_SRC_URI1} ${XTRADB_SRC_URI2} ${XTRADB_SRC_URI3} )" \
-&& IUSE="${IUSE} xtradb"
+	# PBXT_NEWSTYLE means pbxt is in storage/ and gets enabled as other plugins
+	# vs. built outside the dir
+	if pbxt_available; then
+
+		IUSE="${IUSE} pbxt"
+		if mysql_version_is_at_least "5.1.40"; then
+
+			PBXT_NEWSTYLE=1
+		fi
+	fi
+fi
+
+if xtradb_patch_available; then
+	XTRADB_P="percona-xtradb-${XTRADB_VER}"
+	XTRADB_SRC_URI_COMMON="${PERCONA_VER}/source/${XTRADB_P}.tar.gz"
+	XTRADB_SRC_B1="http://www.percona.com/"
+	XTRADB_SRC_B2="${XTRADB_SRC_B1}/percona-builds/"
+	XTRADB_SRC_URI1="${XTRADB_SRC_B2}/Percona-Server/Percona-Server-${XTRADB_SRC_URI_COMMON}"
+	XTRADB_SRC_URI2="${XTRADB_SRC_B2}/xtradb/${XTRADB_SRC_URI_COMMON}"
+	XTRADB_SRC_URI3="${XTRADB_SRC_B1}/${PN}/xtradb/${XTRADB_SRC_URI_COMMON}"
+	SRC_URI="${SRC_URI} xtradb? ( ${XTRADB_SRC_URI1} ${XTRADB_SRC_URI2} ${XTRADB_SRC_URI3} )"
+	IUSE="${IUSE} xtradb"
+fi
 
 #
 # HELPER FUNCTIONS:
 #
 
-# @FUNCTION: mysql_disable_test
+# @FUNCTION: mysql-v2_disable_test
 # @DESCRIPTION:
 # Helper function to disable specific tests.
 mysql_disable_test() {
 	${BUILD_INHERIT}_disable_test "$@"
 }
 
+# @FUNCTION: mysql-v2_configure_minimal
+# @DESCRIPTION:
+# Helper function to configure minimal build
 configure_minimal() {
 	${BUILD_INHERIT}_configure_minimal "$@"
 }
 
+# @FUNCTION: mysql-v2_configure_common
+# @DESCRIPTION:
+# Helper function to configure common builds
 configure_common() {
 	${BUILD_INHERIT}_configure_common "$@"
 }
@@ -421,7 +436,7 @@ mysql-v2_pkg_setup() {
 
 # @FUNCTION: mysql-v2_src_unpack
 # @DESCRIPTION:
-# Unpack the source code and call mysql_src_prepare for EAPI < 2.
+# Unpack the source code
 mysql-v2_src_unpack() {
 
 	# Initialize the proper variables first
