@@ -718,7 +718,9 @@ mysql-autotools_src_install() {
 
 	# Docs
 	einfo "Installing docs"
-	dodoc README ChangeLog EXCEPTIONS-CLIENT INSTALL-SOURCE
+	for i in README ChangeLog EXCEPTIONS-CLIENT INSTALL-SOURCE ; do
+		[[ -f "$i" ]] && dodoc "$i"
+	done
 	doinfo "${S}"/Docs/mysql.info
 
 	# Minimal builds don't have the MySQL server
