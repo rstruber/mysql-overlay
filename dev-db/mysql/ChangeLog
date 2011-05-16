@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  16 May 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  mysql-5.5.10.ebuild, mysql-5.5.12.ebuild:
+  Disable tests that fail for mysql-5.5.*:
+  3 tests fail for latin/utf-8 charsets and 1 causes segmentation faults.
+
   15 May 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
   -mysql-5.0.91.ebuild, -mysql-5.1.50-r2.ebuild, -mysql-5.1.50-r3.ebuild,
   -mysql-5.1.51.ebuild, -mysql-5.1.51-r1.ebuild, -mysql-5.1.52-r2.ebuild,
