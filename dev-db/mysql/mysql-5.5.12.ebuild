@@ -84,7 +84,7 @@ src_test() {
 		# main.flush_read_lock_kill
 		# fails because of unknown system variable 'DEBUG_SYNC'
 		for t in main.mysql_client_test \
-			binlog_statement_insert_delayed.reject main.information_schema \
+			binlog.binlog_statement_insert_delayed main.information_schema \
 			main.mysqld--help-notwin; do
 				mysql_disable_test  "$t" "False positives in Gentoo"
 		done

@@ -4,6 +4,10 @@
 
   16 May 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
   mysql-5.5.10.ebuild, mysql-5.5.12.ebuild:
+  Really disable binlog.binlog_statement_insert_delayed test. 
+
+  16 May 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  mysql-5.5.10.ebuild, mysql-5.5.12.ebuild:
   Disable tests that fail for mysql-5.5.*:
   3 tests fail for latin/utf-8 charsets and 1 causes segmentation faults.
 
