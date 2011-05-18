@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  18 May 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  mysql-5.1.57.ebuild:
+  Update mysql-v2 eclass to use the git-2 eclass.
+  Update the mysql-5.1.57 ebuild to use the mysql-v2 eclass.
+
   16 May 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
   mysql-5.5.10.ebuild, mysql-5.5.12.ebuild:
   Really disable binlog.binlog_statement_insert_delayed test. 

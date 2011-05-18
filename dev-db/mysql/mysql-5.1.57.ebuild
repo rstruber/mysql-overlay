@@ -13,7 +13,7 @@ PERCONA_VER='5.1.45-10' XTRADB_VER='1.0.6-10'
 # Build type
 BUILD="autotools"
 
-inherit toolchain-funcs mysql
+inherit toolchain-funcs mysql-v2
 
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
