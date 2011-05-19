@@ -42,7 +42,7 @@ MYSQL_EXTRAS=""
 
 # @ECLASS-VARIABLE: MYSQL_EXTRAS_VER
 # @DESCRIPTION: The version of the MYSQL_EXTRAS repo to use to build mysql
-[[ "${MY_EXTRAS_VER}" == "live" ]] && MYSQL_EXTRAS="git"
+[[ "${MY_EXTRAS_VER}" == "live" ]] && MYSQL_EXTRAS="git-2"
 
 inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx versionator toolchain-funcs
 
@@ -444,7 +444,7 @@ mysql-v2_src_unpack() {
 
 	unpack ${A}
 	# Grab the patches
-	[[ "${MY_EXTRAS_VER}" == "live" ]] && S="${WORKDIR}/mysql-extras" git_src_unpack
+	[[ "${MY_EXTRAS_VER}" == "live" ]] && S="${WORKDIR}/mysql-extras" git-2_src_unpack
 
 	mv -f "${WORKDIR}/${MY_SOURCEDIR}" "${S}"
 }

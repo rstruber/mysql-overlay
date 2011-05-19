@@ -28,7 +28,7 @@ S="${WORKDIR}/mysql"
 if [[ "${MY_EXTRAS_VER}" == "live" ]]; then
 	EGIT_PROJECT=mysql-extras
 	EGIT_REPO_URI="git://git.overlays.gentoo.org/proj/mysql-extras.git"
-	inherit git
+	inherit git-2
 fi
 
 case "${EAPI:-0}" in
