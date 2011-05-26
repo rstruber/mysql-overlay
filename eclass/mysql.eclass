@@ -708,7 +708,7 @@ configure_51() {
 
 	if pbxt_available && [[ "${PBXT_NEWSTYLE}" == "1" ]]; then
 		use pbxt \
-		&& plugins_dyn="${plugins_dyn} pbxt" \
+		&& plugins_sta="${plugins_sta} pbxt" \
 		|| plugins_dis="${plugins_dis} pbxt"
 	fi
 
