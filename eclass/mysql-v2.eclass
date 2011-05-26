@@ -318,15 +318,17 @@ if pbxt_patch_available; then
 	PBXT_SRC_URI="http://www.primebase.org/download/${PBXT_P}.tar.gz mirror://sourceforge/pbxt/${PBXT_P}.tar.gz"
 	SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )"
 
-	# PBXT_NEWSTYLE means pbxt is in storage/ and gets enabled as other plugins
-	# vs. built outside the dir
-	if pbxt_available; then
+fi
+# PBXT_NEWSTYLE means pbxt is in storage/ and gets enabled as other plugins
+# vs. built outside the dir
+if pbxt_available; then
 
-		IUSE="${IUSE} pbxt"
-		if mysql_version_is_at_least "5.1.40"; then
+	IUSE="${IUSE} pbxt"
 
-			PBXT_NEWSTYLE=1
-		fi
+	if mysql_version_is_at_least "5.1.40"; then
+
+		PBXT_NEWSTYLE=1
+
 	fi
 fi
 
