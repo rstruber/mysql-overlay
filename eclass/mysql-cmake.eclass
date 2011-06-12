@@ -49,6 +49,7 @@ mysql-cmake_disable_test() {
 	# ${S}/mysql-tests/suite/ndb_team/t/disabled.def
 	# ${S}/mysql-tests/suite/binlog/t/disabled.def
 	# ${S}/mysql-tests/suite/innodb/t/disabled.def
+
 	if [ -n "${testsuite}" ]; then
 		for mysql_disable_file in \
 			${S}/mysql-test/suite/${testsuite}/disabled.def  \
@@ -361,6 +362,7 @@ mysql-cmake_src_install() {
 
 	# Various junk (my-*.cnf moved elsewhere)
 	einfo "Removing duplicate /usr/share/mysql files"
+
 #	rm -Rf "${D}/usr/share/info"
 #	for removeme in  "mysql-log-rotate" mysql.server* \
 #		binary-configure* my-*.cnf mi_test_all*

@@ -126,14 +126,14 @@ fi
 
 
 # @ECLASS-VARIABLE: XTRADB_VER
+# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Version of the XTRADB storage engine
-: ${XTRADB_VER:=}
 
 # @ECLASS-VARIABLE: PERCONA_VER
+# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Designation by PERCONA for a MySQL version to apply an XTRADB release
-: ${PERCONA_VER:=}
 
 # Work out the default SERVER_URI correctly
 if [ -z "${SERVER_URI}" ]; then
