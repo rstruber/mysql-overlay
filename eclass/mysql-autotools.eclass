@@ -89,7 +89,7 @@ mysql-autotools_configure_minimal() {
 		myconf="${myconf} --enable-shared --enable-static"
 	fi
 
-	if mysql_version_is_at_least "4.1" && ! use latin1 ; then
+	if ! use latin1 ; then
 		myconf="${myconf} --with-charset=utf8"
 		myconf="${myconf} --with-collation=utf8_general_ci"
 	else
@@ -123,9 +123,9 @@ mysql-autotools_configure_common() {
 		myconf="${myconf} --with-debug=full"
 	else
 		myconf="${myconf} --without-debug"
-		mysql_version_is_at_least "4.1.3" \
-		&& ( use cluster || [[ "${PN}" == "mysql-cluster" ]] ) \
-		&& myconf="${myconf} --without-ndb-debug"
+		if ( use cluster || [[ "${PN}" == "mysql-cluster" ]] ); then
+			myconf="${myconf} --without-ndb-debug"
+		fi
 	fi
 
 	if [ -n "${MYSQL_DEFAULT_CHARSET}" -a -n "${MYSQL_DEFAULT_COLLATION}" ]; then
@@ -134,7 +134,7 @@ mysql-autotools_configure_common() {
 		ewarn "You MUST file bugs without these variables set."
 		myconf="${myconf} --with-charset=${MYSQL_DEFAULT_CHARSET}"
 		myconf="${myconf} --with-collation=${MYSQL_DEFAULT_COLLATION}"
-	elif mysql_version_is_at_least "4.1" && ! use latin1 ; then
+	elif ! use latin1 ; then
 		myconf="${myconf} --with-charset=utf8"
 		myconf="${myconf} --with-collation=utf8_general_ci"
 	else
@@ -150,88 +150,6 @@ mysql-autotools_configure_common() {
 		myconf="${myconf} --without-embedded-server"
 	fi
 
-}
-
-# @FUNCTION: mysql-autotools_configure_40_41_50
-# @DESCRIPTION:
-# Helper function to configure 4.0, 4.1 and 5.0 builds
-mysql-autotools_configure_40_41_50() {
-
-	myconf="${myconf} $(use_with perl bench)"
-	myconf="${myconf} --enable-assembler"
-	myconf="${myconf} --with-extra-tools"
-	myconf="${myconf} --with-innodb"
-	myconf="${myconf} --without-readline"
-	myconf="${myconf} $(use_with ssl openssl)"
-	mysql_version_is_at_least "5.0" || myconf="${myconf} $(use_with raid)"
-
-	# --with-vio is not needed anymore, it's on by default and
-	# has been removed from configure
-	#  Apply to 4.x and 5.0.[0-3]
-	if use ssl ; then
-		 mysql_version_is_at_least "5.0.4" || myconf="${myconf} --with-vio"
-	fi
-
-	if mysql_version_is_at_least "5.0.60" ; then
-			if use berkdb ; then
-				elog "Berkeley DB support was disabled due to build failures"
-				elog "on multiple arches, go to a version earlier than 5.0.60"
-				elog "if you want it again. Gentoo bug #224067."
-			fi
-			myconf="${myconf} --without-berkeley-db"
-	elif use berkdb ; then
-		# The following fix is due to a bug with bdb on SPARC's. See:
-		# http://www.geocrawler.com/mail/msg.php3?msg_id=4754814&list=8
-		# It comes down to non-64-bit safety problems.
-		if use alpha || use amd64 || use hppa || use mips || use sparc ; then
-			elog "Berkeley DB support was disabled due to compatibility issues on this arch"
-			myconf="${myconf} --without-berkeley-db"
-		else
-			myconf="${myconf} --with-berkeley-db=./bdb"
-		fi
-	else
-		myconf="${myconf} --without-berkeley-db"
-	fi
-
-	if mysql_version_is_at_least "4.1.3" ; then
-		myconf="${myconf} --with-geometry"
-		if [[ "${PN}" != "mysql-cluster" ]] ; then
-			myconf="${myconf} $(use_with cluster ndbcluster)"
-		fi
-	fi
-
-	if mysql_version_is_at_least "4.1.3" && use extraengine ; then
-		# http://dev.mysql.com/doc/mysql/en/archive-storage-engine.html
-		myconf="${myconf} --with-archive-storage-engine"
-
-		# http://dev.mysql.com/doc/mysql/en/csv-storage-engine.html
-		myconf="${myconf} --with-csv-storage-engine"
-
-		# http://dev.mysql.com/doc/mysql/en/blackhole-storage-engine.html
-		myconf="${myconf} --with-blackhole-storage-engine"
-
-		# http://dev.mysql.com/doc/mysql/en/federated-storage-engine.html
-		# http://dev.mysql.com/doc/mysql/en/federated-description.html
-		# http://dev.mysql.com/doc/mysql/en/federated-limitations.html
-		if mysql_version_is_at_least "5.0.3" ; then
-			elog "Before using the Federated storage engine, please be sure to read"
-			elog "http://dev.mysql.com/doc/mysql/en/federated-limitations.html"
-			myconf="${myconf} --with-federated-storage-engine"
-		fi
-	fi
-
-	if [ "${MYSQL_COMMUNITY_FEATURES}" == "1" ]; then
-		myconf="${myconf} `use_enable community community-features`"
-		if use community; then
-			myconf="${myconf} `use_enable profiling`"
-		else
-			myconf="${myconf} --disable-profiling"
-		fi
-	fi
-
-	mysql_version_is_at_least "5.0.18" \
-	&& use max-idx-128 \
-	&& myconf="${myconf} --with-max-indexes=128"
 }
 
 # @FUNCTION: mysql-autotools_configure_51
@@ -276,7 +194,7 @@ mysql-autotools_configure_51() {
 	| xargs -0 sed -r -n \
 		-e '/^MYSQL_STORAGE_ENGINE/{
 			s~MYSQL_STORAGE_ENGINE\([[:space:]]*\[?([-_a-z0-9]+)\]?.*,~\1 ~g ;
-			s~^([^ ]+).*~\1~gp; 
+			s~^([^ ]+).*~\1~gp;
 		}' \
 	| tr -s '\n' ' '
 	)"
@@ -291,10 +209,6 @@ mysql-autotools_configure_51() {
 	# These aren't actually required by the base set, but are really useful:
 	plugins_sta="${plugins_sta} archive blackhole"
 
-	# default in 5.5.4
-	if mysql_version_is_at_least "5.5.4" ; then
-		plugins_sta="${plugins_sta} partition"
-	fi
 	# Now the extras
 	if use extraengine ; then
 		# like configuration=max-no-ndb, archive and example removed in 5.1.11
@@ -464,16 +378,14 @@ mysql-autotools_src_prepare() {
 	find . -name 'Makefile.am' \
 		-exec sed --in-place -e 's!$(pkgdatadir)!'${MY_SHAREDSTATEDIR}'!g' {} \;
 
-	if mysql_version_is_at_least "4.1" ; then
-		# Remove what needs to be recreated, so we're sure it's actually done
-		einfo "Cleaning up old buildscript files"
-		find . -name Makefile \
-			-o -name Makefile.in \
-			-o -name configure \
-			-exec rm -f {} \;
-		rm -f "ltmain.sh"
-		rm -f "scripts/mysqlbug"
-	fi
+	# Remove what needs to be recreated, so we're sure it's actually done
+	einfo "Cleaning up old buildscript files"
+	find . -name Makefile \
+		-o -name Makefile.in \
+		-o -name configure \
+		-exec rm -f {} \;
+	rm -f "ltmain.sh"
+	rm -f "scripts/mysqlbug"
 
 	local rebuilddirlist d
 
@@ -499,18 +411,14 @@ mysql-autotools_src_prepare() {
 		popd >/dev/null
 	fi
 
-	if mysql_version_is_at_least "5.1.12" ; then
-		rebuilddirlist="."
-		# This does not seem to be needed presently. robbat2 2010/02/23
-		#einfo "Updating innobase cmake"
-		## TODO: check this with a cmake expert
-		#cmake \
-		#	-DCMAKE_C_COMPILER=$(type -P $(tc-getCC)) \
-		#	-DCMAKE_CXX_COMPILER=$(type -P $(tc-getCXX)) \
-		#	"storage/innobase"
-	else
-		rebuilddirlist=". innobase"
-	fi
+	rebuilddirlist="."
+	# This does not seem to be needed presently. robbat2 2010/02/23
+	#einfo "Updating innobase cmake"
+	## TODO: check this with a cmake expert
+	#cmake \
+	#	-DCMAKE_C_COMPILER=$(type -P $(tc-getCC)) \
+	#	-DCMAKE_CXX_COMPILER=$(type -P $(tc-getCXX)) \
+	#	"storage/innobase"
 
 	for d in ${rebuilddirlist} ; do
 		einfo "Reconfiguring dir '${d}'"
@@ -518,25 +426,6 @@ mysql-autotools_src_prepare() {
 		eautoreconf
 		popd &>/dev/null
 	done
-
-	if mysql_check_version_range "4.1 to 5.0.99.99" \
-	&& use berkdb ; then
-		einfo "Fixing up berkdb buildsystem"
-		[[ -w "bdb/dist/ltmain.sh" ]] && cp -f "ltmain.sh" "bdb/dist/ltmain.sh"
-		cp -f "/usr/share/aclocal/libtool.m4" "bdb/dist/aclocal/libtool.ac" \
-		|| die "Could not copy libtool.m4 to bdb/dist/"
-		#These files exist only with libtool-2*, and need to be included.
-		if [ -f '/usr/share/aclocal/ltsugar.m4' ]; then
-			cat "/usr/share/aclocal/ltsugar.m4" >>  "bdb/dist/aclocal/libtool.ac"
-			cat "/usr/share/aclocal/ltversion.m4" >>  "bdb/dist/aclocal/libtool.ac"
-			cat "/usr/share/aclocal/lt~obsolete.m4" >>  "bdb/dist/aclocal/libtool.ac"
-			cat "/usr/share/aclocal/ltoptions.m4" >>  "bdb/dist/aclocal/libtool.ac"
-		fi
-		pushd "bdb/dist" &>/dev/null
-		sh s_all \
-		|| die "Failed bdb reconfigure"
-		popd &>/dev/null
-	fi
 }
 
 # @FUNCTION: mysql-autotools_src_configure
@@ -554,11 +443,7 @@ mysql-autotools_src_configure() {
 		mysql-autotools_configure_minimal
 	else
 		mysql-autotools_configure_common
-		if mysql_version_is_at_least "5.1.10" ; then
-			mysql-autotools_configure_51
-		else
-			mysql-autotools_configure_40_41_50
-		fi
+		mysql-autotools_configure_51
 	fi
 
 	# Bug #114895, bug #110149
@@ -679,8 +564,6 @@ mysql-autotools_src_install() {
 
 	# Configuration stuff
 	case ${MYSQL_PV_MAJOR} in
-		3*|4.0) mysql_mycnf_version="4.0" ;;
-		4.[1-9]|5.0) mysql_mycnf_version="4.1" ;;
 		5.[1-9]|6*|7*) mysql_mycnf_version="5.1" ;;
 	esac
 	einfo "Building default my.cnf (${mysql_mycnf_version})"

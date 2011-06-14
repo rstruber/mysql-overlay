@@ -37,19 +37,6 @@ mysql-cmake_disable_test() {
 	#einfo "rawtestname=${rawtestname} testname=${testname} testsuite=${testsuite}"
 	echo ${testname} : ${reason} >> "${mysql_disable_file}"
 
-	# ${S}/mysql-tests/t/disabled.def
-	#
-	# ${S}/mysql-tests/suite/federated/disabled.def
-	#
-	# ${S}/mysql-tests/suite/jp/t/disabled.def
-	# ${S}/mysql-tests/suite/ndb/t/disabled.def
-	# ${S}/mysql-tests/suite/rpl/t/disabled.def
-	# ${S}/mysql-tests/suite/parts/t/disabled.def
-	# ${S}/mysql-tests/suite/rpl_ndb/t/disabled.def
-	# ${S}/mysql-tests/suite/ndb_team/t/disabled.def
-	# ${S}/mysql-tests/suite/binlog/t/disabled.def
-	# ${S}/mysql-tests/suite/innodb/t/disabled.def
-
 	if [ -n "${testsuite}" ]; then
 		for mysql_disable_file in \
 			${S}/mysql-test/suite/${testsuite}/disabled.def  \
@@ -108,9 +95,16 @@ configure_cmake_minimal() {
 		-DWITH_ZLIB=system
 		-DWITHOUT_LIBWRAP=1
 		-DWITHOUT_READLINE=1
-		-DWITHOUT_INNOBASE_STORAGE_ENGINE=1
 		-DWITHOUT_ARCHIVE_STORAGE_ENGINE=1
 		-DWITHOUT_BLACKHOLE_STORAGE_ENGINE=1
+		-DWITHOUT_CSV_STORAGE_ENGINE=1
+		-DWITHOUT_FEDERATED_STORAGE_ENGINE=1
+		-DWITHOUT_HEAP_STORAGE_ENGINE=1
+		-DWITHOUT_INNOBASE_STORAGE_ENGINE=1
+		-DWITHOUT_MYISAMMRG_STORAGE_ENGINE=1
+		-DWITHOUT_MYISAM_STORAGE_ENGINE=1
+		-DWITHOUT_PARTITION_STORAGE_ENGINE=1
+		-DWITHOUT_INNOBASE_STORAGE_ENGINE=1
 	)
 }
 
@@ -146,106 +140,20 @@ configure_cmake_standard() {
 	else
 		mycmakeargs+=( -DWITH_SSL=0 )
 	fi
+
+	# Storage engines
+	mycmakeargs+=(
+		-DWITH_ARCHIVE_STORAGE_ENGINE=1
+		-DWITH_BLACKHOLE_STORAGE_ENGINE=1
+		-DWITH_CSV_STORAGE_ENGINE=1
+		-DWITH_HEAP_STORAGE_ENGINE=1
+		-DWITH_INNOBASE_STORAGE_ENGINE=1
+		-DWITH_MYISAMMRG_STORAGE_ENGINE=1
+		-DWITH_MYISAM_STORAGE_ENGINE=1
+		-DWITH_PARTITION_STORAGE_ENGINE=1
+		$(cmake-utils_use_with extraengine FEDERATED_STORAGE_ENGINE)
+	)
 }
-
-# @FUNCTION: configure_51
-# @DESCRIPTION:
-# Helper function to configure 5.1 and later builds
-configure_51() {
-
-	# This is an explict die here, because if we just forcibly disable it, then the
-	# user's data is not accessible.
-	use max-idx-128 && die "Bug #336027: upstream has a corruption issue with max-idx-128 presently"
-	#use max-idx-128 && myconf="${myconf} --with-max-indexes=128"
-
-	# Scan for all available plugins
-	local plugins_avail="$(
-	LANG=C \
-	find "${S}" \
-		\( \
-		-name 'plug.in' \
-		-o -iname 'configure.in' \
-		-o -iname 'configure.ac' \
-		\) \
-		-print0 \
-	| xargs -0 sed -r -n \
-		-e '/^MYSQL_STORAGE_ENGINE/{
-			s~MYSQL_STORAGE_ENGINE\([[:space:]]*\[?([-_a-z0-9]+)\]?.*,~\1 ~g ;
-			s~^([^ ]+).*~\1~gp;
-		}' \
-	| tr -s '\n' ' '
-	)"
-
-	# 5.1 introduces a new way to manage storage engines (plugins)
-	# like configuration=none
-	# This base set are required, and will always be statically built.
-	local plugins_sta="csv myisam myisammrg heap"
-	local plugins_dyn=""
-	local plugins_dis="example ibmdb2i"
-
-	# These aren't actually required by the base set, but are really useful:
-	plugins_sta="${plugins_sta} archive blackhole"
-
-	# default in 5.5.4
-	if mysql_version_is_at_least "5.5.4" ; then
-		plugins_sta="${plugins_sta} partition"
-	fi
-	# Now the extras
-	if use extraengine ; then
-		# like configuration=max-no-ndb, archive and example removed in 5.1.11
-		# not added yet: ibmdb2i
-		# Not supporting as examples: example,daemon_example,ftexample
-		plugins_sta="${plugins_sta} partition"
-
-		if [[ "${PN}" != "mariadb" ]] ; then
-			elog "Before using the Federated storage engine, please be sure to read"
-			elog "http://dev.mysql.com/doc/refman/5.1/en/federated-limitations.html"
-			plugins_dyn="${plugins_sta} federatedx"
-		else
-			elog "MariaDB includes the FederatedX engine. Be sure to read"
-			elog "http://askmonty.org/wiki/index.php/Manual:FederatedX_storage_engine"
-			plugins_dyn="${plugins_sta} federated"
-		fi
-	else
-		plugins_dis="${plugins_dis} partition federated"
-	fi
-
-	# Upstream specifically requests that InnoDB always be built:
-	# - innobase, innodb_plugin
-	# Build falcon if available for 6.x series.
-	for i in innobase falcon ; do
-		[ -e "${S}"/storage/${i} ] && plugins_sta="${plugins_sta} ${i}"
-	done
-	for i in innodb_plugin ; do
-		[ -e "${S}"/storage/${i} ] && plugins_dyn="${plugins_dyn} ${i}"
-	done
-
-	# like configuration=max-no-ndb
-	if ( use cluster || [[ "${PN}" == "mysql-cluster" ]] ) ; then
-		plugins_sta="${plugins_sta} ndbcluster partition"
-		plugins_dis="${plugins_dis//partition}"
-		myconf="${myconf} --with-ndb-binlog"
-	else
-		plugins_dis="${plugins_dis} ndbcluster"
-	fi
-
-	use static && \
-	plugins_sta="${plugins_sta} ${plugins_dyn}" && \
-	plugins_dyn=""
-
-	einfo "Available plugins: ${plugins_avail}"
-	einfo "Dynamic plugins: ${plugins_dyn}"
-	einfo "Static plugins: ${plugins_sta}"
-	einfo "Disabled plugins: ${plugins_dis}"
-
-	# These are the static plugins
-	myconf="${myconf} --with-plugins=${plugins_sta// /,}"
-	# And the disabled ones
-	for i in ${plugins_dis} ; do
-		myconf="${myconf} --without-plugin-${i}"
-	done
-}
-
 
 #
 # EBUILD FUNCTIONS
@@ -363,13 +271,6 @@ mysql-cmake_src_install() {
 	# Various junk (my-*.cnf moved elsewhere)
 	einfo "Removing duplicate /usr/share/mysql files"
 
-#	rm -Rf "${D}/usr/share/info"
-#	for removeme in  "mysql-log-rotate" mysql.server* \
-#		binary-configure* my-*.cnf mi_test_all*
-#	do
-#		rm -f "${D}"/${MY_SHAREDSTATEDIR}/${removeme}
-#	done
-
 	# Clean up stuff for a minimal build
 #	if use minimal ; then
 #		einfo "Remove all extra content for minimal build"
@@ -423,29 +324,24 @@ mysql-cmake_src_install() {
 		done
 	fi
 
-	# Docs
-#	einfo "Installing docs"
-#	dodoc README ChangeLog EXCEPTIONS-CLIENT INSTALL-SOURCE
-#	doinfo "${S}"/Docs/mysql.info
-
 	# Minimal builds don't have the MySQL server
-#	if ! use minimal ; then
-#		einfo "Including support files and sample configurations"
-#		docinto "support-files"
-#		for script in \
-#			"${S}"/support-files/my-*.cnf \
-#			"${S}"/support-files/magic \
-#			"${S}"/support-files/ndb-config-2-node.ini
-#		do
-#			[[ -f "$script" ]] && dodoc "${script}"
-#		done
-#
-#		docinto "scripts"
-#		for script in "${S}"/scripts/mysql* ; do
-#			[[ -f "$script" ]] && [[ "${script%.sh}" == "${script}" ]] && dodoc "${script}"
-#		done
-#
-#	fi
+	if ! use minimal ; then
+		einfo "Including support files and sample configurations"
+		docinto "support-files"
+		for script in \
+			"${S}"/support-files/my-*.cnf.sh \
+			"${S}"/support-files/magic \
+			"${S}"/support-files/ndb-config-2-node.ini.sh
+		do
+			[[ -f "$script" ]] && dodoc "${script}"
+		done
+
+		docinto "scripts"
+		for script in "${S}"/scripts/mysql* ; do
+			[[ -f "$script" ]] && [[ "${script%.sh}" == "${script}" ]] && dodoc "${script}"
+		done
+
+	fi
 
 	mysql_lib_symlinks "${D}"
 }
