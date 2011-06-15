@@ -105,6 +105,8 @@ done
 # strip leading "0" (otherwise it's considered an octal number by BASH)
 MYSQL_VERSION_ID=${MYSQL_VERSION_ID##"0"}
 
+# This eclass should only be used with at least mysql-5.1.50
+mysql_version_is_at_least "5.1.50" || die "This eclass should only be used with >=mysql-5.1.50"
 
 # @ECLASS-VARIABLE: MYSQL_COMMUNITY_FEATURES
 # @DESCRIPTION:
@@ -114,9 +116,7 @@ MYSQL_VERSION_ID=${MYSQL_VERSION_ID##"0"}
 # AND in the re-merged mysql-5.0.82 and newer
 if [ "${PN}" == "mysql-community" -o "${PN}" == "mariadb" ]; then
 	MYSQL_COMMUNITY_FEATURES=1
-elif [ "${MYSQL_PV_MAJOR}" == "5.0" ] && mysql_version_is_at_least "5.0.82"; then
-	MYSQL_COMMUNITY_FEATURES=1
-elif [ "${MYSQL_PV_MAJOR}" == "5.1" ] && mysql_version_is_at_least "5.1.28"; then
+elif [ "${MYSQL_PV_MAJOR}" == "5.1" ]; then
 	MYSQL_COMMUNITY_FEATURES=1
 elif mysql_version_is_at_least "5.4.0"; then
 	MYSQL_COMMUNITY_FEATURES=1
@@ -126,14 +126,14 @@ fi
 
 
 # @ECLASS-VARIABLE: XTRADB_VER
+# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Version of the XTRADB storage engine
-: ${XTRADB_VER:=}
 
 # @ECLASS-VARIABLE: PERCONA_VER
+# @DEFAULT_UNSET
 # @DESCRIPTION:
 # Designation by PERCONA for a MySQL version to apply an XTRADB release
-: ${PERCONA_VER:=}
 
 # Work out the default SERVER_URI correctly
 if [ -z "${SERVER_URI}" ]; then
@@ -207,9 +207,7 @@ if [[ ${PN} != "mysql-cluster" ]] ; then
 	IUSE="${IUSE} cluster"
 fi
 
-mysql_version_is_at_least "5.0.18" \
-&& IUSE="${IUSE} max-idx-128"
-
+IUSE="${IUSE} max-idx-128"
 IUSE="${IUSE} berkdb"
 
 [[ ${MYSQL_COMMUNITY_FEATURES} == 1 ]] \
@@ -259,8 +257,7 @@ RDEPEND="${DEPEND}
 DEPEND="${DEPEND} static? ( || ( sys-libs/ncurses[static-libs] <=sys-libs/ncurses-5.7-r3 ) )"
 
 # compile-time-only
-mysql_version_is_at_least "5.1.12" \
-&& DEPEND="${DEPEND} >=dev-util/cmake-2.4.3"
+DEPEND="${DEPEND} >=dev-util/cmake-2.4.3"
 
 # compile-time-only
 mysql_version_is_at_least "5.5.8" \
@@ -290,7 +287,6 @@ PDEPEND="${PDEPEND} =virtual/mysql-${MYSQL_PV_MAJOR}"
 # PBXT was only introduced after 5.1.12
 pbxt_patch_available() {
 	[[ ${PN} != "mariadb" ]] \
-	&& mysql_version_is_at_least "5.1.12" \
 	&& [[ -n "${PBXT_VERSION}" ]]
 	return $?
 }
@@ -306,7 +302,6 @@ pbxt_available() {
 # XTRADB was only introduced after 5.1.26
 xtradb_patch_available() {
 	[[ ${PN} != "mariadb" ]] \
-	&& mysql_version_is_at_least "5.1.26" \
 	&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]]
 	return $?
 }
@@ -323,13 +318,8 @@ fi
 # vs. built outside the dir
 if pbxt_available; then
 
-	IUSE="${IUSE} pbxt"
-
-	if mysql_version_is_at_least "5.1.40"; then
-
+		IUSE="${IUSE} pbxt"
 		PBXT_NEWSTYLE=1
-
-	fi
 fi
 
 if xtradb_patch_available; then
@@ -397,23 +387,20 @@ mysql-v2_pkg_setup() {
 		die "${M}"
 	fi
 
-	if mysql_version_is_at_least "5.1.51" \
-	   && ! mysql_version_is_at_least "5.2" \
-	   && use debug ; then
-	   # Also in package.use.mask
-	   die "Bug #344885: Upstream has broken USE=debug for 5.1 series >=5.1.51"
+	if ! mysql_version_is_at_least "5.2" \
+		&& use debug ; then
+		# Also in package.use.mask
+		die "Bug #344885: Upstream has broken USE=debug for 5.1 series >=5.1.51"
 	fi
 
-	if mysql_version_is_at_least "4.1.3" \
-	&& ( use cluster || use extraengine || use embedded ) \
+	if ( use cluster || use extraengine || use embedded ) \
 	&& use minimal ; then
 		M="USE flags 'cluster', 'extraengine', 'embedded' conflict with 'minimal' USE flag!"
 		eerror "${M}"
 		die "${M}"
 	fi
 
-	if mysql_version_is_at_least "5.1" \
-	&& xtradb_patch_available \
+	if xtradb_patch_available \
 	&& use xtradb \
 	&& use embedded ; then
 		M="USE flags 'xtradb' and 'embedded' conflict and cause build failures"
@@ -670,14 +657,12 @@ mysql-v2_pkg_config() {
 	egrep -sq external-locking "${helpfile}" && \
 	options="${options/skip-locking/skip-external-locking}"
 
-	if mysql_version_is_at_least "4.1.3" ; then
-		# Filling timezones, see
-		# http://dev.mysql.com/doc/mysql/en/time-zone-support.html
-		"${ROOT}/usr/bin/mysql_tzinfo_to_sql" "${ROOT}/usr/share/zoneinfo" > "${sqltmp}" 2>/dev/null
+	# Filling timezones, see
+	# http://dev.mysql.com/doc/mysql/en/time-zone-support.html
+	"${ROOT}/usr/bin/mysql_tzinfo_to_sql" "${ROOT}/usr/share/zoneinfo" > "${sqltmp}" 2>/dev/null
 
-		if [[ -r "${help_tables}" ]] ; then
-			cat "${help_tables}" >> "${sqltmp}"
-		fi
+	if [[ -r "${help_tables}" ]] ; then
+		cat "${help_tables}" >> "${sqltmp}"
 	fi
 
 	einfo "Creating the mysql database and setting proper"
