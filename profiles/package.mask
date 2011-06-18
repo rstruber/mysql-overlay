@@ -1,3 +1,0 @@
-# Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org> (6 Dec 2010)
-# The embedded patch needs more updates to apply to this version.
-~dev-db/mariadb-5.2.3

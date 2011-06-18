@@ -58,61 +58,6 @@ src_test() {
 		# Ensure that parallel runs don't die
 		export MTR_BUILD_THREAD="$((${RANDOM} % 100))"
 
-		# archive_gis really sucks a lot, but it's only relevant for the
-		# USE=extraengines case
-		case ${PV} in
-			5.0.42)
-			mysql-v2_disable_test "archive_gis" "Totally broken in 5.0.42"
-			;;
-
-			5.0.4[3-9]|5.0.[56]*|5.0.70|5.0.87)
-			[ "$(tc-endian)" == "big" ] && \
-			mysql-v2_disable_test \
-				"archive_gis" \
-				"Broken in 5.0.43-70 and 5.0.87 on big-endian boxes only"
-			;;
-		esac
-
-		# This was a slight testcase breakage when the read_only security issue
-		# was fixed.
-		case ${PV} in
-			5.0.54|5.0.51*)
-			mysql-v2_disable_test \
-				"read_only" \
-				"Broken in 5.0.51-54, output in wrong order"
-			;;
-		esac
-
-		# Ditto to read_only
-		[ "${PV}" == "5.0.51a" ] && \
-			mysql-v2_disable_test \
-				"view" \
-				"Broken in 5.0.51, output in wrong order"
-
-		# x86-specific, OOM issue with some subselects on low memory servers
-		[ "${PV}" == "5.0.54" ] && \
-			[ "${ARCH/x86}" != "${ARCH}" ] && \
-			mysql-v2_disable_test \
-				"subselect" \
-				"Testcase needs tuning on x86 for oom condition"
-
-		# Broke with the YaSSL security issue that didn't affect Gentoo.
-		[ "${PV}" == "5.0.56" ] && \
-			for t in openssl_1 rpl_openssl rpl_ssl ssl \
-				ssl_8k_key ssl_compress ssl_connect ; do \
-				mysql-v2_disable_test \
-					"$t" \
-					"OpenSSL tests broken on 5.0.56"
-			done
-
-		# New test was broken in first time
-		# Upstream bug 41066
-		# http://bugs.mysql.com/bug.php?id=41066
-		[ "${PV}" == "5.0.72" ] && \
-			mysql-v2_disable_test \
-				"status2" \
-				"Broken in 5.0.72, new test is broken, upstream bug #41066"
-
 		# The entire 5.0 series has pre-generated SSL certificates, they have
 		# mostly expired now. ${S}/mysql-tests/std-data/*.pem
 		# The certs really SHOULD be generated for the tests, so that they are
