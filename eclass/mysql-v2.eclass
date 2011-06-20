@@ -341,7 +341,7 @@ fi
 # @FUNCTION: mysql-v2_disable_test
 # @DESCRIPTION:
 # Helper function to disable specific tests.
-mysql_disable_test() {
+mysql-v2_disable_test() {
 	${BUILD_INHERIT}_disable_test "$@"
 }
 

@@ -28,7 +28,7 @@ src_prepare() {
 	sed -i \
 		-e '/^noinst_PROGRAMS/s/basic-t//g' \
 		"${S}"/unittest/mytap/t/Makefile.am
-	mysql-autotools_src_prepare
+	mysql-v2_src_prepare
 }
 
 # Official test instructions:
@@ -58,61 +58,6 @@ src_test() {
 		# Ensure that parallel runs don't die
 		export MTR_BUILD_THREAD="$((${RANDOM} % 100))"
 
-		# archive_gis really sucks a lot, but it's only relevant for the
-		# USE=extraengines case
-		case ${PV} in
-			5.0.42)
-			mysql-autotools_disable_test "archive_gis" "Totally broken in 5.0.42"
-			;;
-
-			5.0.4[3-9]|5.0.[56]*|5.0.70|5.0.87)
-			[ "$(tc-endian)" == "big" ] && \
-			mysql-autotools_disable_test \
-				"archive_gis" \
-				"Broken in 5.0.43-70 and 5.0.87 on big-endian boxes only"
-			;;
-		esac
-
-		# This was a slight testcase breakage when the read_only security issue
-		# was fixed.
-		case ${PV} in
-			5.0.54|5.0.51*)
-			mysql-autotools_disable_test \
-				"read_only" \
-				"Broken in 5.0.51-54, output in wrong order"
-			;;
-		esac
-
-		# Ditto to read_only
-		[ "${PV}" == "5.0.51a" ] && \
-			mysql-autotools_disable_test \
-				"view" \
-				"Broken in 5.0.51, output in wrong order"
-
-		# x86-specific, OOM issue with some subselects on low memory servers
-		[ "${PV}" == "5.0.54" ] && \
-			[ "${ARCH/x86}" != "${ARCH}" ] && \
-			mysql-autotools_disable_test \
-				"subselect" \
-				"Testcase needs tuning on x86 for oom condition"
-
-		# Broke with the YaSSL security issue that didn't affect Gentoo.
-		[ "${PV}" == "5.0.56" ] && \
-			for t in openssl_1 rpl_openssl rpl_ssl ssl \
-				ssl_8k_key ssl_compress ssl_connect ; do \
-				mysql-autotools_disable_test \
-					"$t" \
-					"OpenSSL tests broken on 5.0.56"
-			done
-
-		# New test was broken in first time
-		# Upstream bug 41066
-		# http://bugs.mysql.com/bug.php?id=41066
-		[ "${PV}" == "5.0.72" ] && \
-			mysql-autotools_disable_test \
-				"status2" \
-				"Broken in 5.0.72, new test is broken, upstream bug #41066"
-
 		# The entire 5.0 series has pre-generated SSL certificates, they have
 		# mostly expired now. ${S}/mysql-tests/std-data/*.pem
 		# The certs really SHOULD be generated for the tests, so that they are
@@ -132,7 +77,7 @@ src_test() {
 			5.0.*|5.1.*|5.4.*|5.5.*)
 				for t in openssl_1 rpl_openssl rpl.rpl_ssl rpl.rpl_ssl1 ssl ssl_8k_key \
 					ssl_compress ssl_connect rpl.rpl_heartbeat_ssl ; do \
-					mysql-autotools_disable_test \
+					mysql-v2_disable_test \
 						"$t" \
 						"These OpenSSL tests break due to expired certificates"
 				done
@@ -159,7 +104,7 @@ src_test() {
 				main.information_schema \
 				main.not_partition funcs_1.is_columns_mysql \
 				funcs_1.is_tables_mysql funcs_1.is_triggers; do
-				mysql-autotools_disable_test  "$t" "False positives in Gentoo"
+				mysql-v2_disable_test  "$t" "False positives in Gentoo"
 			done
 			;;
 		esac
@@ -171,21 +116,21 @@ src_test() {
 		case ${PV} in
 			5.1.5*|5.4.*|5.5.*|6*)
 			for t in rpl.rpl_mysql_upgrade main.log_tables_upgrade ; do
-				mysql-autotools_disable_test  "$t" \
+				mysql-v2_disable_test  "$t" \
 					"False positives in Gentoo: connect-timeout"
 			done
 			;;
 		esac
 
 		use profiling && use community \
-		|| mysql-autotools_disable_test main.profiling \
+		|| mysql-v2_disable_test main.profiling \
 			"Profiling test needs profiling support"
 
 		if [ "${PN}" == "mariadb" ]; then
 			for t in \
 				parts.part_supported_sql_func_ndb \
 				parts.partition_auto_increment_ndb ; do
-					mysql-autotools_disable_test $t "ndb not supported in mariadb"
+					mysql-v2_disable_test $t "ndb not supported in mariadb"
 			done
 		fi
 
