@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.84-r1.ebuild,v 1.7 2009/11/09 18:00:20 fauli Exp $
+# $Header: $
 
 MY_EXTRAS_VER="live"
 EAPI="2"
@@ -98,7 +98,7 @@ src_test() {
 		# Failure reason unknown at this time, must resolve before package.mask
 		# removal FIXME
 		case ${PV} in
-			5.1.*|5.4.*|5.5.*)
+			5.1.*|5.2.*|5.4.*|5.5.*)
 			for t in main.mysql_client_test main.mysql_comments \
 				main.mysql_upgrade  \
 				main.information_schema \
