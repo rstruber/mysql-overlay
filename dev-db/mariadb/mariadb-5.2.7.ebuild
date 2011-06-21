@@ -74,7 +74,7 @@ src_test() {
 		# mysql-test/std_data/untrusted-cacert.pem is MEANT to be
 		# expired/invalid.
 		case ${PV} in
-			5.0.*|5.1.*|5.4.*|5.5.*)
+			5.1.*|5.4.*|5.5.*)
 				for t in openssl_1 rpl_openssl rpl.rpl_ssl rpl.rpl_ssl1 ssl ssl_8k_key \
 					ssl_compress ssl_connect rpl.rpl_heartbeat_ssl ; do \
 					mysql-v2_disable_test \
