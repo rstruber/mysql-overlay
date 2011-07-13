@@ -71,12 +71,12 @@ src_test() {
 		# USE=extraengines case
 		case ${PV} in
 			5.0.42)
-			mysql_disable_test "archive_gis" "Totally broken in 5.0.42"
+			mysql-v2_disable_test "archive_gis" "Totally broken in 5.0.42"
 			;;
 
 			5.0.4[3-9]|5.0.[56]*|5.0.70|5.0.87)
 			[ "$(tc-endian)" == "big" ] && \
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"archive_gis" \
 				"Broken in 5.0.43-70 and 5.0.87 on big-endian boxes only"
 			;;
@@ -86,7 +86,7 @@ src_test() {
 		# was fixed.
 		case ${PV} in
 			5.0.54|5.0.51*)
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"read_only" \
 				"Broken in 5.0.51-54, output in wrong order"
 			;;
@@ -94,14 +94,14 @@ src_test() {
 
 		# Ditto to read_only
 		[ "${PV}" == "5.0.51a" ] && \
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"view" \
 				"Broken in 5.0.51, output in wrong order"
 
 		# x86-specific, OOM issue with some subselects on low memory servers
 		[ "${PV}" == "5.0.54" ] && \
 			[ "${ARCH/x86}" != "${ARCH}" ] && \
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"subselect" \
 				"Testcase needs tuning on x86 for oom condition"
 
@@ -109,7 +109,7 @@ src_test() {
 		[ "${PV}" == "5.0.56" ] && \
 			for t in openssl_1 rpl_openssl rpl_ssl ssl \
 				ssl_8k_key ssl_compress ssl_connect ; do \
-				mysql_disable_test \
+				mysql-v2_disable_test \
 					"$t" \
 					"OpenSSL tests broken on 5.0.56"
 			done
@@ -118,7 +118,7 @@ src_test() {
 		# Upstream bug 41066
 		# http://bugs.mysql.com/bug.php?id=41066
 		[ "${PV}" == "5.0.72" ] && \
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"status2" \
 				"Broken in 5.0.72, new test is broken, upstream bug #41066"
 
@@ -141,7 +141,7 @@ src_test() {
 			5.0.*|5.1.*|5.4.*|5.5.*)
 				for t in openssl_1 rpl_openssl rpl.rpl_ssl rpl.rpl_ssl1 ssl ssl_8k_key \
 					ssl_compress ssl_connect rpl.rpl_heartbeat_ssl ; do \
-					mysql_disable_test \
+					mysql-v2_disable_test \
 						"$t" \
 						"These OpenSSL tests break due to expired certificates"
 				done
@@ -168,7 +168,7 @@ src_test() {
 				main.information_schema \
 				main.not_partition funcs_1.is_columns_mysql \
 				funcs_1.is_tables_mysql funcs_1.is_triggers; do
-				mysql_disable_test  "$t" "False positives in Gentoo"
+				mysql-v2_disable_test  "$t" "False positives in Gentoo"
 			done
 			;;
 		esac
@@ -180,21 +180,21 @@ src_test() {
 		case ${PV} in
 			5.1.5*|5.4.*|5.5.*|6*)
 			for t in rpl.rpl_mysql_upgrade main.log_tables_upgrade ; do
-				mysql_disable_test  "$t" \
+				mysql-v2_disable_test  "$t" \
 					"False positives in Gentoo: connect-timeout"
 			done
 			;;
 		esac
 
 		use profiling && use community \
-		|| mysql_disable_test main.profiling \
+		|| mysql-v2_disable_test main.profiling \
 			"Profiling test needs profiling support"
 
 		if [ "${PN}" == "mariadb" ]; then
 			for t in \
 				parts.part_supported_sql_func_ndb \
 				parts.partition_auto_increment_ndb ; do
-					mysql_disable_test $t "ndb not supported in mariadb"
+					mysql-v2_disable_test $t "ndb not supported in mariadb"
 			done
 		fi
 
@@ -213,14 +213,14 @@ src_test() {
 				innodb.innodb_bug49164 innodb.innodb_bug51920 \
 				innodb.innodb_bug54044 \
 				; do
-					mysql_disable_test $t "tests broken in xtradb"
+					mysql-v2_disable_test $t "tests broken in xtradb"
 			done
 		fi
 
 		# bug 332565
 		if ! use extraengine ; then
 			for t in main.range ; do
-				mysql_disable_test $t "Test $t requires USE=extraengine"
+				mysql-v2_disable_test $t "Test $t requires USE=extraengine"
 			done
 		fi
 

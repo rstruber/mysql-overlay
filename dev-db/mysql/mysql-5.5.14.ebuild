@@ -87,7 +87,7 @@ src_test() {
 			binlog.binlog_statement_insert_delayed main.information_schema \
 			main.mysqld--help-notwin main.flush_read_lock_kill \
 			sys_vars.plugin_dir_basic ; do
-				mysql_disable_test  "$t" "False positives in Gentoo"
+				mysql-v2_disable_test  "$t" "False positives in Gentoo"
 		done
 
 		# Run mysql tests
