@@ -2,6 +2,9 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  13 Jul 2011; Robin H. Johnson <robbat2@gentoo.org> -mysql-5.5.13.ebuild:
+  5.5.13 removed from uptream mirrors, unable to verify digest.
+
   13 Jul 2011; Robin H. Johnson <robbat2@gentoo.org> -mysql-5.1.56.ebuild,
   -mysql-5.1.56-r1.ebuild, -mysql-5.1.57.ebuild:
   Old versions moved to tree.
