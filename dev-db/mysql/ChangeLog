@@ -2,6 +2,25 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  14 Jul 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  mysql-5.1.58.ebuild:
+  [dev-db/mysql-5.5.14] Don't use live version of mysql_extras.
+  [dev-db/mysql-5.1.58] Don't use live version of mysql_extras.
+  Synced from the tree.
+
+  13 Jul 2011; Robin H. Johnson <robbat2@gentoo.org> -mysql-5.5.13.ebuild:
+  5.5.13 removed from uptream mirrors, unable to verify digest.
+
+  13 Jul 2011; Robin H. Johnson <robbat2@gentoo.org> -mysql-5.1.56.ebuild,
+  -mysql-5.1.56-r1.ebuild, -mysql-5.1.57.ebuild:
+  Old versions moved to tree.
+
+  13 Jul 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  mysql-5.1.57.ebuild, mysql-5.1.58.ebuild, mysql-5.5.13.ebuild,
+  mysql-5.5.14.ebuild:
+  Replace mysql_disable_test calls with mysql-v2_disable_test.
+  Should finally disable the remaining failing tests.
+
   18 May 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
   mysql-5.1.57.ebuild:
   Update mysql-v2 eclass to use the git-2 eclass.

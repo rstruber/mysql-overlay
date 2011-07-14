@@ -372,7 +372,7 @@ configure_common() {
 #   warn about deprecated features
 mysql-v2_pkg_setup() {
 
-	if hasq test ${FEATURES} ; then
+	if has test ${FEATURES} ; then
 		if ! use minimal ; then
 			if [[ $UID -eq 0 ]]; then
 				eerror "Testing with FEATURES=-userpriv is no longer supported by upstream. Tests MUST be run as non-root."
