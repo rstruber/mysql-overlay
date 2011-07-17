@@ -55,7 +55,7 @@ case "${EAPI:-0}" in
 	*) die "Unsupported EAPI: ${EAPI}" ;;
 esac
 
-EXPORT_FUNCTIONS src_unpack src_prepare src_configure src_compile src_install
+EXPORT_FUNCTIONS pkg_setup src_unpack src_prepare src_configure src_compile src_install
 
 #
 # VARIABLES:
