@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-MY_EXTRAS_VER="20110713-0702Z"
+MY_EXTRAS_VER="20110721-0450Z"
 # PBXT
 PBXT_VERSION='1.0.11-6-pre-ga'
 # XtraDB
@@ -37,7 +37,7 @@ src_prepare() {
 	sed -i \
 		-e '/^noinst_PROGRAMS/s/basic-t//g' \
 		"${S}"/unittest/mytap/t/Makefile.am
-	mysql_src_prepare
+	mysql-v2_src_prepare
 }
 
 # Official test instructions:

@@ -2,6 +2,17 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  21 Jul 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  -mysql-5.1.58.ebuild:
+  Dropped broken mysql-5.1.58 ebuild.
+
+*mysql-5.1.58-r1 (21 Jul 2011)
+
+  21 Jul 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  +mysql-5.1.58-r1.ebuild:
+  [dev-db/mysql-5.1.58-r1] Bumped mysql-5.1.58 to fix all the issues related to
+  the ebuild and the mysql-v2 eclass. Fixes bug 375063.
+
   14 Jul 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
   mysql-5.1.58.ebuild:
   [dev-db/mysql-5.5.14] Don't use live version of mysql_extras.
