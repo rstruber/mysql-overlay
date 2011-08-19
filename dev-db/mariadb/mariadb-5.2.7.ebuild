@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-MY_EXTRAS_VER="20110426-1046Z"
+MY_EXTRAS_VER="20110819-0415Z"
 EAPI="2"
 
 # Build system
