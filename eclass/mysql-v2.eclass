@@ -239,6 +239,7 @@ DEPEND="
 	>=sys-apps/texinfo-4.7-r1
 	>=sys-libs/readline-4.1
 	>=sys-libs/zlib-1.2.3
+	virtual/yacc
 "
 
 [[ ${PN} == mariadb ]] \
