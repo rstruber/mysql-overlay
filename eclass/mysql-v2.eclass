@@ -239,7 +239,6 @@ DEPEND="
 	>=sys-apps/texinfo-4.7-r1
 	>=sys-libs/readline-4.1
 	>=sys-libs/zlib-1.2.3
-	virtual/yacc
 "
 
 [[ ${PN} == mariadb ]] \
@@ -254,6 +253,10 @@ done
 RDEPEND="${DEPEND}
 	!minimal? ( dev-db/mysql-init-scripts )
 	selinux? ( sec-policy/selinux-mysql )
+"
+
+DEPEND="${DEPEND}
+	virtual/yacc
 "
 
 DEPEND="${DEPEND} static? ( || ( sys-libs/ncurses[static-libs] <=sys-libs/ncurses-5.7-r3 ) )"
