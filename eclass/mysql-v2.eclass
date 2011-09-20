@@ -255,6 +255,10 @@ RDEPEND="${DEPEND}
 	selinux? ( sec-policy/selinux-mysql )
 "
 
+DEPEND="${DEPEND}
+	virtual/yacc
+"
+
 DEPEND="${DEPEND} static? ( || ( sys-libs/ncurses[static-libs] <=sys-libs/ncurses-5.7-r3 ) )"
 
 # compile-time-only

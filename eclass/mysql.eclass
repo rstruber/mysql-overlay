@@ -145,6 +145,9 @@ RDEPEND="${DEPEND}
 		!minimal? ( dev-db/mysql-init-scripts )
 		selinux? ( sec-policy/selinux-mysql )"
 
+DEPEND="${DEPEND}
+		virtual/yacc"
+
 if [ "${EAPI:-0}" = "2" ]; then
 	DEPEND="${DEPEND} static? ( || ( sys-libs/ncurses[static-libs] <=sys-libs/ncurses-5.7-r3 ) )"
 fi
