@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mysql-5.5.16 (22 Sep 2011)
+
+  22 Sep 2011; <atlantis@gentoo.org> +mysql-5.5.16.ebuild:
+  Bumped mysql to the 5.5.16 release.
+
 *mysql-5.1.59 (22 Sep 2011)
 
   22 Sep 2011; <atlantis@gentoo.org> +mysql-5.1.59.ebuild:
