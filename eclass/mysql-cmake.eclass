@@ -192,6 +192,8 @@ mysql-cmake_src_configure() {
 
 	debug-print-function ${FUNCNAME} "$@"
 
+	CMAKE_BUILD_TYPE="RelWithDebInfo"
+
 	mycmakeargs=(
 		-DCMAKE_INSTALL_PREFIX=/usr
 		-DMYSQL_DATADIR=/var/lib/mysql
