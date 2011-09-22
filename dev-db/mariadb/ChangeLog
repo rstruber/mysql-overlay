@@ -2,6 +2,13 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mariadb-5.3.1_beta (22 Sep 2011)
+
+  22 Sep 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  +mariadb-5.3.1_beta.ebuild:
+  Bumped mariadb to the 5.3.1_beta release. This needs more work as even unit
+  tests are failing.
+
 *mariadb-5.2.8 (19 Aug 2011)
 
   19 Aug 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
