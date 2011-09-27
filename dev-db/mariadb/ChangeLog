@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mariadb-5.2.9 (27 Sep 2011)
+
+  27 Sep 2011; <atlantis@gentoo.org> +mariadb-5.2.9.ebuild:
+  Bumped mariadb to 5.2.9 release.
+
 *mariadb-5.3.1_beta (22 Sep 2011)
 
   22 Sep 2011; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
