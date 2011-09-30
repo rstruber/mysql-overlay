@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-v2.eclass,v 1.8 2011/09/25 12:43:28 grobian Exp $
 
 # @ECLASS: mysql-v2.eclass
 # @MAINTAINER:
@@ -19,8 +19,8 @@
 # phase hooks.
 
 # @ECLASS-VARIABLE: BUILD
-# @DESCRIPTION: Build type of the mysql version
-# The default value is autotools
+# @DESCRIPTION:
+# Build type of the mysql version
 : ${BUILD:=autotools}
 
 case ${BUILD} in
@@ -41,7 +41,8 @@ esac
 MYSQL_EXTRAS=""
 
 # @ECLASS-VARIABLE: MYSQL_EXTRAS_VER
-# @DESCRIPTION: The version of the MYSQL_EXTRAS repo to use to build mysql
+# @DESCRIPTION:
+# The version of the MYSQL_EXTRAS repo to use to build mysql
 [[ "${MY_EXTRAS_VER}" == "live" ]] && MYSQL_EXTRAS="git-2"
 
 inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx versionator toolchain-funcs
@@ -250,8 +251,9 @@ for i in "mysql" "mysql-community" "mysql-cluster" "mariadb" ; do
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
 
+# prefix: first need to implement something for #196294
 RDEPEND="${DEPEND}
-	!minimal? ( dev-db/mysql-init-scripts )
+	!minimal? ( !prefix? ( dev-db/mysql-init-scripts ) )
 	selinux? ( sec-policy/selinux-mysql )
 "
 
