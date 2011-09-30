@@ -1,13 +1,14 @@
-# Copyright 1999-2009 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.161 2011/07/08 11:35:01 ssuominen Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.166 2011/09/25 12:43:28 grobian Exp $
 
 # @ECLASS: mysql.eclass
 # @MAINTAINER:
-# Author: Francesco Riosa (Retired) <vivo@gentoo.org>
-# Maintainers: MySQL Team <mysql-bugs@gentoo.org>
-#		- Luca Longinotti <chtekk@gentoo.org>
-#		- Robin H. Johnson <robbat2@gentoo.org>
+# MySQL Team <mysql-bugs@gentoo.org>
+# Luca Longinotti <chtekk@gentoo.org>
+# Robin H. Johnson <robbat2@gentoo.org>
+# @AUTHOR:
+# Francesco Riosa (Retired) <vivo@gentoo.org>
 # @BLURB: This eclass provides most of the functions for mysql ebuilds
 # @DESCRIPTION:
 # The mysql.eclass provides almost all the code to build the mysql ebuilds
@@ -141,8 +142,9 @@ for i in "mysql" "mysql-community" "mysql-cluster" "mariadb" ; do
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
 
+# prefix: first need to implement something for #196294
 RDEPEND="${DEPEND}
-		!minimal? ( dev-db/mysql-init-scripts )
+		!minimal? ( !prefix? ( dev-db/mysql-init-scripts ) )
 		selinux? ( sec-policy/selinux-mysql )"
 
 DEPEND="${DEPEND}
@@ -618,7 +620,7 @@ configure_51() {
 	| xargs -0 sed -r -n \
 		-e '/^MYSQL_STORAGE_ENGINE/{
 			s~MYSQL_STORAGE_ENGINE\([[:space:]]*\[?([-_a-z0-9]+)\]?.*,~\1 ~g ;
-			s~^([^ ]+).*~\1~gp; 
+			s~^([^ ]+).*~\1~gp;
 		}' \
 	| tr -s '\n' ' '
 	)"
