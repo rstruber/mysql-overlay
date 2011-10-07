@@ -3,8 +3,6 @@
 -=dev-db/mariadb-5.2*
 ->=dev-db/mysql-5.5
 >=dev-db/mysql-5.6
-->=virtual/mysql-5.5
-=virtual/mysql-5.6
 -=virtual/mysql-5.2*
 ->=virtual/mysql-5.5
 >=virtual/mysql-5.6
