@@ -108,7 +108,7 @@ mysql-autotools_configure_common() {
 	myconf="${myconf} --with-extra-charsets=all"
 	myconf="${myconf} --with-mysqld-user=mysql"
 	myconf="${myconf} --with-server"
-	myconf="${myconf} --with-unix-socket-path=/var/run/mysqld/mysqld.sock"
+	myconf="${myconf} --with-unix-socket-path=${EPREFIX}/var/run/mysqld/mysqld.sock"
 	myconf="${myconf} --without-libwrap"
 
 	if use static ; then
@@ -160,13 +160,13 @@ mysql-autotools_configure_51() {
 	# TODO: !!!! readd --without-readline
 	# the failure depend upon config/ac-macros/readline.m4 checking into
 	# readline.h instead of history.h
-	myconf="${myconf} $(use_with ssl ssl /usr)"
+	myconf="${myconf} $(use_with ssl ssl "${EPREFIX}"/usr)"
 	myconf="${myconf} --enable-assembler"
 	myconf="${myconf} --with-geometry"
 	myconf="${myconf} --with-readline"
-	myconf="${myconf} --with-zlib-dir=/usr/"
+	myconf="${myconf} --with-zlib-dir=${EPREFIX}/usr/"
 	myconf="${myconf} --without-pstack"
-	myconf="${myconf} --with-plugindir=/usr/$(get_libdir)/mysql/plugin"
+	myconf="${myconf} --with-plugindir=${EPREFIX}/usr/$(get_libdir)/mysql/plugin"
 
 	# This is an explict die here, because if we just forcibly disable it, then the
 	# user's data is not accessible.
@@ -320,7 +320,7 @@ pbxt_src_configure() {
 	eautoreconf
 
 	local myconf=""
-	myconf="${myconf} --with-mysql=${S} --libdir=/usr/$(get_libdir)"
+	myconf="${myconf} --with-mysql=${S} --libdir=${EPREFIX}/usr/$(get_libdir)"
 	use debug && myconf="${myconf} --with-debug=full"
 	econf ${myconf} || die "Problem configuring PBXT storage engine"
 }
@@ -376,7 +376,7 @@ mysql-autotools_src_prepare() {
 
 	# Make charsets install in the right place
 	find . -name 'Makefile.am' \
-		-exec sed --in-place -e 's!$(pkgdatadir)!'${MY_SHAREDSTATEDIR}'!g' {} \;
+		-exec sed --in-place -e 's!$(pkgdatadir)!'"${EPREFIX}"${MY_SHAREDSTATEDIR}'!g' {} \;
 
 	# Remove what needs to be recreated, so we're sure it's actually done
 	einfo "Cleaning up old buildscript files"
@@ -477,12 +477,12 @@ mysql-autotools_src_configure() {
 		filter-flags -fomit-frame-pointer
 
 	econf \
-		--libexecdir="/usr/sbin" \
-		--sysconfdir="${MY_SYSCONFDIR}" \
-		--localstatedir="${MY_LOCALSTATEDIR}" \
-		--sharedstatedir="${MY_SHAREDSTATEDIR}" \
-		--libdir="${MY_LIBDIR}" \
-		--includedir="${MY_INCLUDEDIR}" \
+		--libexecdir="${EPREFIX}/usr/sbin" \
+		--sysconfdir="${EPREFIX}${MY_SYSCONFDIR}" \
+		--localstatedir="${EPREFIX}${MY_LOCALSTATEDIR}" \
+		--sharedstatedir="${EPREFIX}${MY_SHAREDSTATEDIR}" \
+		--libdir="${EPREFIX}${MY_LIBDIR}" \
+		--includedir="${EPREFIX}${MY_INCLUDEDIR}" \
 		--with-low-memory \
 		--with-client-ldflags=-lstdc++ \
 		--enable-thread-safe-client \
@@ -523,8 +523,8 @@ mysql-autotools_src_install() {
 
 	emake install \
 		DESTDIR="${D}" \
-		benchdir_root="${MY_SHAREDSTATEDIR}" \
-		testroot="${MY_SHAREDSTATEDIR}" \
+		benchdir_root="${EPREFIX}${MY_SHAREDSTATEDIR}" \
+		testroot="${EPREFIX}${MY_SHAREDSTATEDIR}" \
 		|| die "emake install failed"
 
 	if [[ "${PBXT_NEWSTYLE}" != "1" ]]; then
@@ -570,7 +570,10 @@ mysql-autotools_src_install() {
 	insinto "${MY_SYSCONFDIR}"
 	doins scripts/mysqlaccess.conf
 	mycnf_src="my.cnf-${mysql_mycnf_version}"
-	sed -e "s!@DATADIR@!${MY_DATADIR}!g" \
+	sed -e "s!@DATADIR@!${EPREFIX}${MY_DATADIR}!g" \
+		-e "s!/tmp!${EPREFIX}/tmp!" \
+		-e "s!/usr!${EPREFIX}/usr!" \
+		-e "s!= /var!= ${EPREFIX}/var!" \
 		"${FILESDIR}/${mycnf_src}" \
 		> "${TMPDIR}/my.cnf.ok"
 	if use latin1 ; then
