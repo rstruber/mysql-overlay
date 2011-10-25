@@ -3,7 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.84-r1.ebuild,v 1.7 2009/11/09 18:00:20 fauli Exp $
 
 MY_EXTRAS_VER="20110426-1046Z"
-EAPI="2"
+EAPI="4"
 
 # Build system
 BUILD="autotools"
