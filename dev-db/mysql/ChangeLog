@@ -2,6 +2,11 @@
 # Copyright 1999-2011 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mysql-5.5.18 (20 Nov 2011)
+
+  20 Nov 2011; Robin H. Johnson <robbat2@gentoo.org> +mysql-5.5.18.ebuild:
+  Version bump.
+
 *mysql-5.1.60 (19 Nov 2011)
 
   19 Nov 2011; Robin H. Johnson <robbat2@gentoo.org> +mysql-5.1.60.ebuild:
