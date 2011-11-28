@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-v2.eclass,v 1.9 2011/10/07 04:30:18 jmbsvicetto Exp $
 
 # @ECLASS: mysql-v2.eclass
 # @MAINTAINER:
@@ -19,8 +19,8 @@
 # phase hooks.
 
 # @ECLASS-VARIABLE: BUILD
-# @DESCRIPTION: Build type of the mysql version
-# The default value is autotools
+# @DESCRIPTION:
+# Build type of the mysql version
 : ${BUILD:=autotools}
 
 case ${BUILD} in
@@ -41,7 +41,9 @@ esac
 MYSQL_EXTRAS=""
 
 # @ECLASS-VARIABLE: MYSQL_EXTRAS_VER
-# @DESCRIPTION: The version of the MYSQL_EXTRAS repo to use to build mysql
+# @DESCRIPTION:
+# The version of the MYSQL_EXTRAS repo to use to build mysql
+# Use "none" to disable it's use
 [[ "${MY_EXTRAS_VER}" == "live" ]] && MYSQL_EXTRAS="git-2"
 
 inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx versionator toolchain-funcs
@@ -173,7 +175,7 @@ fi
 SRC_URI="${SERVER_URI}"
 
 # Gentoo patches to MySQL
-[[ ${MY_EXTRAS_VER} != live ]] \
+[[ ${MY_EXTRAS_VER} != live ]] && [[ ${MY_EXTRAS_VER} != none ]] \
 && SRC_URI="${SRC_URI}
 		mirror://gentoo/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
 		http://g3nt8.org/patches/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
@@ -234,7 +236,7 @@ IUSE="${IUSE} berkdb"
 # These are used for both runtime and compiletime
 DEPEND="
 	ssl? ( >=dev-libs/openssl-0.9.6d )
-	userland_GNU? ( sys-process/procps )
+	kernel_linux? ( sys-process/procps )
 	>=sys-apps/sed-4
 	>=sys-apps/texinfo-4.7-r1
 	>=sys-libs/readline-4.1
@@ -250,8 +252,9 @@ for i in "mysql" "mysql-community" "mysql-cluster" "mariadb" ; do
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
 
+# prefix: first need to implement something for #196294
 RDEPEND="${DEPEND}
-	!minimal? ( dev-db/mysql-init-scripts )
+	!minimal? ( !prefix? ( dev-db/mysql-init-scripts ) )
 	selinux? ( sec-policy/selinux-mysql )
 "
 
@@ -493,12 +496,12 @@ mysql-v2_pkg_postinst() {
 	mysql_init_vars
 
 	# Check FEATURES="collision-protect" before removing this
-	[[ -d "${ROOT}/var/log/mysql" ]] || install -d -m0750 -o mysql -g mysql "${ROOT}${MY_LOGDIR}"
+	[[ -d "${EROOT}/var/log/mysql" ]] || install -d -m0750 -o mysql -g mysql "${EROOT}${MY_LOGDIR}"
 
 	# Secure the logfiles
-	touch "${ROOT}${MY_LOGDIR}"/mysql.{log,err}
-	chown mysql:mysql "${ROOT}${MY_LOGDIR}"/mysql*
-	chmod 0660 "${ROOT}${MY_LOGDIR}"/mysql*
+	touch "${EROOT}${MY_LOGDIR}"/mysql.{log,err}
+	chown mysql:mysql "${EROOT}${MY_LOGDIR}"/mysql*
+	chmod 0660 "${EROOT}${MY_LOGDIR}"/mysql*
 
 	# Minimal builds don't have the MySQL server
 	if ! use minimal ; then
@@ -568,8 +571,8 @@ mysql-v2_pkg_config() {
 	fi
 
 	if [[ ( -n "${MY_DATADIR}" ) && ( "${MY_DATADIR}" != "${old_MY_DATADIR}" ) ]]; then
-		local MY_DATADIR_s="$(strip_duplicate_slashes ${ROOT}/${MY_DATADIR})"
-		local old_MY_DATADIR_s="$(strip_duplicate_slashes ${ROOT}/${old_MY_DATADIR})"
+		local MY_DATADIR_s="$(strip_duplicate_slashes ${EROOT}/${MY_DATADIR})"
+		local old_MY_DATADIR_s="$(strip_duplicate_slashes ${EROOT}/${old_MY_DATADIR})"
 
 		if [[ -d "${old_MY_DATADIR_s}" ]]; then
 			if [[ -d "${MY_DATADIR_s}" ]]; then
@@ -595,13 +598,13 @@ mysql-v2_pkg_config() {
 	local pwd2="b"
 	local maxtry=15
 
-	if [ -z "${MYSQL_ROOT_PASSWORD}" -a -f "${ROOT}/root/.my.cnf" ]; then
-		MYSQL_ROOT_PASSWORD="$(sed -n -e '/^password=/s,^password=,,gp' "${ROOT}/root/.my.cnf")"
+	if [ -z "${MYSQL_ROOT_PASSWORD}" -a -f "${EROOT}/root/.my.cnf" ]; then
+		MYSQL_ROOT_PASSWORD="$(sed -n -e '/^password=/s,^password=,,gp' "${EROOT}/root/.my.cnf")"
 	fi
 
-	if [[ -d "${ROOT}/${MY_DATADIR}/mysql" ]] ; then
+	if [[ -d "${EROOT}/${MY_DATADIR}/mysql" ]] ; then
 		ewarn "You have already a MySQL database in place."
-		ewarn "(${ROOT}/${MY_DATADIR}/*)"
+		ewarn "(${EROOT}/${MY_DATADIR}/*)"
 		ewarn "Please rename or delete it if you wish to replace it."
 		die "MySQL database already exists!"
 	fi
@@ -630,27 +633,27 @@ mysql-v2_pkg_config() {
 	local options=""
 	local sqltmp="$(emktemp)"
 
-	local help_tables="${ROOT}${MY_SHAREDSTATEDIR}/fill_help_tables.sql"
+	local help_tables="${EROOT}${MY_SHAREDSTATEDIR}/fill_help_tables.sql"
 	[[ -r "${help_tables}" ]] \
 	&& cp "${help_tables}" "${TMPDIR}/fill_help_tables.sql" \
 	|| touch "${TMPDIR}/fill_help_tables.sql"
 	help_tables="${TMPDIR}/fill_help_tables.sql"
 
 	pushd "${TMPDIR}" &>/dev/null
-	"${ROOT}/usr/bin/mysql_install_db" >"${TMPDIR}"/mysql_install_db.log 2>&1
+	"${EROOT}/usr/bin/mysql_install_db" --basedir=/usr >"${TMPDIR}"/mysql_install_db.log 2>&1
 	if [ $? -ne 0 ]; then
 		grep -B5 -A999 -i "ERROR" "${TMPDIR}"/mysql_install_db.log 1>&2
 		die "Failed to run mysql_install_db. Please review /var/log/mysql/mysqld.err AND ${TMPDIR}/mysql_install_db.log"
 	fi
 	popd &>/dev/null
-	[[ -f "${ROOT}/${MY_DATADIR}/mysql/user.frm" ]] \
+	[[ -f "${EROOT}/${MY_DATADIR}/mysql/user.frm" ]] \
 	|| die "MySQL databases not installed"
-	chown -R mysql:mysql "${ROOT}/${MY_DATADIR}" 2>/dev/null
-	chmod 0750 "${ROOT}/${MY_DATADIR}" 2>/dev/null
+	chown -R mysql:mysql "${EROOT}/${MY_DATADIR}" 2>/dev/null
+	chmod 0750 "${EROOT}/${MY_DATADIR}" 2>/dev/null
 
 	# Figure out which options we need to disable to do the setup
 	helpfile="${TMPDIR}/mysqld-help"
-	${ROOT}/usr/sbin/mysqld --verbose --help >"${helpfile}" 2>/dev/null
+	${EROOT}/usr/sbin/mysqld --verbose --help >"${helpfile}" 2>/dev/null
 	for opt in grant-tables host-cache name-resolve networking slave-start bdb \
 		federated innodb ssl log-bin relay-log slow-query-log external-locking \
 		ndbcluster \
@@ -664,7 +667,7 @@ mysql-v2_pkg_config() {
 
 	# Filling timezones, see
 	# http://dev.mysql.com/doc/mysql/en/time-zone-support.html
-	"${ROOT}/usr/bin/mysql_tzinfo_to_sql" "${ROOT}/usr/share/zoneinfo" > "${sqltmp}" 2>/dev/null
+	"${EROOT}/usr/bin/mysql_tzinfo_to_sql" "${EROOT}/usr/share/zoneinfo" > "${sqltmp}" 2>/dev/null
 
 	if [[ -r "${help_tables}" ]] ; then
 		cat "${help_tables}" >> "${sqltmp}"
@@ -673,13 +676,13 @@ mysql-v2_pkg_config() {
 	einfo "Creating the mysql database and setting proper"
 	einfo "permissions on it ..."
 
-	local socket="${ROOT}/var/run/mysqld/mysqld${RANDOM}.sock"
-	local pidfile="${ROOT}/var/run/mysqld/mysqld${RANDOM}.pid"
-	local mysqld="${ROOT}/usr/sbin/mysqld \
+	local socket="${EROOT}/var/run/mysqld/mysqld${RANDOM}.sock"
+	local pidfile="${EROOT}/var/run/mysqld/mysqld${RANDOM}.pid"
+	local mysqld="${EROOT}/usr/sbin/mysqld \
 		${options} \
 		--user=mysql \
-		--basedir=${ROOT}/usr \
-		--datadir=${ROOT}/${MY_DATADIR} \
+		--basedir=${EROOT}/usr \
+		--datadir=${EROOT}/${MY_DATADIR} \
 		--max_allowed_packet=8M \
 		--net_buffer_length=16K \
 		--default-storage-engine=MyISAM \
@@ -703,14 +706,14 @@ mysql-v2_pkg_config() {
 	ebegin "Setting root password"
 	# Do this from memory, as we don't want clear text passwords in temp files
 	local sql="UPDATE mysql.user SET Password = PASSWORD('${MYSQL_ROOT_PASSWORD}') WHERE USER='root'"
-	"${ROOT}/usr/bin/mysql" \
+	"${EROOT}/usr/bin/mysql" \
 		--socket=${socket} \
 		-hlocalhost \
 		-e "${sql}"
 	eend $?
 
 	ebegin "Loading \"zoneinfo\", this step may require a few seconds ..."
-	"${ROOT}/usr/bin/mysql" \
+	"${EROOT}/usr/bin/mysql" \
 		--socket=${socket} \
 		-hlocalhost \
 		-uroot \

@@ -117,7 +117,7 @@ configure_cmake_standard() {
 		-DENABLED_LOCAL_INFILE=1
 		-DEXTRA_CHARSETS=all
 		-DMYSQL_USER=mysql
-		-DMYSQL_UNIX_ADDR=/var/run/mysqld/mysqld.sock
+		-DMYSQL_UNIX_ADDR=${EPREFIX}/var/run/mysqld/mysqld.sock
 		-DWITHOUT_READLINE=1
 		-DWITH_ZLIB=system
 		-DWITHOUT_LIBWRAP=1
@@ -195,9 +195,9 @@ mysql-cmake_src_configure() {
 	CMAKE_BUILD_TYPE="RelWithDebInfo"
 
 	mycmakeargs=(
-		-DCMAKE_INSTALL_PREFIX=/usr
-		-DMYSQL_DATADIR=/var/lib/mysql
-		-DSYSCONFDIR=/etc/mysql
+		-DCMAKE_INSTALL_PREFIX=${EPREFIX}/usr
+		-DMYSQL_DATADIR=${EPREFIX}/var/lib/mysql
+		-DSYSCONFDIR=${EPREFIX}/etc/mysql
 		-DINSTALL_BINDIR=bin
 		-DINSTALL_DOCDIR=share/doc/${P}
 		-DINSTALL_DOCREADMEDIR=share/doc/${P}
@@ -205,14 +205,14 @@ mysql-cmake_src_configure() {
 		-DINSTALL_INFODIR=share/info
 		-DINSTALL_LIBDIR=$(get_libdir)/mysql
 		-DINSTALL_MANDIR=share/man
-		-DINSTALL_MYSQLDATADIR=/var/lib/mysql
+		-DINSTALL_MYSQLDATADIR=${EPREFIX}/var/lib/mysql
 		-DINSTALL_MYSQLSHAREDIR=share/mysql
 		-DINSTALL_MYSQLTESTDIR=share/mysql/mysql-test
 		-DINSTALL_PLUGINDIR=$(get_libdir)/mysql/plugin
 		-DINSTALL_SBINDIR=sbin
 		-DINSTALL_SCRIPTDIR=share/mysql/scripts
 		-DINSTALL_SQLBENCHDIR=share/mysql
-		-DINSTALL_SUPPORTFILESDIR=/usr/share/mysql
+		-DINSTALL_SUPPORTFILESDIR=${EPREFIX}/usr/share/mysql
 		-DWITH_COMMENT="Gentoo Linux ${PF}"
 		-DWITHOUT_UNIT_TESTS=1
 	)

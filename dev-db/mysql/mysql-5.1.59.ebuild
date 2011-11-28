@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.1.58.ebuild,v 1.1 2011/07/13 07:37:01 robbat2 Exp $
 
-EAPI="2"
+EAPI="4"
 
 MY_EXTRAS_VER="20110721-0450Z"
 # PBXT
