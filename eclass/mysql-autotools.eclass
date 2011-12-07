@@ -219,11 +219,11 @@ mysql-autotools_configure_51() {
 		if [[ "${PN}" != "mariadb" ]] ; then
 			elog "Before using the Federated storage engine, please be sure to read"
 			elog "http://dev.mysql.com/doc/refman/5.1/en/federated-limitations.html"
-			plugins_dyn="${plugins_sta} federatedx"
+			plugins_dyn="${plugins_dyn} federated"
 		else
 			elog "MariaDB includes the FederatedX engine. Be sure to read"
 			elog "http://askmonty.org/wiki/index.php/Manual:FederatedX_storage_engine"
-			plugins_dyn="${plugins_sta} federated"
+			plugins_dyn="${plugins_dyn} federatedx"
 		fi
 	else
 		plugins_dis="${plugins_dis} partition federated"
@@ -289,7 +289,7 @@ mysql-autotools_configure_51() {
 
 	if pbxt_available && [[ "${PBXT_NEWSTYLE}" == "1" ]]; then
 		use pbxt \
-		&& plugins_dyn="${plugins_dyn} pbxt" \
+		&& plugins_sta="${plugins_sta} pbxt" \
 		|| plugins_dis="${plugins_dis} pbxt"
 	fi
 
@@ -402,7 +402,7 @@ mysql-autotools_src_prepare() {
 		popd >/dev/null
 	fi
 
-	if pbxt_available && [[ "${PBXT_NEWSTYLE}" == "1" ]] && use pbxt ; then
+	if pbxt_available && [[ "${PBXT_NEWSTYLE}" != "1" ]] && use pbxt ; then
 		einfo "Adding storage engine: PBXT"
 		pushd "${S}"/storage >/dev/null
 		i='pbxt'
