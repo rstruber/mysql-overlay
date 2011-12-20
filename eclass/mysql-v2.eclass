@@ -53,7 +53,7 @@ inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx 
 #
 
 case "${EAPI:-0}" in
-	2|3|4) ;;
+	3|4) ;;
 	*) die "Unsupported EAPI: ${EAPI}" ;;
 esac
 
@@ -496,7 +496,7 @@ mysql-v2_pkg_postinst() {
 	mysql_init_vars
 
 	# Check FEATURES="collision-protect" before removing this
-	[[ -d "${EROOT}/var/log/mysql" ]] || install -d -m0750 -o mysql -g mysql "${ROOT}${MY_LOGDIR}"
+	[[ -d "${ROOT}${MY_LOGDIR}" ]] || install -d -m0750 -o mysql -g mysql "${ROOT}${MY_LOGDIR}"
 
 	# Secure the logfiles
 	touch "${ROOT}${MY_LOGDIR}"/mysql.{log,err}
