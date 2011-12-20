@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.5.1_alpha_pre2.ebuild,v 1.8 2010/04/01 20:41:21 robbat2 Exp $
 
-EAPI="2"
+EAPI="4"
 
 MY_EXTRAS_VER="live"
 MY_PV="${PV//_alpha_pre/-m}"
