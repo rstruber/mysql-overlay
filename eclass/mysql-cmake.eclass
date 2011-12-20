@@ -315,7 +315,7 @@ mysql-cmake_src_install() {
 		if [[ "${PREVIOUS_DATADIR}" != "yes" ]] ; then
 			dodir "${MY_DATADIR#${EPREFIX}}"
 			keepdir "${MY_DATADIR#${EPREFIX}}"
-			chown -R mysql:mysql "${ED}/${MY_DATADIR}"
+			chown -R mysql:mysql "${D}/${MY_DATADIR}"
 		fi
 
 		diropts "-m0755"
