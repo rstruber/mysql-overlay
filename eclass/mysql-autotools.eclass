@@ -337,7 +337,7 @@ pbxt_src_compile() {
 pbxt_src_install() {
 
 	pushd "${WORKDIR}/pbxt-${PBXT_VERSION}" &>/dev/null
-		emake install DESTDIR="${D}" || die "Failed to install PBXT"
+		emake install DESTDIR="${ED}" || die "Failed to install PBXT"
 	popd
 }
 
@@ -376,7 +376,7 @@ mysql-autotools_src_prepare() {
 
 	# Make charsets install in the right place
 	find . -name 'Makefile.am' \
-		-exec sed --in-place -e 's!$(pkgdatadir)!'"${EPREFIX}"${MY_SHAREDSTATEDIR}'!g' {} \;
+		-exec sed --in-place -e 's!$(pkgdatadir)!'${MY_SHAREDSTATEDIR}'!g' {} \;
 
 	# Remove what needs to be recreated, so we're sure it's actually done
 	einfo "Cleaning up old buildscript files"
@@ -478,11 +478,11 @@ mysql-autotools_src_configure() {
 
 	econf \
 		--libexecdir="${EPREFIX}/usr/sbin" \
-		--sysconfdir="${EPREFIX}${MY_SYSCONFDIR}" \
-		--localstatedir="${EPREFIX}${MY_LOCALSTATEDIR}" \
-		--sharedstatedir="${EPREFIX}${MY_SHAREDSTATEDIR}" \
-		--libdir="${EPREFIX}${MY_LIBDIR}" \
-		--includedir="${EPREFIX}${MY_INCLUDEDIR}" \
+		--sysconfdir="${MY_SYSCONFDIR}" \
+		--localstatedir="${MY_LOCALSTATEDIR}" \
+		--sharedstatedir="${MY_SHAREDSTATEDIR}" \
+		--libdir="${MY_LIBDIR}" \
+		--includedir="${MY_INCLUDEDIR}" \
 		--with-low-memory \
 		--with-client-ldflags=-lstdc++ \
 		--enable-thread-safe-client \
@@ -522,9 +522,9 @@ mysql-autotools_src_install() {
 	mysql_init_vars
 
 	emake install \
-		DESTDIR="${D}" \
-		benchdir_root="${EPREFIX}${MY_SHAREDSTATEDIR}" \
-		testroot="${EPREFIX}${MY_SHAREDSTATEDIR}" \
+		DESTDIR="${ED}" \
+		benchdir_root="${MY_SHAREDSTATEDIR}" \
+		testroot="${MY_SHAREDSTATEDIR}" \
 		|| die "emake install failed"
 
 	if [[ "${PBXT_NEWSTYLE}" != "1" ]]; then
@@ -539,27 +539,27 @@ mysql-autotools_src_install() {
 
 	# Various junk (my-*.cnf moved elsewhere)
 	einfo "Removing duplicate /usr/share/mysql files"
-	rm -Rf "${D}/usr/share/info"
+	rm -Rf "${ED}/usr/share/info"
 	for removeme in  "mysql-log-rotate" mysql.server* \
 		binary-configure* my-*.cnf mi_test_all*
 	do
-		rm -f "${D}"/${MY_SHAREDSTATEDIR}/${removeme}
+		rm -f "${ED}"/${MY_SHAREDSTATEDIR}/${removeme}
 	done
 
 	# Clean up stuff for a minimal build
 	if use minimal ; then
 		einfo "Remove all extra content for minimal build"
-		rm -Rf "${D}${MY_SHAREDSTATEDIR}"/{mysql-test,sql-bench}
-		rm -f "${D}"/usr/bin/{mysql{_install_db,manager*,_secure_installation,_fix_privilege_tables,hotcopy,_convert_table_format,d_multi,_fix_extensions,_zap,_explain_log,_tableinfo,d_safe,_install,_waitpid,binlog,test},myisam*,isam*,pack_isam}
-		rm -f "${D}/usr/sbin/mysqld"
-		rm -f "${D}${MY_LIBDIR}"/lib{heap,merge,nisam,my{sys,strings,sqld,isammrg,isam},vio,dbug}.a
+		rm -Rf "${ED}${MY_SHAREDSTATEDIR}"/{mysql-test,sql-bench}
+		rm -f "${ED}"/usr/bin/{mysql{_install_db,manager*,_secure_installation,_fix_privilege_tables,hotcopy,_convert_table_format,d_multi,_fix_extensions,_zap,_explain_log,_tableinfo,d_safe,_install,_waitpid,binlog,test},myisam*,isam*,pack_isam}
+		rm -f "${ED}/usr/sbin/mysqld"
+		rm -f "${ED}${MY_LIBDIR}"/lib{heap,merge,nisam,my{sys,strings,sqld,isammrg,isam},vio,dbug}.a
 	fi
 
 	# Unless they explicitly specific USE=test, then do not install the
 	# testsuite. It DOES have a use to be installed, esp. when you want to do a
 	# validation of your database configuration after tuning it.
 	if use !test ; then
-		rm -rf "${D}"/${MY_SHAREDSTATEDIR}/mysql-test
+		rm -rf "${ED}"/${MY_SHAREDSTATEDIR}/mysql-test
 	fi
 
 	# Configuration stuff
@@ -567,10 +567,10 @@ mysql-autotools_src_install() {
 		5.[1-9]|6*|7*) mysql_mycnf_version="5.1" ;;
 	esac
 	einfo "Building default my.cnf (${mysql_mycnf_version})"
-	insinto "${MY_SYSCONFDIR}"
+	insinto "${MY_SYSCONFDIR#${EPREFIX}}"
 	doins scripts/mysqlaccess.conf
 	mycnf_src="my.cnf-${mysql_mycnf_version}"
-	sed -e "s!@DATADIR@!${EPREFIX}${MY_DATADIR}!g" \
+	sed -e "s!@DATADIR@!${MY_DATADIR}!g" \
 		-e "s!/tmp!${EPREFIX}/tmp!" \
 		-e "s!/usr!${EPREFIX}/usr!" \
 		-e "s!= /var!= ${EPREFIX}/var!" \
@@ -589,16 +589,16 @@ mysql-autotools_src_install() {
 		# Empty directories ...
 		diropts "-m0750"
 		if [[ "${PREVIOUS_DATADIR}" != "yes" ]] ; then
-			dodir "${MY_DATADIR}"
-			keepdir "${MY_DATADIR}"
+			dodir "${MY_DATADIR#${EPREFIX}}"
+			keepdir "${MY_DATADIR#${EPREFIX}}"
 			chown -R mysql:mysql "${D}/${MY_DATADIR}"
 		fi
 
 		diropts "-m0755"
-		for folder in "${MY_LOGDIR}" "/var/run/mysqld" ; do
+		for folder in "${MY_LOGDIR#${EPREFIX}}" "/var/run/mysqld" ; do
 			dodir "${folder}"
 			keepdir "${folder}"
-			chown -R mysql:mysql "${D}/${folder}"
+			chown -R mysql:mysql "${ED}/${folder}"
 		done
 	fi
 
@@ -628,5 +628,5 @@ mysql-autotools_src_install() {
 
 	fi
 
-	mysql_lib_symlinks "${D}"
+	mysql_lib_symlinks "${ED}"
 }
