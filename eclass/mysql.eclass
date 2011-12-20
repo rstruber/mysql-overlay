@@ -1386,7 +1386,7 @@ mysql_pkg_config() {
 
 	# Figure out which options we need to disable to do the setup
 	helpfile="${TMPDIR}/mysqld-help"
-	${ROOT}/usr/sbin/mysqld --verbose --help >"${helpfile}" 2>/dev/null
+	${EROOT}/usr/sbin/mysqld --verbose --help >"${helpfile}" 2>/dev/null
 	for opt in grant-tables host-cache name-resolve networking slave-start bdb \
 		federated innodb ssl log-bin relay-log slow-query-log external-locking \
 		ndbcluster \
