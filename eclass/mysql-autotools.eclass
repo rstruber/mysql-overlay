@@ -337,7 +337,7 @@ pbxt_src_compile() {
 pbxt_src_install() {
 
 	pushd "${WORKDIR}/pbxt-${PBXT_VERSION}" &>/dev/null
-		emake install DESTDIR="${ED}" || die "Failed to install PBXT"
+		emake install DESTDIR="${D}" || die "Failed to install PBXT"
 	popd
 }
 
@@ -522,7 +522,7 @@ mysql-autotools_src_install() {
 	mysql_init_vars
 
 	emake install \
-		DESTDIR="${ED}" \
+		DESTDIR="${D}" \
 		benchdir_root="${MY_SHAREDSTATEDIR}" \
 		testroot="${MY_SHAREDSTATEDIR}" \
 		|| die "emake install failed"
