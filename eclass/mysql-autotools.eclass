@@ -543,23 +543,23 @@ mysql-autotools_src_install() {
 	for removeme in  "mysql-log-rotate" mysql.server* \
 		binary-configure* my-*.cnf mi_test_all*
 	do
-		rm -f "${ED}"/${MY_SHAREDSTATEDIR}/${removeme}
+		rm -f "${D}"/${MY_SHAREDSTATEDIR}/${removeme}
 	done
 
 	# Clean up stuff for a minimal build
 	if use minimal ; then
 		einfo "Remove all extra content for minimal build"
-		rm -Rf "${ED}${MY_SHAREDSTATEDIR}"/{mysql-test,sql-bench}
+		rm -Rf "${D}${MY_SHAREDSTATEDIR}"/{mysql-test,sql-bench}
 		rm -f "${ED}"/usr/bin/{mysql{_install_db,manager*,_secure_installation,_fix_privilege_tables,hotcopy,_convert_table_format,d_multi,_fix_extensions,_zap,_explain_log,_tableinfo,d_safe,_install,_waitpid,binlog,test},myisam*,isam*,pack_isam}
 		rm -f "${ED}/usr/sbin/mysqld"
-		rm -f "${ED}${MY_LIBDIR}"/lib{heap,merge,nisam,my{sys,strings,sqld,isammrg,isam},vio,dbug}.a
+		rm -f "${D}${MY_LIBDIR}"/lib{heap,merge,nisam,my{sys,strings,sqld,isammrg,isam},vio,dbug}.a
 	fi
 
 	# Unless they explicitly specific USE=test, then do not install the
 	# testsuite. It DOES have a use to be installed, esp. when you want to do a
 	# validation of your database configuration after tuning it.
 	if use !test ; then
-		rm -rf "${ED}"/${MY_SHAREDSTATEDIR}/mysql-test
+		rm -rf "${D}"/${MY_SHAREDSTATEDIR}/mysql-test
 	fi
 
 	# Configuration stuff
