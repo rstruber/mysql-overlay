@@ -2,8 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-MY_EXTRAS_VER="20110426-1046Z"
-EAPI="2"
+MY_EXTRAS_VER="20110819-0415Z"
+EAPI="4"
 
 # Build system
 BUILD="autotools"
@@ -74,7 +74,7 @@ src_test() {
 		# mysql-test/std_data/untrusted-cacert.pem is MEANT to be
 		# expired/invalid.
 		case ${PV} in
-			5.1.*|5.4.*|5.5.*)
+			5.1.*|5.5.*)
 				for t in openssl_1 rpl_openssl rpl.rpl_ssl rpl.rpl_ssl1 ssl ssl_8k_key \
 					ssl_compress ssl_connect rpl.rpl_heartbeat_ssl ; do \
 					mysql-v2_disable_test \
@@ -98,7 +98,7 @@ src_test() {
 		# Failure reason unknown at this time, must resolve before package.mask
 		# removal FIXME
 		case ${PV} in
-			5.1.*|5.2.*|5.4.*|5.5.*)
+			5.1.*|5.2.*|5.3.*|5.5.*)
 			for t in main.mysql_client_test main.mysql_comments \
 				main.mysql_upgrade  \
 				main.information_schema \
@@ -114,7 +114,7 @@ src_test() {
 		# which is not valid, and since it does not have 'loose-' in front of
 		# it, it's causing a failure
 		case ${PV} in
-			5.1.5*|5.4.*|5.5.*|6*)
+			5.1.5*|5.5.*|6*)
 			for t in rpl.rpl_mysql_upgrade main.log_tables_upgrade ; do
 				mysql-v2_disable_test  "$t" \
 					"False positives in Gentoo: connect-timeout"
