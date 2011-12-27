@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.5.14.ebuild,v 1.2 2011/07/14 03:58:44 jmbsvicetto Exp $
 
-EAPI="2"
+EAPI="4"
 
 MY_EXTRAS_VER="20110713-0702Z"
 MY_PV="${PV//_alpha_pre/-m}"
