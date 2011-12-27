@@ -123,13 +123,8 @@ configure_cmake_standard() {
 		-DWITHOUT_LIBWRAP=1
 	)
 
-	if use static ; then
-		mycmakeargs+=( -DDISABLE_SHARED=1 )
-	else
-		mycmakeargs+=( -DDISABLED_SHARED=0 )
-	fi
-
 	mycmakeargs+=(
+		$(cmake-utils_use_disable !static SHARED)
 		$(cmake-utils_use_with debug)
 		$(cmake-utils_use_with embedded EMBEDDED_SERVER)
 		$(cmake-utils_use_with profiling)
