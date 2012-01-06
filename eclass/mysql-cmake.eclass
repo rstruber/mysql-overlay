@@ -128,6 +128,7 @@ configure_cmake_standard() {
 		$(cmake-utils_use_with debug)
 		$(cmake-utils_use_with embedded EMBEDDED_SERVER)
 		$(cmake-utils_use_with profiling)
+		$(cmake-utils_use_enable systemtap DTRACE)
 	)
 
 	if use ssl; then
