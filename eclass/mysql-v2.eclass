@@ -382,7 +382,7 @@ mysql-v2_pkg_setup() {
 
 	if has test ${FEATURES} ; then
 		if ! use minimal ; then
-			if [[ $UID -eq 0 ]]; then
+			if ! has userpriv ${FEATURES} ; then
 				eerror "Testing with FEATURES=-userpriv is no longer supported by upstream. Tests MUST be run as non-root."
 			fi
 		fi
