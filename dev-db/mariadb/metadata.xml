@@ -16,6 +16,7 @@
   <flag name='pbxt'>Add experimental support for PBXT storage engine</flag>
   <flag name='profiling'>Add support for statement profiling (requires USE=community).</flag>
   <flag name='sphinx'>Add suport for the sphinx full-text search engine</flag>
+  <flag name="systemtap">Build support for profiling and tracing using <pkg>dev-util/systemtap</pkg></flag>
   <flag name='test'>Install upstream testsuites for end use.</flag>
 </use>
 </pkgmetadata>
