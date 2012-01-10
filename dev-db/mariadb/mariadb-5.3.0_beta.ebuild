@@ -3,7 +3,7 @@
 # $Header: $
 
 MY_EXTRAS_VER="20110819-0415Z"
-EAPI="2"
+EAPI="4"
 
 # Build system
 BUILD="autotools"
