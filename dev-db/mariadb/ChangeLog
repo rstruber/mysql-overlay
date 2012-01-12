@@ -2,6 +2,11 @@
 # Copyright 1999-2012 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mariadb-5.3.3_rc (12 Jan 2012)
+
+  12 Jan 2012; <atlantis@gentoo.org> +mariadb-5.3.3_rc.ebuild:
+  [dev-db/mariadb] 5.3.3_rc version bump.
+
 *mariadb-5.2.10 (12 Jan 2012)
 
   12 Jan 2012; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
