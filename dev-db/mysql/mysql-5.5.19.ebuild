@@ -1,10 +1,10 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.5.1_alpha_pre2.ebuild,v 1.8 2010/04/01 20:41:21 robbat2 Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.5.14.ebuild,v 1.2 2011/07/14 03:58:44 jmbsvicetto Exp $
 
 EAPI="4"
 
-MY_EXTRAS_VER="live"
+MY_EXTRAS_VER="20110713-0702Z"
 MY_PV="${PV//_alpha_pre/-m}"
 MY_PV="${MY_PV//_/-}"
 
@@ -83,10 +83,20 @@ src_test() {
 		#
 		# main.flush_read_lock_kill
 		# fails because of unknown system variable 'DEBUG_SYNC'
+		#
+		# main.openssl_1
+		# error message changing
+		# -mysqltest: Could not open connection 'default': 2026 SSL connection
+		#  error: ASN: bad other signature confirmation
+		# +mysqltest: Could not open connection 'default': 2026 SSL connection
+		#  error: error:00000001:lib(0):func(0):reason(1)
+		#
+
 		for t in main.mysql_client_test \
 			binlog.binlog_statement_insert_delayed main.information_schema \
-			main.mysqld--help-notwin; do
-				mysql_disable_test  "$t" "False positives in Gentoo"
+			main.mysqld--help-notwin main.flush_read_lock_kill \
+			sys_vars.plugin_dir_basic main.openssl_1 ; do
+				mysql-v2_disable_test  "$t" "False positives in Gentoo"
 		done
 
 		# Run mysql tests

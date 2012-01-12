@@ -53,7 +53,7 @@ inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx 
 #
 
 case "${EAPI:-0}" in
-	2|3|4) ;;
+	3|4) ;;
 	*) die "Unsupported EAPI: ${EAPI}" ;;
 esac
 
@@ -227,6 +227,8 @@ IUSE="${IUSE} berkdb"
 && mysql_version_is_at_least "5.2.5" \
 && IUSE="${IUSE} sphinx"
 
+mysql_version_is_at_least "5.5.7" \
+&& IUSE="${IUSE} systemtap"
 
 #
 # DEPENDENCIES:
@@ -278,6 +280,9 @@ mysql_version_is_at_least "5.5.8" \
 [[ "${PN}" == "mariadb" ]] \
 && mysql_version_is_at_least "5.2.5" \
 && DEPEND="${DEPEND} sphinx? ( app-misc/sphinx )"
+
+mysql_version_is_at_least "5.5.7" \
+&& DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )"
 
 # dev-perl/DBD-mysql is needed by some scripts installed by MySQL
 PDEPEND="perl? ( >=dev-perl/DBD-mysql-2.9004 )"
@@ -383,7 +388,7 @@ mysql-v2_pkg_setup() {
 
 	if has test ${FEATURES} ; then
 		if ! use minimal ; then
-			if [[ $UID -eq 0 ]]; then
+			if ! has userpriv ${FEATURES} ; then
 				eerror "Testing with FEATURES=-userpriv is no longer supported by upstream. Tests MUST be run as non-root."
 			fi
 		fi
@@ -497,12 +502,12 @@ mysql-v2_pkg_postinst() {
 	mysql_init_vars
 
 	# Check FEATURES="collision-protect" before removing this
-	[[ -d "${EROOT}/var/log/mysql" ]] || install -d -m0750 -o mysql -g mysql "${EROOT}${MY_LOGDIR}"
+	[[ -d "${ROOT}${MY_LOGDIR}" ]] || install -d -m0750 -o mysql -g mysql "${ROOT}${MY_LOGDIR}"
 
 	# Secure the logfiles
-	touch "${EROOT}${MY_LOGDIR}"/mysql.{log,err}
-	chown mysql:mysql "${EROOT}${MY_LOGDIR}"/mysql*
-	chmod 0660 "${EROOT}${MY_LOGDIR}"/mysql*
+	touch "${ROOT}${MY_LOGDIR}"/mysql.{log,err}
+	chown mysql:mysql "${ROOT}${MY_LOGDIR}"/mysql*
+	chmod 0660 "${ROOT}${MY_LOGDIR}"/mysql*
 
 	# Minimal builds don't have the MySQL server
 	if ! use minimal ; then
@@ -572,8 +577,8 @@ mysql-v2_pkg_config() {
 	fi
 
 	if [[ ( -n "${MY_DATADIR}" ) && ( "${MY_DATADIR}" != "${old_MY_DATADIR}" ) ]]; then
-		local MY_DATADIR_s="$(strip_duplicate_slashes ${EROOT}/${MY_DATADIR})"
-		local old_MY_DATADIR_s="$(strip_duplicate_slashes ${EROOT}/${old_MY_DATADIR})"
+		local MY_DATADIR_s="$(strip_duplicate_slashes ${ROOT}/${MY_DATADIR})"
+		local old_MY_DATADIR_s="$(strip_duplicate_slashes ${ROOT}/${old_MY_DATADIR})"
 
 		if [[ -d "${old_MY_DATADIR_s}" ]]; then
 			if [[ -d "${MY_DATADIR_s}" ]]; then
@@ -603,9 +608,9 @@ mysql-v2_pkg_config() {
 		MYSQL_ROOT_PASSWORD="$(sed -n -e '/^password=/s,^password=,,gp' "${EROOT}/root/.my.cnf")"
 	fi
 
-	if [[ -d "${EROOT}/${MY_DATADIR}/mysql" ]] ; then
+	if [[ -d "${ROOT}/${MY_DATADIR}/mysql" ]] ; then
 		ewarn "You have already a MySQL database in place."
-		ewarn "(${EROOT}/${MY_DATADIR}/*)"
+		ewarn "(${ROOT}/${MY_DATADIR}/*)"
 		ewarn "Please rename or delete it if you wish to replace it."
 		die "MySQL database already exists!"
 	fi
@@ -634,23 +639,23 @@ mysql-v2_pkg_config() {
 	local options=""
 	local sqltmp="$(emktemp)"
 
-	local help_tables="${EROOT}${MY_SHAREDSTATEDIR}/fill_help_tables.sql"
+	local help_tables="${ROOT}${MY_SHAREDSTATEDIR}/fill_help_tables.sql"
 	[[ -r "${help_tables}" ]] \
 	&& cp "${help_tables}" "${TMPDIR}/fill_help_tables.sql" \
 	|| touch "${TMPDIR}/fill_help_tables.sql"
 	help_tables="${TMPDIR}/fill_help_tables.sql"
 
 	pushd "${TMPDIR}" &>/dev/null
-	"${EROOT}/usr/bin/mysql_install_db" --basedir=/usr >"${TMPDIR}"/mysql_install_db.log 2>&1
+	"${EROOT}/usr/bin/mysql_install_db" "--basedir=${EPREFIX}/usr" >"${TMPDIR}"/mysql_install_db.log 2>&1
 	if [ $? -ne 0 ]; then
 		grep -B5 -A999 -i "ERROR" "${TMPDIR}"/mysql_install_db.log 1>&2
-		die "Failed to run mysql_install_db. Please review /var/log/mysql/mysqld.err AND ${TMPDIR}/mysql_install_db.log"
+		die "Failed to run mysql_install_db. Please review ${EPREFIX}/var/log/mysql/mysqld.err AND ${TMPDIR}/mysql_install_db.log"
 	fi
 	popd &>/dev/null
-	[[ -f "${EROOT}/${MY_DATADIR}/mysql/user.frm" ]] \
+	[[ -f "${ROOT}/${MY_DATADIR}/mysql/user.frm" ]] \
 	|| die "MySQL databases not installed"
-	chown -R mysql:mysql "${EROOT}/${MY_DATADIR}" 2>/dev/null
-	chmod 0750 "${EROOT}/${MY_DATADIR}" 2>/dev/null
+	chown -R mysql:mysql "${ROOT}/${MY_DATADIR}" 2>/dev/null
+	chmod 0750 "${ROOT}/${MY_DATADIR}" 2>/dev/null
 
 	# Figure out which options we need to disable to do the setup
 	helpfile="${TMPDIR}/mysqld-help"
@@ -683,7 +688,7 @@ mysql-v2_pkg_config() {
 		${options} \
 		--user=mysql \
 		--basedir=${EROOT}/usr \
-		--datadir=${EROOT}/${MY_DATADIR} \
+		--datadir=${ROOT}/${MY_DATADIR} \
 		--max_allowed_packet=8M \
 		--net_buffer_length=16K \
 		--default-storage-engine=MyISAM \
@@ -737,5 +742,5 @@ mysql-v2_pkg_config() {
 # Remove mysql symlinks.
 mysql-v2_pkg_postrm() {
 
-	: # mysql_lib_symlinks "${D}"
+	: # mysql_lib_symlinks "${ED}"
 }
