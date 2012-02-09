@@ -122,6 +122,10 @@ innodb_flush_log_at_trx_commit = 1
 innodb_lock_wait_timeout = 50
 innodb_file_per_table
 
+# Uncomment this to get FEDERATED engine support
+#plugin-load=federated=ha_federated.so
+loose-federated
+
 [mysqldump]
 quick
 max_allowed_packet 			= 16M
