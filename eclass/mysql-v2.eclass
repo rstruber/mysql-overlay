@@ -134,6 +134,7 @@ if [ -z "${SERVER_URI}" ]; then
 		# Recently upstream switched to an archive site, and not on mirrors
 		SERVER_URI="http://downloads.mysql.com/archives/${URI_FILE}-${MIRROR_PV}/${URI_A}
 					mirror://mysql/Downloads/${URI_DIR}-${PV%.*}/${URI_A}"
+	fi
 fi
 
 # Define correct SRC_URIs
