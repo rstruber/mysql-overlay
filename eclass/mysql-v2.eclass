@@ -1,6 +1,6 @@
-# Copyright 1999-2012 Gentoo Foundation
+# Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-v2.eclass,v 1.14 2012/01/09 10:42:19 grobian Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-v2.eclass,v 1.9 2011/10/07 04:30:18 jmbsvicetto Exp $
 
 # @ECLASS: mysql-v2.eclass
 # @MAINTAINER:
@@ -326,13 +326,14 @@ if pbxt_patch_available; then
 	PBXT_SRC_URI="http://www.primebase.org/download/${PBXT_P}.tar.gz mirror://sourceforge/pbxt/${PBXT_P}.tar.gz"
 	SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )"
 
-	# PBXT_NEWSTYLE means pbxt is in storage/ and gets enabled as other plugins
-	# vs. built outside the dir
-	if pbxt_available; then
+fi
 
-		IUSE="${IUSE} pbxt"
-		PBXT_NEWSTYLE=1
-	fi
+# PBXT_NEWSTYLE means pbxt is in storage/ and gets enabled as other plugins
+# vs. built outside the dir
+if pbxt_available; then
+
+	IUSE="${IUSE} pbxt"
+	PBXT_NEWSTYLE=1
 fi
 
 if xtradb_patch_available; then
