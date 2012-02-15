@@ -123,7 +123,7 @@ mysql-autotools_configure_common() {
 		myconf="${myconf} --with-debug=full"
 	else
 		myconf="${myconf} --without-debug"
-		if ( use cluster || [[ "${PN}" == "mysql-cluster" ]] ); then
+		if ( use cluster ); then
 			myconf="${myconf} --without-ndb-debug"
 		fi
 	fi
@@ -238,7 +238,7 @@ mysql-autotools_configure_51() {
 	done
 
 	# like configuration=max-no-ndb
-	if ( use cluster || [[ "${PN}" == "mysql-cluster" ]] ) ; then
+	if ( use cluster ) ; then
 		plugins_sta="${plugins_sta} ndbcluster partition"
 		plugins_dis="${plugins_dis//partition}"
 		myconf="${myconf} --with-ndb-binlog"
@@ -364,12 +364,9 @@ mysql-autotools_src_prepare() {
 	i="${S}"/storage/innodb_plugin/plug.in
 	[ -f "${i}" ] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
 
-	# Additional checks, remove bundled zlib (Cluster needs this, for static
-	# memory management in zlib, leave available for Cluster)
-	if [[ "${PN}" != "mysql-cluster" ]] ; then
-		rm -f "${S}/zlib/"*.[ch]
-		sed -i -e "s/zlib\/Makefile dnl/dnl zlib\/Makefile/" "${S}/configure.in"
-	fi
+	# Additional checks, remove bundled zlib
+	rm -f "${S}/zlib/"*.[ch]
+	sed -i -e "s/zlib\/Makefile dnl/dnl zlib\/Makefile/" "${S}/configure.in"
 	rm -f "scripts/mysqlbug"
 
 	# Make charsets install in the right place
