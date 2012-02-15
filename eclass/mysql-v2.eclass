@@ -110,23 +110,6 @@ MYSQL_VERSION_ID=${MYSQL_VERSION_ID##"0"}
 # This eclass should only be used with at least mysql-5.1.50
 mysql_version_is_at_least "5.1.50" || die "This eclass should only be used with >=mysql-5.1.50"
 
-# @ECLASS-VARIABLE: MYSQL_COMMUNITY_FEATURES
-# @DESCRIPTION:
-# Specifiy if community features are available. Possible values are 1 (yes)
-# and 0 (no).
-# Community features are available in mysql-community
-# AND in the re-merged mysql-5.0.82 and newer
-if [ "${PN}" == "mysql-community" -o "${PN}" == "mariadb" ]; then
-	MYSQL_COMMUNITY_FEATURES=1
-elif [ "${MYSQL_PV_MAJOR}" == "5.1" ]; then
-	MYSQL_COMMUNITY_FEATURES=1
-elif mysql_version_is_at_least "5.4.0"; then
-	MYSQL_COMMUNITY_FEATURES=1
-else
-	MYSQL_COMMUNITY_FEATURES=0
-fi
-
-
 # @ECLASS-VARIABLE: XTRADB_VER
 # @DEFAULT_UNSET
 # @DESCRIPTION:
@@ -151,14 +134,11 @@ if [ -z "${SERVER_URI}" ]; then
 		http://mirrors.fe.up.pt/pub/${PN}/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		http://ftp-stud.hs-esslingen.de/pub/Mirrors/${PN}/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		"
-	# The community and cluster builds are on the mirrors
-	elif [[ "${MYSQL_COMMUNITY_FEATURES}" == "1" || ${PN} == "mysql-cluster" ]] ; then
+	# The cluster builds are on the mirrors
+	elif [[ ${PN} == "mysql-cluster" ]] ; then
 		if [[ "${PN}" == "mysql-cluster" ]] ; then
 			URI_DIR="MySQL-Cluster"
 			URI_FILE="mysql-cluster-gpl"
-		else
-			URI_DIR="MySQL"
-			URI_FILE="mysql"
 		fi
 		URI_A="${URI_FILE}-${MY_PV}.tar.gz"
 		MIRROR_PV=$(get_version_component_range 1-2 ${PV})
@@ -188,9 +168,6 @@ if [[ "${PN}" == "mariadb" ]]; then
 	HOMEPAGE="http://mariadb.org/"
 	DESCRIPTION="MariaDB is a MySQL fork with 3rd-party patches and additional storage engines merged."
 fi
-if [[ "${PN}" == "mysql-community" ]]; then
-	DESCRIPTION="${DESCRIPTION} (obsolete, move to dev-db/mysql)"
-fi
 LICENSE="GPL-2"
 SLOT="0"
 
@@ -212,9 +189,7 @@ fi
 
 IUSE="${IUSE} max-idx-128"
 IUSE="${IUSE} berkdb"
-
-[[ ${MYSQL_COMMUNITY_FEATURES} == 1 ]] \
-&& IUSE="${IUSE} +community profiling"
+IUSE="${IUSE} +community profiling"
 
 [[ ${PN} == "mariadb" ]] \
 && IUSE="${IUSE} libevent"
@@ -249,7 +224,7 @@ DEPEND="
 && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
 
 # Having different flavours at the same time is not a good idea
-for i in "mysql" "mysql-community" "mysql-cluster" "mariadb" ; do
+for i in "mysql" "mysql-cluster" "mariadb" ; do
 	[[ ${i} == ${PN} ]] ||
 	DEPEND="${DEPEND} !dev-db/${i}"
 done

@@ -172,13 +172,11 @@ mysql-autotools_configure_51() {
 	# user's data is not accessible.
 	use max-idx-128 && die "Bug #336027: upstream has a corruption issue with max-idx-128 presently"
 	#use max-idx-128 && myconf="${myconf} --with-max-indexes=128"
-	if [ "${MYSQL_COMMUNITY_FEATURES}" == "1" ]; then
-		myconf="${myconf} $(use_enable community community-features)"
-		if use community; then
-			myconf="${myconf} $(use_enable profiling)"
-		else
-			myconf="${myconf} --disable-profiling"
-		fi
+	myconf="${myconf} $(use_enable community community-features)"
+	if use community; then
+		myconf="${myconf} $(use_enable profiling)"
+	else
+		myconf="${myconf} --disable-profiling"
 	fi
 
 	# Scan for all available plugins
