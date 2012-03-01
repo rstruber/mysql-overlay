@@ -1,10 +1,10 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.1.58.ebuild,v 1.1 2011/07/13 07:37:01 robbat2 Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.1.61.ebuild,v 1.2 2012/01/31 20:23:03 robbat2 Exp $
 
 EAPI="4"
 
-MY_EXTRAS_VER="20110721-0450Z"
+MY_EXTRAS_VER="20111118-2347Z"
 # PBXT
 PBXT_VERSION='1.0.11-6-pre-ga'
 # XtraDB
@@ -19,7 +19,7 @@ inherit toolchain-funcs mysql-v2
 IUSE="$IUSE"
 
 # REMEMBER: also update eclass/mysql*.eclass before committing!
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~ppc-macos ~x64-macos ~x86-solaris"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~amd64-linux ~ppc-macos ~x64-macos ~x86-solaris"
 
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
 # This is often broken still
@@ -217,10 +217,14 @@ src_test() {
 			done
 		fi
 
-		# bug 332565
 		if ! use extraengine ; then
+			# bug 332565
 			for t in main.range ; do
 				mysql-v2_disable_test $t "Test $t requires USE=extraengine"
+			done
+			# bug 401673
+			for t in federated.federated_plugin ; do
+				mysql-v2_disable_test $t "Test $t requires USE=extraengine (Need federated engine)"
 			done
 		fi
 

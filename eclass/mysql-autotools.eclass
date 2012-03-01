@@ -123,7 +123,7 @@ mysql-autotools_configure_common() {
 		myconf="${myconf} --with-debug=full"
 	else
 		myconf="${myconf} --without-debug"
-		if ( use cluster || [[ "${PN}" == "mysql-cluster" ]] ); then
+		if ( use cluster ); then
 			myconf="${myconf} --without-ndb-debug"
 		fi
 	fi
@@ -172,13 +172,11 @@ mysql-autotools_configure_51() {
 	# user's data is not accessible.
 	use max-idx-128 && die "Bug #336027: upstream has a corruption issue with max-idx-128 presently"
 	#use max-idx-128 && myconf="${myconf} --with-max-indexes=128"
-	if [ "${MYSQL_COMMUNITY_FEATURES}" == "1" ]; then
-		myconf="${myconf} $(use_enable community community-features)"
-		if use community; then
-			myconf="${myconf} $(use_enable profiling)"
-		else
-			myconf="${myconf} --disable-profiling"
-		fi
+	myconf="${myconf} $(use_enable community community-features)"
+	if use community; then
+		myconf="${myconf} $(use_enable profiling)"
+	else
+		myconf="${myconf} --disable-profiling"
 	fi
 
 	# Scan for all available plugins
@@ -219,11 +217,11 @@ mysql-autotools_configure_51() {
 		if [[ "${PN}" != "mariadb" ]] ; then
 			elog "Before using the Federated storage engine, please be sure to read"
 			elog "http://dev.mysql.com/doc/refman/5.1/en/federated-limitations.html"
-			plugins_dyn="${plugins_sta} federatedx"
+			plugins_dyn="${plugins_dyn} federated"
 		else
 			elog "MariaDB includes the FederatedX engine. Be sure to read"
 			elog "http://askmonty.org/wiki/index.php/Manual:FederatedX_storage_engine"
-			plugins_dyn="${plugins_sta} federated"
+			plugins_dyn="${plugins_dyn} federatedx"
 		fi
 	else
 		plugins_dis="${plugins_dis} partition federated"
@@ -240,7 +238,7 @@ mysql-autotools_configure_51() {
 	done
 
 	# like configuration=max-no-ndb
-	if ( use cluster || [[ "${PN}" == "mysql-cluster" ]] ) ; then
+	if ( use cluster ) ; then
 		plugins_sta="${plugins_sta} ndbcluster partition"
 		plugins_dis="${plugins_dis//partition}"
 		myconf="${myconf} --with-ndb-binlog"
@@ -366,12 +364,9 @@ mysql-autotools_src_prepare() {
 	i="${S}"/storage/innodb_plugin/plug.in
 	[ -f "${i}" ] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
 
-	# Additional checks, remove bundled zlib (Cluster needs this, for static
-	# memory management in zlib, leave available for Cluster)
-	if [[ "${PN}" != "mysql-cluster" ]] ; then
-		rm -f "${S}/zlib/"*.[ch]
-		sed -i -e "s/zlib\/Makefile dnl/dnl zlib\/Makefile/" "${S}/configure.in"
-	fi
+	# Additional checks, remove bundled zlib
+	rm -f "${S}/zlib/"*.[ch]
+	sed -i -e "s/zlib\/Makefile dnl/dnl zlib\/Makefile/" "${S}/configure.in"
 	rm -f "scripts/mysqlbug"
 
 	# Make charsets install in the right place
