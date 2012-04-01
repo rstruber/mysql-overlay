@@ -1,26 +1,44 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.92.ebuild,v 1.2 2012/01/08 23:40:20 jmbsvicetto Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.1.61.ebuild,v 1.2 2012/01/31 20:23:03 robbat2 Exp $
 
-MY_EXTRAS_VER="live"
 EAPI="4"
 
-inherit toolchain-funcs mysql
+MY_EXTRAS_VER="20120401-2131Z"
+# PBXT
+PBXT_VERSION='1.0.11-6-pre-ga'
+# XtraDB
+PERCONA_VER='5.1.45-10' XTRADB_VER='1.0.6-10'
+
+# Build type
+BUILD="autotools"
+
+inherit toolchain-funcs mysql-v2
+
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
 
 # REMEMBER: also update eclass/mysql*.eclass before committing!
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-freebsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~amd64-linux ~ppc-macos ~x64-macos ~x86-solaris"
 
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
+# This is often broken still
 EPATCH_EXCLUDE=''
 
-DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )"
-RDEPEND=""
+# Most of these are in the eclass
+DEPEND="|| ( >=sys-devel/gcc-3.4.6 >=sys-devel/gcc-apple-4.0 )
+		>=sys-devel/libtool-2.2.10"
+RDEPEND="${RDEPEND}"
 
 # Please do not add a naive src_unpack to this ebuild
 # If you want to add a single patch, copy the ebuild to an overlay
 # and create your own mysql-extras tarball, looking at 000_index.txt
+src_prepare() {
+	sed -i \
+		-e '/^noinst_PROGRAMS/s/basic-t//g' \
+		"${S}"/unittest/mytap/t/Makefile.am
+	mysql-v2_src_prepare
+}
 
 # Official test instructions:
 # USE='berkdb -cluster embedded extraengine perl ssl community' \
@@ -40,6 +58,7 @@ src_test() {
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 		cd "${S}"
 		einfo ">>> Test phase [test]: ${CATEGORY}/${PF}"
+		local retstatus_unit
 		local retstatus_ns
 		local retstatus_ps
 		local t
@@ -52,12 +71,12 @@ src_test() {
 		# USE=extraengines case
 		case ${PV} in
 			5.0.42)
-			mysql_disable_test "archive_gis" "Totally broken in 5.0.42"
+			mysql-v2_disable_test "archive_gis" "Totally broken in 5.0.42"
 			;;
 
 			5.0.4[3-9]|5.0.[56]*|5.0.70|5.0.87)
 			[ "$(tc-endian)" == "big" ] && \
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"archive_gis" \
 				"Broken in 5.0.43-70 and 5.0.87 on big-endian boxes only"
 			;;
@@ -67,7 +86,7 @@ src_test() {
 		# was fixed.
 		case ${PV} in
 			5.0.54|5.0.51*)
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"read_only" \
 				"Broken in 5.0.51-54, output in wrong order"
 			;;
@@ -75,14 +94,14 @@ src_test() {
 
 		# Ditto to read_only
 		[ "${PV}" == "5.0.51a" ] && \
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"view" \
 				"Broken in 5.0.51, output in wrong order"
 
 		# x86-specific, OOM issue with some subselects on low memory servers
 		[ "${PV}" == "5.0.54" ] && \
 			[ "${ARCH/x86}" != "${ARCH}" ] && \
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"subselect" \
 				"Testcase needs tuning on x86 for oom condition"
 
@@ -90,7 +109,7 @@ src_test() {
 		[ "${PV}" == "5.0.56" ] && \
 			for t in openssl_1 rpl_openssl rpl_ssl ssl \
 				ssl_8k_key ssl_compress ssl_connect ; do \
-				mysql_disable_test \
+				mysql-v2_disable_test \
 					"$t" \
 					"OpenSSL tests broken on 5.0.56"
 			done
@@ -99,7 +118,7 @@ src_test() {
 		# Upstream bug 41066
 		# http://bugs.mysql.com/bug.php?id=41066
 		[ "${PV}" == "5.0.72" ] && \
-			mysql_disable_test \
+			mysql-v2_disable_test \
 				"status2" \
 				"Broken in 5.0.72, new test is broken, upstream bug #41066"
 
@@ -119,58 +138,104 @@ src_test() {
 		# mysql-test/std_data/untrusted-cacert.pem is MEANT to be
 		# expired/invalid.
 		case ${PV} in
-			5.0.*|5.1.*)
+			5.0.*|5.1.*|5.4.*|5.5.*)
 				for t in openssl_1 rpl_openssl rpl.rpl_ssl rpl.rpl_ssl1 ssl ssl_8k_key \
-					ssl_compress ssl_connect ; do \
-					mysql_disable_test \
+					ssl_compress ssl_connect rpl.rpl_heartbeat_ssl ; do \
+					mysql-v2_disable_test \
 						"$t" \
 						"These OpenSSL tests break due to expired certificates"
 				done
 			;;
 		esac
 
-		# These are also failing in MySQL 5.0 for now, and are believed to be
+		# These are also failing in MySQL 5.1 for now, and are believed to be
 		# false positives:
 		#
-		# main.mysql_comment, main.mysql_upgrade:
+		# main.mysql_comment, main.mysql_upgrade, main.information_schema,
+		# funcs_1.is_columns_mysql funcs_1.is_tables_mysql funcs_1.is_triggers:
 		# fails due to USE=-latin1 / utf8 default
 		#
 		# main.mysql_client_test:
 		# segfaults at random under Portage only, suspect resource limits.
+		#
+		# main.not_partition:
+		# Failure reason unknown at this time, must resolve before package.mask
+		# removal FIXME
 		case ${PV} in
-			5.0.*)
-			for t in main.mysql_client_test main.mysql_comments main.mysql_upgrade; do
-				mysql_disable_test  "$t" "False positives in Gentoo"
+			5.1.*|5.4.*|5.5.*)
+			for t in main.mysql_client_test main.mysql_comments \
+				main.mysql_upgrade  \
+				main.information_schema \
+				main.not_partition funcs_1.is_columns_mysql \
+				funcs_1.is_tables_mysql funcs_1.is_triggers; do
+				mysql-v2_disable_test  "$t" "False positives in Gentoo"
+			done
+			;;
+		esac
+
+		# New failures in 5.1.50/5.1.51, reported by jmbsvicetto.
+		# These tests are picking up a 'connect-timeout' config from somewhere,
+		# which is not valid, and since it does not have 'loose-' in front of
+		# it, it's causing a failure
+		case ${PV} in
+			5.1.5*|5.4.*|5.5.*|6*)
+			for t in rpl.rpl_mysql_upgrade main.log_tables_upgrade ; do
+				mysql-v2_disable_test  "$t" \
+					"False positives in Gentoo: connect-timeout"
 			done
 			;;
 		esac
 
 		use profiling && use community \
-		|| mysql_disable_test main.profiling \
+		|| mysql-v2_disable_test main.profiling \
 			"Profiling test needs profiling support"
 
 		if [ "${PN}" == "mariadb" ]; then
 			for t in \
 				parts.part_supported_sql_func_ndb \
 				parts.partition_auto_increment_ndb ; do
-					mysql_disable_test $t "ndb not supported in mariadb"
+					mysql-v2_disable_test $t "ndb not supported in mariadb"
 			done
 		fi
 
-		case $PV in
-			5.0.91)
-			for t in archive archive_gis archive-big \
-				federated_archive mysqldump-max \
+		# This fail with XtraDB in place of normal InnoDB
+		# TODO: test if they are broken with the rest of the Percona patches
+		if xtradb_patch_available && use xtradb ; then
+			for t in main.innodb innodb.innodb_bug51378 \
+				main.information_schema_db main.mysqlshow \
+				main.innodb-autoinc main.innodb_bug21704 \
+				main.innodb_bug44369 main.innodb_bug46000 \
+				main.index_merge_innodb \
+				innodb.innodb innodb.innodb_misc1 innodb.innodb_bug52663 \
+				innodb.innodb-autoinc innodb.innodb-autoinc-44030 \
+				innodb.innodb_bug21704 innodb.innodb_bug44369 \
+				innodb.innodb_bug46000 innodb.innodb_bug48024 \
+				innodb.innodb_bug49164 innodb.innodb_bug51920 \
+				innodb.innodb_bug54044 \
 				; do
-					mysql_disable_test $t "Broken in 5.0.91"
-				done
-			;;
-		esac
+					mysql-v2_disable_test $t "tests broken in xtradb"
+			done
+		fi
+
+		if ! use extraengine ; then
+			# bug 332565
+			for t in main.range ; do
+				mysql-v2_disable_test $t "Test $t requires USE=extraengine"
+			done
+			# bug 401673
+			for t in federated.federated_plugin ; do
+				mysql-v2_disable_test $t "Test $t requires USE=extraengine (Need federated engine)"
+			done
+		fi
 
 		# create directories because mysqladmin might make out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
 
 		# We run the test protocols seperately
+		emake test-unit
+		retstatus_unit=$?
+		[[ $retstatus_unit -eq 0 ]] || eerror "test-unit failed"
+
 		emake test-ns force="--force --vardir=${S}/mysql-test/var-ns"
 		retstatus_ns=$?
 		[[ $retstatus_ns -eq 0 ]] || eerror "test-ns failed"
@@ -181,10 +246,14 @@ src_test() {
 		[[ $retstatus_ps -eq 0 ]] || eerror "test-ps failed"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
 
+		# TODO:
+		# When upstream enables the pr and nr testsuites, we need those as well.
+
 		# Cleanup is important for these testcases.
 		pkill -9 -f "${S}/ndb" 2>/dev/null
 		pkill -9 -f "${S}/sql" 2>/dev/null
 		failures=""
+		[[ $retstatus_unit -eq 0 ]] || failures="${failures} test-unit"
 		[[ $retstatus_ns -eq 0 ]] || failures="${failures} test-ns"
 		[[ $retstatus_ps -eq 0 ]] || failures="${failures} test-ps"
 		has usersandbox $FEATURES && eerror "Some tests may fail with FEATURES=usersandbox"
