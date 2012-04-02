@@ -116,7 +116,7 @@ mysql_version_is_at_least "5.1.50" || die "This eclass should only be used with 
 if [ -z "${SERVER_URI}" ]; then
 	[ -z "${MY_PV}" ] && MY_PV="${PV//_/-}"
 	if [ "${PN}" == "mariadb" ]; then
-		MARIA_FULL_PV="$(replace_version_separator 3 '-' ${PV})"
+		MARIA_FULL_PV="$(replace_version_separator 3 '-' ${MY_PV})"
 		MARIA_FULL_P="${PN}-${MARIA_FULL_PV}"
 		SERVER_URI="
 		http://ftp.osuosl.org/pub/mariadb/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
