@@ -37,7 +37,7 @@ mysql-cmake_disable_test() {
 	#einfo "rawtestname=${rawtestname} testname=${testname} testsuite=${testsuite}"
 	echo ${testname} : ${reason} >> "${mysql_disable_file}"
 
-	if [ -n "${testsuite}" ]; then
+	if [ -n "${testsuite}" ] && [ "${testsuite}" != "main" ]; then
 		for mysql_disabled_file in \
 			${S}/mysql-test/suite/${testsuite}/disabled.def  \
 			${S}/mysql-test/suite/${testsuite}/t/disabled.def  \
@@ -45,7 +45,7 @@ mysql-cmake_disable_test() {
 			[ -f "${mysql_disabled_file}" ] && break
 		done
 		if [ "${mysql_disabled_file}" != "FAILED" ]; then
-			echo "${testname} : ${reason}" >> "${mysql_disable_file}"
+			echo "${testname} : ${reason}" >> "${mysql_disabled_file}"
 		else
 			for mysql_disabled_dir in \
 				${S}/mysql-test/suite/${testsuite} \
