@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-MY_EXTRAS_VER="20110819-0415Z"
+MY_EXTRAS_VER="20111118-2347Z"
 EAPI="4"
 
 # Build system
@@ -91,11 +91,14 @@ src_test() {
 		# +mysqltest: Could not open connection 'default': 2026 SSL connection
 		#  error: error:00000001:lib(0):func(0):reason(1)
 		#
+		# plugins.unix_socket
+		# fails because portage strips out the USER enviornment variable
+		#
 
 		for t in main.mysql_client_test \
 			binlog.binlog_statement_insert_delayed main.information_schema \
 			main.mysqld--help-notwin main.flush_read_lock_kill \
-			sys_vars.plugin_dir_basic main.openssl_1 ; do
+			sys_vars.plugin_dir_basic main.openssl_1 plugins.unix_socket ; do
 				mysql-v2_disable_test  "$t" "False positives in Gentoo"
 		done
 

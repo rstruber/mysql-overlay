@@ -176,6 +176,7 @@ IUSE="${IUSE} berkdb"
 IUSE="${IUSE} +community profiling"
 
 [[ ${PN} == "mariadb" ]] \
+&& mysql_check_version_range "5.1.38 to 5.3.99" \
 && IUSE="${IUSE} libevent"
 
 [[ ${PN} == "mariadb" ]] \
@@ -205,6 +206,7 @@ DEPEND="
 "
 
 [[ ${PN} == mariadb ]] \
+&& mysql_check_version_range "5.1.38 to 5.3.99" \
 && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
 
 # Having different flavours at the same time is not a good idea
