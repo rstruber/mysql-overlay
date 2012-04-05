@@ -71,10 +71,11 @@ src_test() {
 		# false positives:
 		#
 		# main.information_schema, binlog.binlog_statement_insert_delayed,
-		# main.mysqld--help-notwin
+		# main.mysqld--help, funcs_1.is_triggers, funcs_1.is_tables_mysql,
+		# funcs_1.is_columns_mysql
 		# fails due to USE=-latin1 / utf8 default
 		#
-		# main.mysql_client_test:
+		# main.mysql_client_test, main.mysql_client_test_nonblock:
 		# segfaults at random under Portage only, suspect resource limits.
 		#
 		# sys_vars.plugin_dir_basic
@@ -95,10 +96,11 @@ src_test() {
 		# fails because portage strips out the USER enviornment variable
 		#
 
-		for t in main.mysql_client_test \
+		for t in main.mysql_client_test main.mysql_client_test_nonblock \
 			binlog.binlog_statement_insert_delayed main.information_schema \
-			main.mysqld--help-notwin main.flush_read_lock_kill \
-			sys_vars.plugin_dir_basic main.openssl_1 plugins.unix_socket ; do
+			main.mysqld--help main.flush_read_lock_kill \
+			sys_vars.plugin_dir_basic main.openssl_1 plugins.unix_socket \
+			funcs_1.is_triggers funcs_1.is_tables_mysql funcs_1.is_columns_mysql ; do
 				mysql-v2_disable_test  "$t" "False positives in Gentoo"
 		done
 
