@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.92.ebuild,v 1.2 2012/01/08 23:40:20 jmbsvicetto Exp $
 
-MY_EXTRAS_VER="live"
+MY_EXTRAS_VER="20120401-2131Z"
 EAPI="4"
 
 inherit toolchain-funcs mysql
@@ -162,10 +162,29 @@ src_test() {
 			for t in archive archive_gis archive-big \
 				federated_archive mysqldump-max \
 				; do
-					mysql_disable_test $t "Broken in 5.0.91"
+					mysql_disable_test $t "Broken in $PV"
+				done
+			;;
+			5.0.96)
+				for t in \
+					client_xml compress connect ctype_recoding drop \
+					federated grant information_schema \
+					information_schema_db innodb lowercase_table \
+					lowercase_utf8 mysql-bug41486 mysql-bug45236 mysql \
+					mysqlcheck mysqldump-max mysqldump mysqldump_restore \
+					mysqlshow ps ps_1general rename rpl000009 rpl_ddl \
+					rpl_delete_all rpl_drop_db rpl_dual_pos_advance \
+					rpl_error_ignored_table rpl_filter_tables_not_exist \
+					rpl_replicate_do rpl_trigger_not_windows select \
+					show_check sp system_mysql_db system_mysql_db_fix30020 \
+					system_mysql_db_fix40123 view \
+				; do
+					mysql_disable_test $t "Broken in $PV"
 				done
 			;;
 		esac
+
+
 
 		# create directories because mysqladmin might make out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}

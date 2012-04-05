@@ -1,6 +1,6 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.166 2011/09/25 12:43:28 grobian Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.170 2012/01/09 10:42:19 grobian Exp $
 
 # @ECLASS: mysql.eclass
 # @MAINTAINER:
@@ -33,7 +33,7 @@ if [[ "${MY_EXTRAS_VER}" == "live" ]]; then
 fi
 
 case "${EAPI:-0}" in
-	2)
+	2 | 3 | 4)
 		EXPORT_FUNCTIONS pkg_setup \
 					src_unpack src_prepare \
 					src_configure src_compile \

@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-MY_EXTRAS_VER="20111118-2347Z"
+MY_EXTRAS_VER="20120401-2131Z"
 MY_PV="${PV//_alpha_pre/-m}"
 MY_PV="${MY_PV//_/-}"
 
