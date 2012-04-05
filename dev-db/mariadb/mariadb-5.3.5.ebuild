@@ -2,12 +2,14 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-SERVER_URI="http://ftp.osuosl.org/pub/mariadb/mariadb-5.3.5-ga/kvm-tarbake-jaunty-x86/mariadb-5.3.5-ga.tar.gz"
 MY_EXTRAS_VER="20110819-0415Z"
 EAPI="4"
 
 # Build system
 BUILD="autotools"
+
+# Suffix on files...
+MY_PV="$PV-ga"
 
 inherit toolchain-funcs mysql-v2
 # only to make repoman happy. it is really set in the eclass
