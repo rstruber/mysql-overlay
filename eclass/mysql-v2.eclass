@@ -1,6 +1,6 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-v2.eclass,v 1.9 2011/10/07 04:30:18 jmbsvicetto Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql-v2.eclass,v 1.14 2012/01/09 10:42:19 grobian Exp $
 
 # @ECLASS: mysql-v2.eclass
 # @MAINTAINER:
@@ -248,7 +248,6 @@ PDEPEND="perl? ( >=dev-perl/DBD-mysql-2.9004 )"
 
 # For other stuff to bring us in
 PDEPEND="${PDEPEND} =virtual/mysql-${MYSQL_PV_MAJOR}"
-
 
 #
 # External patches
