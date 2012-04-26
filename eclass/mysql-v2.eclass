@@ -243,7 +243,8 @@ mysql_version_is_at_least "5.5.8" \
 && DEPEND="${DEPEND} sphinx? ( app-misc/sphinx )"
 
 mysql_version_is_at_least "5.5.7" \
-&& DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )"
+&& DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )" \
+&& DEPEND="${DEPEND} kernel_linux? ( dev-libs/libaio )"
 
 # dev-perl/DBD-mysql is needed by some scripts installed by MySQL
 PDEPEND="perl? ( >=dev-perl/DBD-mysql-2.9004 )"
