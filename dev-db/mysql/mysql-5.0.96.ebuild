@@ -1,9 +1,9 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.92.ebuild,v 1.2 2012/01/08 23:40:20 jmbsvicetto Exp $
+# $Header: $
 
-MY_EXTRAS_VER="20120401-2131Z"
 EAPI="4"
+MY_EXTRAS_VER="20120401-2131Z"
 
 inherit toolchain-funcs mysql
 # only to make repoman happy. it is really set in the eclass
@@ -183,8 +183,6 @@ src_test() {
 				done
 			;;
 		esac
-
-
 
 		# create directories because mysqladmin might make out of order
 		mkdir -p "${S}"/mysql-test/var-{ps,ns}{,/log}
