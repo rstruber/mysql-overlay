@@ -2,6 +2,15 @@
 # Copyright 1999-2012 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  22 May 2012; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  mariadb-5.1.55.ebuild, mariadb-5.1.62.ebuild, mariadb-5.2.7.ebuild,
+  mariadb-5.2.8.ebuild, mariadb-5.2.9.ebuild, mariadb-5.2.10.ebuild,
+  mariadb-5.2.12.ebuild, mariadb-5.3.0_beta.ebuild, mariadb-5.3.1_beta.ebuild,
+  mariadb-5.3.3_rc.ebuild, mariadb-5.3.5.ebuild, mariadb-5.3.6.ebuild,
+  mariadb-5.5.22.ebuild, mariadb-5.5.23.ebuild:
+  Move EAPI assignment to the top.
+  Whitespace.
+
 *mariadb-5.3.3_rc (12 Jan 2012)
 
   12 Jan 2012; <atlantis@gentoo.org> +mariadb-5.3.3_rc.ebuild:
