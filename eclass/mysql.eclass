@@ -29,7 +29,7 @@ S="${WORKDIR}/mysql"
 if [[ "${MY_EXTRAS_VER}" == "live" ]]; then
 	EGIT_PROJECT=mysql-extras
 	EGIT_REPO_URI="git://git.overlays.gentoo.org/proj/mysql-extras.git"
-	inherit git
+	inherit git-2
 fi
 
 case "${EAPI:-0}" in
@@ -151,7 +151,7 @@ DEPEND="${DEPEND}
 		virtual/yacc"
 
 if [ "${EAPI:-0}" = "2" ]; then
-	DEPEND="${DEPEND} static? ( || ( sys-libs/ncurses[static-libs] <=sys-libs/ncurses-5.7-r3 ) )"
+	DEPEND="${DEPEND} static? ( sys-libs/ncurses[static-libs] )"
 fi
 
 # compile-time-only

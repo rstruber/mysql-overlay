@@ -223,7 +223,7 @@ DEPEND="${DEPEND}
 	virtual/yacc
 "
 
-DEPEND="${DEPEND} static? ( || ( sys-libs/ncurses[static-libs] <=sys-libs/ncurses-5.7-r3 ) )"
+DEPEND="${DEPEND} static? ( sys-libs/ncurses[static-libs] )"
 
 # compile-time-only
 DEPEND="${DEPEND} >=dev-util/cmake-2.4.3"
