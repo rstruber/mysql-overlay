@@ -2,8 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-MY_EXTRAS_VER="20120425-1449Z"
 EAPI="4"
+MY_EXTRAS_VER="20120425-1449Z"
 
 # Build system
 BUILD="autotools"
