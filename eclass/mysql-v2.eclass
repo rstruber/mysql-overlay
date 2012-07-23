@@ -15,7 +15,7 @@
 # This eclass uses the mysql-autotools and mysql-cmake eclasses for the
 # specific bits related to the build system.
 # It provides the src_unpack, src_prepare, src_configure, src_compile,
-# scr_install, pkg_preinst, pkg_postinst, pkg_config and pkg_postrm
+# src_install, pkg_preinst, pkg_postinst, pkg_config and pkg_postrm
 # phase hooks.
 
 # @ECLASS-VARIABLE: BUILD
