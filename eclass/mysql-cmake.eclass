@@ -137,7 +137,7 @@ configure_cmake_standard() {
 		mycmakeargs+=( -DWITH_SSL=0 )
 	fi
 
-	if use tcmalloc; then
+	if mysql_version_is_at_least "5.5" && use tcmalloc; then
 		mycmakeargs+=( -DCMAKE_EXE_LINKER_FLAGS='-ltcmalloc' -DWITH_SAFEMALLOC=OFF )
 	fi
 
