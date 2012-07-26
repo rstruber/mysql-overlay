@@ -186,6 +186,9 @@ IUSE="${IUSE} +community profiling"
 && mysql_version_is_at_least "5.2.5" \
 && IUSE="${IUSE} sphinx"
 
+mysql_version_is_at_least "5.5" \
+&& IUSE="${IUSE} tcmalloc"
+
 mysql_version_is_at_least "5.5.7" \
 && IUSE="${IUSE} systemtap"
 
@@ -242,6 +245,9 @@ mysql_version_is_at_least "5.5.8" \
 
 mysql_version_is_at_least "5.5.7" \
 && DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )"
+
+mysql_version_is_at_least "5.5" \
+&& DEPEND="${DEPEND} tcmalloc? ( dev-util/google-perftools )"
 
 # dev-perl/DBD-mysql is needed by some scripts installed by MySQL
 PDEPEND="perl? ( >=dev-perl/DBD-mysql-2.9004 )"

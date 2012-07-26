@@ -137,6 +137,10 @@ configure_cmake_standard() {
 		mycmakeargs+=( -DWITH_SSL=0 )
 	fi
 
+	if use tcmalloc; then
+		mycmakeargs+=( -DCMAKE_EXE_LINKER_FLAGS='-ltcmalloc' -DWITH_SAFEMALLOC=OFF )
+	fi
+
 	# Storage engines
 	mycmakeargs+=(
 		-DWITH_ARCHIVE_STORAGE_ENGINE=1
