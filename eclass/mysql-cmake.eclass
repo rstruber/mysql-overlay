@@ -15,7 +15,7 @@
 # the src_unpack, src_prepare, src_configure, src_compile, scr_install,
 # pkg_preinst, pkg_postinst, pkg_config and pkg_postrm phase hooks.
 
-inherit cmake-utils
+inherit cmake-utils flag-o-matic multilib
 
 #
 # HELPER FUNCTIONS:
@@ -150,6 +150,10 @@ configure_cmake_standard() {
 		mycmakeargs+=( -DWITH_SSL=system )
 	else
 		mycmakeargs+=( -DWITH_SSL=0 )
+	fi
+
+	if mysql_version_is_at_least "5.5" && use tcmalloc; then
+		mycmakeargs+=( -DCMAKE_EXE_LINKER_FLAGS='-ltcmalloc' -DWITH_SAFEMALLOC=OFF )
 	fi
 
 	# Storage engines

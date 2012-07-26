@@ -1,19 +1,25 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.5.14.ebuild,v 1.2 2011/07/14 03:58:44 jmbsvicetto Exp $
 
 EAPI="4"
-MY_EXTRAS_VER="20120416-2021Z"
 
-# Build system
+MY_EXTRAS_VER="20120401-2131Z"
+MY_PV="${PV//_alpha_pre/-m}"
+MY_PV="${MY_PV//_/-}"
+
+# Build type
 BUILD="cmake"
 
 inherit toolchain-funcs mysql-v2
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
 
+# Define the mysql-extras source
+EGIT_REPO_URI="git://git.overlays.gentoo.org/proj/mysql-extras.git"
+
 # REMEMBER: also update eclass/mysql*.eclass before committing!
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-freebsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x64-solaris ~x86-solaris"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
 
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
 EPATCH_EXCLUDE=''
@@ -24,17 +30,11 @@ RDEPEND="${RDEPEND}"
 # Please do not add a naive src_unpack to this ebuild
 # If you want to add a single patch, copy the ebuild to an overlay
 # and create your own mysql-extras tarball, looking at 000_index.txt
-src_prepare() {
-	sed -i \
-		-e '/^noinst_PROGRAMS/s/basic-t//g' \
-		"${S}"/unittest/mytap/t/Makefile.am
-	mysql-v2_src_prepare
-}
 
 # Official test instructions:
 # USE='berkdb -cluster embedded extraengine perl ssl community' \
 # FEATURES='test userpriv -usersandbox' \
-# ebuild mariadb-X.X.XX.ebuild \
+# ebuild mysql-X.X.XX.ebuild \
 # digest clean package
 src_test() {
 
@@ -71,11 +71,10 @@ src_test() {
 		# false positives:
 		#
 		# main.information_schema, binlog.binlog_statement_insert_delayed,
-		# main.mysqld--help, funcs_1.is_triggers, funcs_1.is_tables_mysql,
-		# funcs_1.is_columns_mysql
+		# main.mysqld--help-notwin
 		# fails due to USE=-latin1 / utf8 default
 		#
-		# main.mysql_client_test, main.mysql_client_test_nonblock:
+		# main.mysql_client_test:
 		# segfaults at random under Portage only, suspect resource limits.
 		#
 		# sys_vars.plugin_dir_basic
@@ -92,15 +91,11 @@ src_test() {
 		# +mysqltest: Could not open connection 'default': 2026 SSL connection
 		#  error: error:00000001:lib(0):func(0):reason(1)
 		#
-		# plugins.unix_socket
-		# fails because portage strips out the USER enviornment variable
-		#
 
-		for t in main.mysql_client_test main.mysql_client_test_nonblock \
+		for t in main.mysql_client_test \
 			binlog.binlog_statement_insert_delayed main.information_schema \
-			main.mysqld--help main.flush_read_lock_kill \
-			sys_vars.plugin_dir_basic main.openssl_1 plugins.unix_socket \
-			funcs_1.is_triggers funcs_1.is_tables_mysql funcs_1.is_columns_mysql ; do
+			main.mysqld--help-notwin main.flush_read_lock_kill \
+			sys_vars.plugin_dir_basic main.openssl_1 ; do
 				mysql-v2_disable_test  "$t" "False positives in Gentoo"
 		done
 
