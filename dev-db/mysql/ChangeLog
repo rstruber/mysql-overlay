@@ -2,6 +2,16 @@
 # Copyright 1999-2012 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mysql-5.5.25a (07 Jul 2012)
+
+  07 Jul 2012; <atlantis@gentoo.org> +mysql-5.5.25a.ebuild:
+  [dev-db/mysql-5.5.25a] Version bump.
+
+  22 May 2012; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
+  mysql-5.0.92.ebuild, mysql-5.0.96.ebuild:
+  Move EAPI assignment to the top.
+  Whitespace.
+
   15 Feb 2012; Jorge Manuel B. S. Vicetto <jmbsvicetto@gentoo.org>
   files/my.cnf-5.1:
   Update table_cache to table_open_cache variable for mysql-5.1 my.cnf file.

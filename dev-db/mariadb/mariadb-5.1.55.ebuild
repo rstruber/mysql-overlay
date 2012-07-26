@@ -1,6 +1,6 @@
-# Copyright 1999-2011 Gentoo Foundation
+# Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-db/mysql/mysql-5.0.84-r1.ebuild,v 1.7 2009/11/09 18:00:20 fauli Exp $
+# $Header: $
 
 EAPI="4"
 MY_EXTRAS_VER="20110426-1046Z"

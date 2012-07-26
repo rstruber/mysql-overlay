@@ -15,7 +15,7 @@
 # the src_unpack, src_prepare, src_configure, src_compile, scr_install,
 # pkg_preinst, pkg_postinst, pkg_config and pkg_postrm phase hooks.
 
-inherit cmake-utils
+inherit cmake-utils flag-o-matic multilib
 
 #
 # HELPER FUNCTIONS:

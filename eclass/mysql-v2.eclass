@@ -15,7 +15,7 @@
 # This eclass uses the mysql-autotools and mysql-cmake eclasses for the
 # specific bits related to the build system.
 # It provides the src_unpack, src_prepare, src_configure, src_compile,
-# scr_install, pkg_preinst, pkg_postinst, pkg_config and pkg_postrm
+# src_install, pkg_preinst, pkg_postinst, pkg_config and pkg_postrm
 # phase hooks.
 
 # @ECLASS-VARIABLE: BUILD
@@ -223,7 +223,7 @@ DEPEND="${DEPEND}
 	virtual/yacc
 "
 
-DEPEND="${DEPEND} static? ( || ( sys-libs/ncurses[static-libs] <=sys-libs/ncurses-5.7-r3 ) )"
+DEPEND="${DEPEND} static? ( sys-libs/ncurses[static-libs] )"
 
 # compile-time-only
 DEPEND="${DEPEND} >=dev-util/cmake-2.4.3"
