@@ -186,15 +186,10 @@ IUSE="${IUSE} +community profiling"
 && mysql_version_is_at_least "5.2.5" \
 && IUSE="${IUSE} sphinx"
 
-mysql_version_is_at_least "5.5" \
-&& REQUIRED_USE="tcmalloc? ( !jemalloc )
-    jemalloc? ( !tcmalloc )"
-
-mysql_version_is_at_least "5.5" \
-&& IUSE="${IUSE} jemalloc"
-
-mysql_version_is_at_least "5.5" \
-&& IUSE="${IUSE} tcmalloc"
+if mysql_version_is_at_least "5.5"; then
+	REQUIRED_USE="tcmalloc? ( !jemalloc ) jemalloc? ( !tcmalloc )"
+	IUSE="${IUSE} jemalloc tcmalloc"
+fi
 
 mysql_version_is_at_least "5.5.7" \
 && IUSE="${IUSE} systemtap"
