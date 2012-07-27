@@ -187,6 +187,9 @@ IUSE="${IUSE} +community profiling"
 && IUSE="${IUSE} sphinx"
 
 mysql_version_is_at_least "5.5" \
+&& IUSE="${IUSE} jemalloc"
+
+mysql_version_is_at_least "5.5" \
 && IUSE="${IUSE} tcmalloc"
 
 mysql_version_is_at_least "5.5.7" \
@@ -245,6 +248,9 @@ mysql_version_is_at_least "5.5.8" \
 
 mysql_version_is_at_least "5.5.7" \
 && DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )"
+
+mysql_version_is_at_least "5.5" \
+&& DEPEND="${DEPEND} jemalloc? ( dev-libs/jemalloc )"
 
 mysql_version_is_at_least "5.5" \
 && DEPEND="${DEPEND} tcmalloc? ( dev-util/google-perftools )"
