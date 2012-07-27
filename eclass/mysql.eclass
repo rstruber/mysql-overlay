@@ -1272,7 +1272,7 @@ mysql_pkg_postinst() {
                 elog "Note: PBXT is now statically built when enabled."
                 elog ""
                 elog "If, you previously installed as a plugin and "
-                elot "you cannot start the MySQL server,"
+                elog "you cannot start the MySQL server,"
 		elog "remove the ${MY_DATADIR}/mysql/plugin.* files, then"
 		elog "use the MySQL upgrade script to restore the table"
 		elog "or execute the following SQL command:"
