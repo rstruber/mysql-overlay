@@ -187,8 +187,10 @@ IUSE="${IUSE} +community profiling"
 && mysql_version_is_at_least "5.2.5" \
 && IUSE="${IUSE} sphinx"
 
-mysql_version_is_at_least "5.5" \
-&& IUSE="${IUSE} tcmalloc"
+if mysql_version_is_at_least "5.5"; then
+	REQUIRED_USE="tcmalloc? ( !jemalloc ) jemalloc? ( !tcmalloc )"
+	IUSE="${IUSE} jemalloc tcmalloc"
+fi
 
 mysql_version_is_at_least "5.5.7" \
 && IUSE="${IUSE} systemtap"
@@ -248,6 +250,9 @@ mysql_version_is_at_least "5.5.8" \
 mysql_version_is_at_least "5.5.7" \
 && DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )" \
 && DEPEND="${DEPEND} kernel_linux? ( dev-libs/libaio )"
+
+mysql_version_is_at_least "5.5" \
+&& DEPEND="${DEPEND} jemalloc? ( dev-libs/jemalloc )"
 
 mysql_version_is_at_least "5.5" \
 && DEPEND="${DEPEND} tcmalloc? ( dev-util/google-perftools )"
