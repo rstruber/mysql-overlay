@@ -176,6 +176,7 @@ IUSE="${IUSE} berkdb"
 IUSE="${IUSE} +community profiling"
 
 [[ ${PN} == "mariadb" ]] \
+&& mysql_check_version_range "5.1.38 to 5.3.99" \
 && IUSE="${IUSE} libevent"
 
 [[ ${PN} == "mariadb" ]] \
@@ -208,6 +209,7 @@ DEPEND="
 "
 
 [[ ${PN} == mariadb ]] \
+&& mysql_check_version_range "5.1.38 to 5.3.99" \
 && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
 
 # Having different flavours at the same time is not a good idea
@@ -244,7 +246,8 @@ mysql_version_is_at_least "5.5.8" \
 && DEPEND="${DEPEND} sphinx? ( app-misc/sphinx )"
 
 mysql_version_is_at_least "5.5.7" \
-&& DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )"
+&& DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )" \
+&& DEPEND="${DEPEND} kernel_linux? ( dev-libs/libaio )"
 
 mysql_version_is_at_least "5.5" \
 && DEPEND="${DEPEND} tcmalloc? ( dev-util/google-perftools )"
@@ -501,10 +504,10 @@ mysql-v2_pkg_postinst() {
 	fi
 
 	if pbxt_available && use pbxt ; then
-		# TODO: explain it better
-		elog "    mysql> INSTALL PLUGIN pbxt SONAME 'libpbxt.so';"
-		elog "    mysql> CREATE TABLE t1 (c1 int, c2 text) ENGINE=pbxt;"
-		elog "if, after that, you cannot start the MySQL server,"
+		elog "Note: PBXT is now statically built when enabled."
+		elog ""
+		elog "If, you previously installed as a plugin and "
+		elog "you cannot start the MySQL server,"
 		elog "remove the ${MY_DATADIR}/mysql/plugin.* files, then"
 		elog "use the MySQL upgrade script to restore the table"
 		elog "or execute the following SQL command:"

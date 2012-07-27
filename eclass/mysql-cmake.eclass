@@ -26,28 +26,43 @@ inherit cmake-utils flag-o-matic multilib
 # Helper function to disable specific tests.
 mysql-cmake_disable_test() {
 
-	local rawtestname testname testsuite reason mysql_disable_file
+	local rawtestname testname testsuite reason mysql_disabled_file mysql_disabled_dir
 	rawtestname="${1}" ; shift
 	reason="${@}"
 	ewarn "test '${rawtestname}' disabled: '${reason}'"
 
 	testsuite="${rawtestname/.*}"
 	testname="${rawtestname/*.}"
-	mysql_disable_file="${S}/mysql-test/t/disabled.def"
+	for mysql_disabled_file in \
+		${S}/mysql-test/disabled.def  \
+		${S}/mysql-test/t/disabled.def ; do
+		[ -f "${mysql_disabled_file}" ] && break
+	done
+	#mysql_disabled_file="${S}/mysql-test/t/disabled.def"
 	#einfo "rawtestname=${rawtestname} testname=${testname} testsuite=${testsuite}"
-	echo ${testname} : ${reason} >> "${mysql_disable_file}"
+	echo ${testname} : ${reason} >> "${mysql_disabled_file}"
 
-	if [ -n "${testsuite}" ]; then
-		for mysql_disable_file in \
+	if [ -n "${testsuite}" ] && [ "${testsuite}" != "main" ]; then
+		for mysql_disabled_file in \
 			${S}/mysql-test/suite/${testsuite}/disabled.def  \
 			${S}/mysql-test/suite/${testsuite}/t/disabled.def  \
 			FAILED ; do
-			[ -f "${mysql_disable_file}" ] && break
+			[ -f "${mysql_disabled_file}" ] && break
 		done
 		if [ "${mysql_disabled_file}" != "FAILED" ]; then
-			echo "${testname} : ${reason}" >> "${mysql_disable_file}"
+			echo "${testname} : ${reason}" >> "${mysql_disabled_file}"
 		else
-			ewarn "Could not find testsuite disabled.def location for ${rawtestname}"
+			for mysql_disabled_dir in \
+				${S}/mysql-test/suite/${testsuite} \
+				${S}/mysql-test/suite/${testsuite}/t  \
+				FAILED ; do
+				[ -d "${mysql_disabled_dir}" ] && break
+			done
+			if [ "${mysql_disabled_dir}" != "FAILED" ]; then
+				echo "${testname} : ${reason}" >> "${mysql_disabled_dir}/disabled.def"
+			else
+				ewarn "Could not find testsuite disabled.def location for ${rawtestname}"
+			fi
 		fi
 	fi
 }
@@ -153,6 +168,18 @@ configure_cmake_standard() {
 		-DWITH_PARTITION_STORAGE_ENGINE=1
 		$(cmake-utils_use_with extraengine FEDERATED_STORAGE_ENGINE)
 	)
+
+	if pbxt_available ; then
+		mycmakeargs+=( $(cmake-utils_use_with pbxt PBXT_STORAGE_ENGINE) )
+	fi
+
+	if [ "${PN}" == "mariadb" ]; then
+		mycmakeargs+=(
+			$(cmake-utils_use_with oqgraph OQGRAPH_STORAGE_ENGINE)
+			$(cmake-utils_use_with sphinx SPHINX_STORAGE_ENGINE)
+			$(cmake-utils_use_with extraengine FEDERATEDX_STORAGE_ENGINE)
+		)
+	fi
 }
 
 #

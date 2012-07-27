@@ -3,10 +3,13 @@
 # $Header: $
 
 EAPI="4"
-MY_EXTRAS_VER="20110819-0415Z"
+MY_EXTRAS_VER="20120425-1449Z"
 
 # Build system
 BUILD="autotools"
+
+# Suffix on files...
+#MY_PV="$PV-ga"
 
 inherit toolchain-funcs mysql-v2
 # only to make repoman happy. it is really set in the eclass
