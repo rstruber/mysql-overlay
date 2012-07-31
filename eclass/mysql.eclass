@@ -790,7 +790,7 @@ mysql_pkg_setup() {
 	# bug 350844
 	case "${EAPI:-0}" in
 		0 | 1)
-			if use static && !built_with_use sys-libs/ncurses static-libs; then
+			if use static && ! built_with_use sys-libs/ncurses static-libs; then
 				die "To build MySQL statically you need to enable static-libs for sys-libs/ncurses"
 			fi
 			;;
