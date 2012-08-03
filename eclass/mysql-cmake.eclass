@@ -248,6 +248,13 @@ mysql-cmake_src_configure() {
 		-DWITHOUT_UNIT_TESTS=1
 	)
 
+	# Bug 412851
+	# MariaDB requires this flag to compile with GPLv3 readline linked
+	# Adds a warning about redistribution to configure
+	if [[ "${PN}" == "mariadb" ]] ; then
+		mycmakeargs+=( -DNOT_FOR_DISTRIBUTION=1 )
+	fi
+
 	configure_cmake_locale
 
 	if use minimal ; then
