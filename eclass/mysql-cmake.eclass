@@ -331,7 +331,7 @@ mysql-cmake_src_install() {
 
 	# Configuration stuff
 	case ${MYSQL_PV_MAJOR} in
-		5.[1-9]|6*|7*) mysql_mycnf_version="5.1" ;;
+		5.[5-9]|6*|7*) mysql_mycnf_version="5.5" ;;
 	esac
 	einfo "Building default my.cnf (${mysql_mycnf_version})"
 	insinto "${MY_SYSCONFDIR}"
