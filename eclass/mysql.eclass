@@ -1,6 +1,6 @@
 # Copyright 1999-2012 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.170 2012/01/09 10:42:19 grobian Exp $
+# $Header: /var/cvsroot/gentoo-x86/eclass/mysql.eclass,v 1.175 2012/09/27 16:35:41 axs Exp $
 
 # @ECLASS: mysql.eclass
 # @MAINTAINER:
@@ -33,7 +33,7 @@ if [[ "${MY_EXTRAS_VER}" == "live" ]]; then
 fi
 
 case "${EAPI:-0}" in
-	2 | 3 | 4)
+	2|3|4|5)
 		EXPORT_FUNCTIONS pkg_setup \
 					src_unpack src_prepare \
 					src_configure src_compile \
@@ -1304,8 +1304,10 @@ mysql_pkg_config() {
 	fi
 
 	if [[ ( -n "${MY_DATADIR}" ) && ( "${MY_DATADIR}" != "${old_MY_DATADIR}" ) ]]; then
-		local MY_DATADIR_s="$(strip_duplicate_slashes ${ROOT}/${MY_DATADIR})"
-		local old_MY_DATADIR_s="$(strip_duplicate_slashes ${ROOT}/${old_MY_DATADIR})"
+		local MY_DATADIR_s="${ROOT}/${MY_DATADIR}"
+		MY_DATADIR_s="${MY_DATADIR_s%%/}"
+		local old_MY_DATADIR_s="${ROOT}/${old_MY_DATADIR}"
+		old_MY_DATADIR_s="${old_MY_DATADIR_s%%/}"
 
 		if [[ -d "${old_MY_DATADIR_s}" ]]; then
 			if [[ -d "${MY_DATADIR_s}" ]]; then
