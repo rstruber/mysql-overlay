@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-MY_EXTRAS_VER="live"
+MY_EXTRAS_VER="20121101-2319Z"
 # PBXT
 PBXT_VERSION='1.0.11-6-pre-ga'
 # XtraDB
