@@ -65,7 +65,7 @@ src_test() {
 		export MTR_BUILD_THREAD="$((${RANDOM} % 100))"
 
 		# create directories because mysqladmin might right out of order
-		mkdir -p "${S}"/mysql-test/var-{tests}{,/log}
+		mkdir -p "${S}"/mysql-test/var-tests{,/log}
 
 		# These are failing in MySQL 5.5 for now and are believed to be
 		# false positives:
