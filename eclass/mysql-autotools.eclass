@@ -17,7 +17,7 @@
 # the src_unpack, src_prepare, src_configure, src_compile, scr_install,
 # pkg_preinst, pkg_postinst, pkg_config and pkg_postrm phase hooks.
 
-inherit autotools flag-o-matic multilib
+inherit autotools flag-o-matic multilib prefix
 
 #
 # HELPER FUNCTIONS:
@@ -598,6 +598,7 @@ mysql-autotools_src_install() {
 			-e "/character-set/s|utf8|latin1|g" \
 			"${TMPDIR}/my.cnf.ok"
 	fi
+	eprefixify "${TMPDIR}/my.cnf.ok"
 	newins "${TMPDIR}/my.cnf.ok" my.cnf
 
 	# Minimal builds don't have the MySQL server
