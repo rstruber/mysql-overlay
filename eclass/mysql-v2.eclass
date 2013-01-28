@@ -152,7 +152,7 @@ DESCRIPTION="A fast, multi-threaded, multi-user SQL database server."
 HOMEPAGE="http://www.mysql.com/"
 if [[ "${PN}" == "mariadb" ]]; then
 	HOMEPAGE="http://mariadb.org/"
-	DESCRIPTION="MariaDB is a MySQL fork with 3rd-party patches and additional storage engines merged."
+	DESCRIPTION="An enhanced, drop-in replacement for MySQL"
 fi
 LICENSE="GPL-2"
 SLOT="0"
