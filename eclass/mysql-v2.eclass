@@ -187,6 +187,10 @@ IUSE="${IUSE} +community profiling"
 && mysql_version_is_at_least "5.2.5" \
 && IUSE="${IUSE} sphinx"
 
+[[ ${PN} == "mariadb" ]] \
+&& mysql_version_is_at_least "5.2.10" \
+&& IUSE="${IUSE} pam"
+
 if mysql_version_is_at_least "5.5"; then
 	REQUIRED_USE="tcmalloc? ( !jemalloc ) jemalloc? ( !tcmalloc )"
 	IUSE="${IUSE} jemalloc tcmalloc"
@@ -229,6 +233,10 @@ done
 [[ "${PN}" == "mariadb" ]] \
 && mysql_version_is_at_least "5.2.5" \
 && DEPEND="${DEPEND} sphinx? ( app-misc/sphinx )"
+
+[[ "${PN}" == "mariadb" ]] \
+&& mysql_version_is_at_least "5.2.10" \
+&& DEPEND="${DEPEND} !minimal? ( pam? ( virtual/pam ) )"
 
 # Bug 441700 MariaDB >=5.3 include custom mytop
 [[ "${PN}" == "mariadb" ]] \
@@ -483,6 +491,15 @@ mysql-v2_pkg_postinst() {
 			&& [[ "${script%.sh}" == "${script}" ]] \
 			&& dodoc "${script}"
 		done
+
+		if [ ${PN} == "mariadb" ] \
+		&& mysql_version_is_at_least "5.2.10" && use pam ; then
+			einfo
+			elog "This install includes the PAM authentication plugin."
+			elog "To activate and configure the PAM plugin, please read:"
+			elog "https://kb.askmonty.org/en/pam-authentication-plugin/"
+			einfo
+		fi
 
 		einfo
 		elog "You might want to run:"

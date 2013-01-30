@@ -185,6 +185,11 @@ configure_cmake_standard() {
 			$(cmake-utils_use_with sphinx SPHINX_STORAGE_ENGINE)
 			$(cmake-utils_use_with extraengine FEDERATEDX_STORAGE_ENGINE)
 		)
+
+		if ! use pam ; then
+			mycmakeargs+=( -DAUTH_PAM_DISABLED=1 )
+		fi
+		
 	fi
 }
 

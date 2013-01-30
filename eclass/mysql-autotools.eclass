@@ -289,6 +289,15 @@ mysql-autotools_configure_51() {
 				|| plugins_dis="${plugins_dis} ${i}"
 			done
 		fi
+
+		#Authentication plugins
+		if mysql_version_is_at_least "5.2.11" ; then
+			for i in pam ; do
+				use ${i} \
+				&& plugins_dyn="${plugins_dyn} auth_${i}" \
+				|| plugins_dis="${plugins_dis} auth_${i}"
+			done
+		fi
 	fi
 
 	if pbxt_available && [[ "${PBXT_NEWSTYLE}" == "1" ]]; then
