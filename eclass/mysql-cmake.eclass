@@ -393,4 +393,8 @@ mysql-cmake_src_install() {
 	fi
 
 	mysql_lib_symlinks "${ED}"
+
+	#Remove mytop if perl is not selected
+	[[ "${PN}" == "mariadb" ]] && ! use perl \
+	&& rm -f "${ED}/usr/bin/mytop"
 }

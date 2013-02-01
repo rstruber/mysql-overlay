@@ -657,4 +657,9 @@ mysql-autotools_src_install() {
 	fi
 
 	mysql_lib_symlinks "${ED}"
+
+	#Remove mytop if perl is not selected
+	[[ "${PN}" == "mariadb" ]] && ! use perl \
+	&& mysql_version_is_at_least "5.3" \
+	&& rm -f "${ED}/usr/bin/mytop"
 }

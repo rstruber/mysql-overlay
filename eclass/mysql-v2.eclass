@@ -241,7 +241,7 @@ done
 # Bug 441700 MariaDB >=5.3 include custom mytop
 [[ "${PN}" == "mariadb" ]] \
 && mysql_version_is_at_least "5.3" \
-&& DEPEND="${DEPEND} !dev-db/mytop"
+&& DEPEND="${DEPEND} perl? ( !dev-db/mytop )"
 
 mysql_version_is_at_least "5.5.7" \
 && DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )" \
@@ -258,6 +258,15 @@ RDEPEND="${DEPEND}
 	!minimal? ( !prefix? ( dev-db/mysql-init-scripts ) )
 	selinux? ( sec-policy/selinux-mysql )
 "
+
+# Bug 455016 Add dependancies of mytop
+[[ "${PN}" == "mariadb" ]] \
+&& mysql_version_is_at_least "5.3" \
+&& RDEPEND="${RDEPEND} perl? (
+	virtual/perl-Getopt-Long
+	dev-perl/TermReadKey
+	virtual/perl-Term-ANSIColor
+	virtual/perl-Time-HiRes ) "
 
 DEPEND="${DEPEND}
 	virtual/yacc
