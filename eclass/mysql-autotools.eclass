@@ -662,4 +662,7 @@ mysql-autotools_src_install() {
 	[[ "${PN}" == "mariadb" ]] && ! use perl \
 	&& mysql_version_is_at_least "5.3" \
 	&& rm -f "${ED}/usr/bin/mytop"
+
+	#Bug 455462 remove unnecessary libtool files
+	prune_libtool_files --modules
 }
