@@ -221,6 +221,7 @@ mysql-cmake_src_prepare() {
 	[ -f "${i}" ] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
 
 	rm -f "scripts/mysqlbug"
+	epatch_user
 }
 
 # @FUNCTION: mysql-cmake_src_configure
@@ -275,7 +276,10 @@ mysql-cmake_src_configure() {
 
 	CXXFLAGS="${CXXFLAGS} -fno-exceptions -fno-strict-aliasing"
 	CXXFLAGS="${CXXFLAGS} -felide-constructors -fno-rtti"
-	CXXFLAGS="${CXXFLAGS} -fno-implicit-templates"
+	# Causes linkage failures.  Upstream bug #59607 removes it
+	if ! mysql_version_is_at_least "5.6" ; then
+		CXXFLAGS="${CXXFLAGS} -fno-implicit-templates"
+	fi
 	export CXXFLAGS
 
 	# bug #283926, with GCC4.4, this is required to get correct behavior.
