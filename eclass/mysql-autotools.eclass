@@ -456,6 +456,8 @@ mysql-autotools_src_prepare() {
 # @DESCRIPTION:
 # Configure mysql to build the code for Gentoo respecting the use flags.
 mysql-autotools_src_configure() {
+	# bug 401733
+	export QA_CONFIGURE_OPTIONS=".*"
 
 	# Make sure the vars are correctly initialized
 	mysql_init_vars
