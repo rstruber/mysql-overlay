@@ -2,6 +2,11 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mariadb-5.5.30 (13 Mar 2013)
+
+  13 Mar 2013; Robin H. Johnson <robbat2@gentoo.org> +mariadb-5.5.30.ebuild:
+  Bump.
+
   04 Mar 2013; Robin H. Johnson <robbat2@gentoo.org> mariadb-5.1.67.ebuild,
   mariadb-5.2.14.ebuild, mariadb-5.3.12.ebuild, mariadb-5.5.29.ebuild:
   Update headers and keywords.
