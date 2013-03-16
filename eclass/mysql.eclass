@@ -1021,7 +1021,7 @@ mysql_src_configure() {
 	filter-flags "-O" "-O[01]"
 
 	# glib-2.3.2_pre fix, bug #16496
-	append-flags "-DHAVE_ERRNO_AS_DEFINE=1"
+	append-cppflags "-DHAVE_ERRNO_AS_DEFINE=1"
 
 	# As discovered by bug #246652, doing a double-level of SSP causes NDB to
 	# fail badly during cluster startup.
