@@ -151,7 +151,7 @@ configure_cmake_standard() {
 	if use ssl; then
 		mycmakeargs+=( -DWITH_SSL=system )
 	else
-		mycmakeargs+=( -DWITH_SSL=0 )
+		mycmakeargs+=( -DWITH_SSL=bundled )
 	fi
 
 	if mysql_version_is_at_least "5.5" && use jemalloc; then
