@@ -137,8 +137,13 @@ if [[ -z ${SERVER_URI} ]]; then
 		SERVER_URI="http://www.percona.com/redir/downloads/${PERCONA_PN}-${MIRROR_PV}/LATEST/source/${PERCONA_PN}-${MY_PV}-rel30.${MY_PATCH}.tar.gz"
 #		http://www.percona.com/redir/downloads/Percona-Server-5.5/LATEST/source/Percona-Server-5.5.30-rel30.2.tar.gz
 	else
-		URI_DIR="MySQL"
-		URI_FILE="mysql"
+		if [[ "${PN}" == "mysql-cluster" ]] ; then
+			URI_DIR="MySQL-Cluster"
+			URI_FILE="mysql-cluster-gpl"
+		else
+			URI_DIR="MySQL"
+			URI_FILE="mysql"
+		fi
 		URI_A="${URI_FILE}-${MY_PV}.tar.gz"
 		MIRROR_PV=$(get_version_component_range 1-2 ${PV})
 		# Recently upstream switched to an archive site, and not on mirrors
@@ -241,7 +246,7 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 fi
 
 # Having different flavours at the same time is not a good idea
-for i in "mysql" "mariadb" "mariadb-galera" "percona-server"; do
+for i in "mysql" "mariadb" "mariadb-galera" "percona-server" "mysql-cluster" ; do
 	[[ ${i} == ${PN} ]] ||
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
@@ -411,7 +416,7 @@ mysql-v2_pkg_setup() {
 	enewgroup mysql 60 || die "problem adding 'mysql' group"
 	enewuser mysql 60 -1 /dev/null mysql || die "problem adding 'mysql' user"
 
-	if use cluster; then
+	if use cluster && [[ "${PN}" != "mysql-cluster" ]]; then
 		ewarn "Upstream has noted that the NDB cluster support in the 5.0 and"
 		ewarn "5.1 series should NOT be put into production. In the near"
 		ewarn "future, it will be disabled from building."

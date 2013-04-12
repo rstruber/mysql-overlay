@@ -878,7 +878,7 @@ mysql_src_unpack() {
 
 	unpack ${A}
 	# Grab the patches
-	[[ "${MY_EXTRAS_VER}" == "live" ]] && S="${WORKDIR}/mysql-extras" git_src_unpack
+	[[ "${MY_EXTRAS_VER}" == "live" ]] && S="${WORKDIR}/mysql-extras" git-2_src_unpack
 
 	mv -f "${WORKDIR}/${MY_SOURCEDIR}" "${S}"
 
