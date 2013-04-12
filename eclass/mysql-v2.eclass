@@ -53,7 +53,7 @@ inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx 
 #
 
 case "${EAPI:-0}" in
-	3|4|5) ;;
+	4|5) ;;
 	*) die "Unsupported EAPI: ${EAPI}" ;;
 esac
 
@@ -172,7 +172,6 @@ IUSE="${IUSE} extraengine"
 IUSE="${IUSE} cluster"
 
 IUSE="${IUSE} max-idx-128"
-IUSE="${IUSE} berkdb"
 IUSE="${IUSE} +community profiling"
 
 [[ ${PN} == "mariadb" ]] \
@@ -536,10 +535,6 @@ mysql-v2_pkg_postinst() {
 		elog "      PRIMARY KEY (name)"
 		elog "    ) CHARACTER SET utf8 COLLATE utf8_bin;"
 	fi
-
-	mysql_check_version_range "4.0 to 5.0.99.99" \
-	&& use berkdb \
-	&& elog "Berkeley DB support is deprecated and will be removed in future versions!"
 }
 
 # @FUNCTION: mysql-v2_getopt
@@ -674,7 +669,7 @@ mysql-v2_pkg_config() {
 	# Figure out which options we need to disable to do the setup
 	helpfile="${TMPDIR}/mysqld-help"
 	${EROOT}/usr/sbin/mysqld --verbose --help >"${helpfile}" 2>/dev/null
-	for opt in grant-tables host-cache name-resolve networking slave-start bdb \
+	for opt in grant-tables host-cache name-resolve networking slave-start \
 		federated innodb ssl log-bin relay-log slow-query-log external-locking \
 		ndbcluster log-slave-updates \
 		; do
