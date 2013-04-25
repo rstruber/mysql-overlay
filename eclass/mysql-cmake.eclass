@@ -274,11 +274,15 @@ mysql-cmake_src_configure() {
 	# Bug #114895, bug #110149
 	filter-flags "-O" "-O[01]"
 
-	CXXFLAGS="${CXXFLAGS} -fno-exceptions -fno-strict-aliasing"
+	CXXFLAGS="${CXXFLAGS} -fno-strict-aliasing"
 	CXXFLAGS="${CXXFLAGS} -felide-constructors -fno-rtti"
 	# Causes linkage failures.  Upstream bug #59607 removes it
 	if ! mysql_version_is_at_least "5.6" ; then
 		CXXFLAGS="${CXXFLAGS} -fno-implicit-templates"
+	fi
+	# As of 5.7, exceptions are used!
+	if ! mysql_version_is_at_least "5.7" ; then
+		CXXFLAGS="${CXXFLAGS} -fno-exceptions"
 	fi
 	export CXXFLAGS
 
