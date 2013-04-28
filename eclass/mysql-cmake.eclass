@@ -320,6 +320,9 @@ mysql-cmake_src_install() {
 	dosym "/usr/bin/mysqlcheck" "/usr/bin/mysqlrepair"
 	dosym "/usr/bin/mysqlcheck" "/usr/bin/mysqloptimize"
 
+	# Create a mariadb_config symlink
+	[[ "${PN}" == "mariadb" ]] && dosym "/usr/bin/mysql_config" "/usr/bin/mariadb_config"
+
 	# INSTALL_LAYOUT=STANDALONE causes cmake to create a /usr/data dir
 	rm -Rf "${ED}/usr/data"
 
@@ -397,7 +400,6 @@ mysql-cmake_src_install() {
 		for script in "${S}"/scripts/mysql* ; do
 			[[ -f "$script" ]] && [[ "${script%.sh}" == "${script}" ]] && dodoc "${script}"
 		done
-
 	fi
 
 	mysql_lib_symlinks "${ED}"
