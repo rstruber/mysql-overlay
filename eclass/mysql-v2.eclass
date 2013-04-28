@@ -711,6 +711,14 @@ mysql-v2_pkg_config() {
 	einfo "Creating the mysql database and setting proper"
 	einfo "permissions on it ..."
 
+	# Now that /var/run is a tmpfs mount point, we need to ensure it exists before using it
+	PID_DIR="${EROOT}/var/run/mysqld"
+	if [[ ! -d "${PID_DIR}" ]]; then
+		mkdir "${PID_DIR}"
+		chown mysql:mysql "${PID_DIR}"
+		chmod 755 "${PID_DIR}"
+	fi
+
 	local socket="${EROOT}/var/run/mysqld/mysqld${RANDOM}.sock"
 	local pidfile="${EROOT}/var/run/mysqld/mysqld${RANDOM}.pid"
 	local mysqld="${EROOT}/usr/sbin/mysqld \
