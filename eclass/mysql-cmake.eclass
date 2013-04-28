@@ -189,7 +189,7 @@ configure_cmake_standard() {
 		if ! use pam ; then
 			mycmakeargs+=( -DAUTH_PAM_DISABLED=1 )
 		fi
-		
+
 	fi
 }
 
