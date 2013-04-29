@@ -115,7 +115,7 @@ mysql_version_is_at_least "5.1.50" || die "This eclass should only be used with 
 # Work out the default SERVER_URI correctly
 if [ -z "${SERVER_URI}" ]; then
 	[ -z "${MY_PV}" ] && MY_PV="${PV//_/-}"
-	if [ "${PN}" == "mariadb" ]; then
+	if [ "${PN}" == "mariadb" ] || [ "${PN}" == "mariadb-galera" ]; then
 		MARIA_FULL_PV="$(replace_version_separator 3 '-' ${MY_PV})"
 		MARIA_FULL_P="${PN}-${MARIA_FULL_PV}"
 		SERVER_URI="
@@ -126,6 +126,9 @@ if [ -z "${SERVER_URI}" ]; then
 		http://mirrors.fe.up.pt/pub/${PN}/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		http://ftp-stud.hs-esslingen.de/pub/Mirrors/${PN}/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		"
+		if [ "${PN}" == "mariadb-galera" ]; then
+			MY_SOURCEDIR="${PN%%-galera}-${GALERA_FULL_PV}"
+		fi
 	else
 		URI_DIR="MySQL"
 		URI_FILE="mysql"
@@ -154,6 +157,10 @@ if [[ "${PN}" == "mariadb" ]]; then
 	HOMEPAGE="http://mariadb.org/"
 	DESCRIPTION="An enhanced, drop-in replacement for MySQL"
 fi
+if [ "${PN}" == "mariadb-galera" ]; then
+	HOMEPAGE="http://mariadb.org/"
+	DESCRIPTION="An enhanced, drop-in replacement for MySQL with Galera Replication"
+fi
 LICENSE="GPL-2"
 SLOT="0"
 
@@ -178,15 +185,15 @@ IUSE="${IUSE} +community profiling"
 && mysql_check_version_range "5.1.38 to 5.3.99" \
 && IUSE="${IUSE} libevent"
 
-[[ ${PN} == "mariadb" ]] \
+([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
 && mysql_version_is_at_least "5.2" \
 && IUSE="${IUSE} oqgraph"
 
-[[ ${PN} == "mariadb" ]] \
+([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
 && mysql_version_is_at_least "5.2.5" \
 && IUSE="${IUSE} sphinx"
 
-[[ ${PN} == "mariadb" ]] \
+([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
 && mysql_version_is_at_least "5.2.10" \
 && IUSE="${IUSE} pam"
 
@@ -215,7 +222,7 @@ DEPEND="
 	>=sys-libs/zlib-1.2.3
 "
 
-[[ ${PN} == mariadb ]] \
+([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
 && mysql_check_version_range "5.1.38 to 5.3.99" \
 && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
 
@@ -225,20 +232,20 @@ for i in "mysql" "mariadb" "mariadb-galera" ; do
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
 
-[[ "${PN}" == "mariadb" ]] \
+([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
 && mysql_version_is_at_least "5.2" \
 && DEPEND="${DEPEND} oqgraph? ( >=dev-libs/boost-1.40.0 )"
 
-[[ "${PN}" == "mariadb" ]] \
+([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
 && mysql_version_is_at_least "5.2.5" \
 && DEPEND="${DEPEND} sphinx? ( app-misc/sphinx )"
 
-[[ "${PN}" == "mariadb" ]] \
+([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
 && mysql_version_is_at_least "5.2.10" \
 && DEPEND="${DEPEND} !minimal? ( pam? ( virtual/pam ) )"
 
 # Bug 441700 MariaDB >=5.3 include custom mytop
-[[ "${PN}" == "mariadb" ]] \
+([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
 && mysql_version_is_at_least "5.3" \
 && DEPEND="${DEPEND} perl? ( !dev-db/mytop )"
 
@@ -259,7 +266,7 @@ RDEPEND="${DEPEND}
 "
 
 # Bug 455016 Add dependancies of mytop
-[[ "${PN}" == "mariadb" ]] \
+([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
 && mysql_version_is_at_least "5.3" \
 && RDEPEND="${RDEPEND} perl? (
 	virtual/perl-Getopt-Long
@@ -294,13 +301,13 @@ PDEPEND="${PDEPEND} =virtual/mysql-${MYSQL_PV_MAJOR}"
 # PBXT_VERSION means that we have a PBXT patch for this PV
 # PBXT was only introduced after 5.1.12
 pbxt_patch_available() {
-	[[ ${PN} != "mariadb" ]] \
+	[[ ${PN} != "mariadb" ]] && [[ ${PN} != "mariadb-galera" ]]\
 	&& [[ -n "${PBXT_VERSION}" ]]
 	return $?
 }
 
 pbxt_available() {
-	pbxt_patch_available || [[ ${PN} == "mariadb" ]]
+	pbxt_patch_available || [[ ${PN} == "mariadb" ]] || [[ ${PN} == "mariadb-galera" ]]
 	return $?
 }
 
@@ -309,7 +316,7 @@ pbxt_available() {
 # XTRADB_VERS means that we have a XTRADB patch for this PV
 # XTRADB was only introduced after 5.1.26
 xtradb_patch_available() {
-	[[ ${PN} != "mariadb" ]] \
+	[[ ${PN} != "mariadb" ]] && [[ ${PN} != "mariadb-galera" ]] \
 	&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]]
 	return $?
 }
