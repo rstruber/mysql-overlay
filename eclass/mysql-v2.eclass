@@ -11,7 +11,7 @@
 # @BLURB: This eclass provides most of the functions for mysql ebuilds
 # @DESCRIPTION:
 # The mysql-v2.eclass is the base eclass to build the mysql and
-# alternative projects (mariadb) ebuilds.
+# alternative projects (mariadb and percona) ebuilds.
 # This eclass uses the mysql-autotools and mysql-cmake eclasses for the
 # specific bits related to the build system.
 # It provides the src_unpack, src_prepare, src_configure, src_compile,
@@ -220,7 +220,7 @@ DEPEND="
 && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
 
 # Having different flavours at the same time is not a good idea
-for i in "mysql" "mariadb" ; do
+for i in "mysql" "mariadb" "mariadb-galera" ; do
 	[[ ${i} == ${PN} ]] ||
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
