@@ -36,29 +36,29 @@ mysql-cmake_disable_test() {
 	for mysql_disabled_file in \
 		${S}/mysql-test/disabled.def  \
 		${S}/mysql-test/t/disabled.def ; do
-		[ -f "${mysql_disabled_file}" ] && break
+		[[ -f ${mysql_disabled_file} ]] && break
 	done
 	#mysql_disabled_file="${S}/mysql-test/t/disabled.def"
 	#einfo "rawtestname=${rawtestname} testname=${testname} testsuite=${testsuite}"
 	echo ${testname} : ${reason} >> "${mysql_disabled_file}"
 
-	if [ -n "${testsuite}" ] && [ "${testsuite}" != "main" ]; then
+	if [[ ( -n ${testsuite} ) && ( ${testsuite} != "main" ) ]]; then
 		for mysql_disabled_file in \
 			${S}/mysql-test/suite/${testsuite}/disabled.def  \
 			${S}/mysql-test/suite/${testsuite}/t/disabled.def  \
 			FAILED ; do
-			[ -f "${mysql_disabled_file}" ] && break
+			[[ -f ${mysql_disabled_file} ]] && break
 		done
-		if [ "${mysql_disabled_file}" != "FAILED" ]; then
+		if [[ ${mysql_disabled_file} != "FAILED" ]]; then
 			echo "${testname} : ${reason}" >> "${mysql_disabled_file}"
 		else
 			for mysql_disabled_dir in \
 				${S}/mysql-test/suite/${testsuite} \
 				${S}/mysql-test/suite/${testsuite}/t  \
 				FAILED ; do
-				[ -d "${mysql_disabled_dir}" ] && break
+				[[ -d ${mysql_disabled_dir} ]] && break
 			done
-			if [ "${mysql_disabled_dir}" != "FAILED" ]; then
+			if [[ ${mysql_disabled_dir} != "FAILED" ]]; then
 				echo "${testname} : ${reason}" >> "${mysql_disabled_dir}/disabled.def"
 			else
 				ewarn "Could not find testsuite disabled.def location for ${rawtestname}"
@@ -72,7 +72,7 @@ mysql-cmake_disable_test() {
 # Helper function to configure locale cmake options
 configure_cmake_locale() {
 
-	if ! use minimal && [ -n "${MYSQL_DEFAULT_CHARSET}" -a -n "${MYSQL_DEFAULT_COLLATION}" ]; then
+	if ! use minimal && [[ ( -n ${MYSQL_DEFAULT_CHARSET} ) && ( -n ${MYSQL_DEFAULT_COLLATION} ) ]]; then
 		ewarn "You are using a custom charset of ${MYSQL_DEFAULT_CHARSET}"
 		ewarn "and a collation of ${MYSQL_DEFAULT_COLLATION}."
 		ewarn "You MUST file bugs without these variables set."
@@ -218,7 +218,7 @@ mysql-cmake_src_prepare() {
 
 	# last -fPIC fixup, per bug #305873
 	i="${S}"/storage/innodb_plugin/plug.in
-	[ -f "${i}" ] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
+	[[ -f ${i} ]] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
 
 	rm -f "scripts/mysqlbug"
 	epatch_user
@@ -259,7 +259,7 @@ mysql-cmake_src_configure() {
 	# Bug 412851
 	# MariaDB requires this flag to compile with GPLv3 readline linked
 	# Adds a warning about redistribution to configure
-	if [[ "${PN}" == "mariadb" ]] ; then
+	if [[ ${PN} == "mariadb" ]] ; then
 		mycmakeargs+=( -DNOT_FOR_DISTRIBUTION=1 )
 	fi
 
@@ -321,7 +321,7 @@ mysql-cmake_src_install() {
 	dosym "/usr/bin/mysqlcheck" "/usr/bin/mysqloptimize"
 
 	# Create a mariadb_config symlink
-	[[ "${PN}" == "mariadb" ]] && dosym "/usr/bin/mysql_config" "/usr/bin/mariadb_config"
+	[[ ${PN} == "mariadb" ]] && dosym "/usr/bin/mysql_config" "/usr/bin/mariadb_config"
 
 	# INSTALL_LAYOUT=STANDALONE causes cmake to create a /usr/data dir
 	rm -Rf "${ED}/usr/data"
@@ -370,7 +370,7 @@ mysql-cmake_src_install() {
 		einfo "Creating initial directories"
 		# Empty directories ...
 		diropts "-m0750"
-		if [[ "${PREVIOUS_DATADIR}" != "yes" ]] ; then
+		if [[ ${PREVIOUS_DATADIR} != "yes" ]] ; then
 			dodir "${MY_DATADIR#${EPREFIX}}"
 			keepdir "${MY_DATADIR#${EPREFIX}}"
 			chown -R mysql:mysql "${D}/${MY_DATADIR}"
@@ -393,16 +393,16 @@ mysql-cmake_src_install() {
 			"${S}"/support-files/magic \
 			"${S}"/support-files/ndb-config-2-node.ini.sh
 		do
-			[[ -f "$script" ]] && dodoc "${script}"
+			[[ -f $script ]] && dodoc "${script}"
 		done
 
 		docinto "scripts"
 		for script in "${S}"/scripts/mysql* ; do
-			[[ -f "$script" ]] && [[ "${script%.sh}" == "${script}" ]] && dodoc "${script}"
+			[[ ( -f $script ) && ( ${script%.sh} == ${script} ) ]] && dodoc "${script}"
 		done
 	fi
 
 	#Remove mytop if perl is not selected
-	[[ "${PN}" == "mariadb" ]] && ! use perl \
+	[[ ${PN} == "mariadb" ]] && ! use perl \
 	&& rm -f "${ED}/usr/bin/mytop"
 }

@@ -44,7 +44,7 @@ MYSQL_EXTRAS=""
 # @DESCRIPTION:
 # The version of the MYSQL_EXTRAS repo to use to build mysql
 # Use "none" to disable it's use
-[[ "${MY_EXTRAS_VER}" == "live" ]] && MYSQL_EXTRAS="git-2"
+[[ ${MY_EXTRAS_VER} == "live" ]] && MYSQL_EXTRAS="git-2"
 
 inherit eutils flag-o-matic gnuconfig ${MYSQL_EXTRAS} ${BUILD_INHERIT} mysql_fx versionator toolchain-funcs
 
@@ -67,8 +67,8 @@ EXPORT_FUNCTIONS pkg_setup src_unpack src_prepare src_configure src_compile src_
 # and we will run a mysql server during test phase
 S="${WORKDIR}/mysql"
 
-[[ "${MY_EXTRAS_VER}" == "latest" ]] && MY_EXTRAS_VER="20090228-0714Z"
-if [[ "${MY_EXTRAS_VER}" == "live" ]]; then
+[[ ${MY_EXTRAS_VER} == "latest" ]] && MY_EXTRAS_VER="20090228-0714Z"
+if [[ ${MY_EXTRAS_VER} == "live" ]]; then
 	EGIT_PROJECT=mysql-extras
 	EGIT_REPO_URI="git://git.overlays.gentoo.org/proj/mysql-extras.git"
 fi
@@ -113,9 +113,9 @@ mysql_version_is_at_least "5.1.50" || die "This eclass should only be used with 
 # Designation by PERCONA for a MySQL version to apply an XTRADB release
 
 # Work out the default SERVER_URI correctly
-if [ -z "${SERVER_URI}" ]; then
-	[ -z "${MY_PV}" ] && MY_PV="${PV//_/-}"
-	if [ "${PN}" == "mariadb" ] || [ "${PN}" == "mariadb-galera" ]; then
+if [[ -z ${SERVER_URI} ]]; then
+	[[ -z ${MY_PV} ]] && MY_PV="${PV//_/-}"
+	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
 		MARIA_FULL_PV="$(replace_version_separator 3 '-' ${MY_PV})"
 		MARIA_FULL_P="${PN}-${MARIA_FULL_PV}"
 		SERVER_URI="
@@ -126,8 +126,8 @@ if [ -z "${SERVER_URI}" ]; then
 		http://mirrors.fe.up.pt/pub/${PN}/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		http://ftp-stud.hs-esslingen.de/pub/Mirrors/${PN}/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
 		"
-		if [ "${PN}" == "mariadb-galera" ]; then
-			MY_SOURCEDIR="${PN%%-galera}-${GALERA_FULL_PV}"
+		if [[ ${PN} == "mariadb-galera" ]]; then
+			MY_SOURCEDIR="${PN%%-galera}-${MARIA_FULL_PV}"
 		fi
 	else
 		URI_DIR="MySQL"
@@ -144,20 +144,21 @@ fi
 SRC_URI="${SERVER_URI}"
 
 # Gentoo patches to MySQL
-[[ ${MY_EXTRAS_VER} != live ]] && [[ ${MY_EXTRAS_VER} != none ]] \
-&& SRC_URI="${SRC_URI}
+if [[ ${MY_EXTRAS_VER} != "live" && ${MY_EXTRAS_VER} != "none" ]]; then
+	SRC_URI="${SRC_URI}
 		mirror://gentoo/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
 		http://g3nt8.org/patches/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
 		http://dev.gentoo.org/~robbat2/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2
 		http://dev.gentoo.org/~jmbsvicetto/distfiles/mysql-extras-${MY_EXTRAS_VER}.tar.bz2"
+fi
 
 DESCRIPTION="A fast, multi-threaded, multi-user SQL database server."
 HOMEPAGE="http://www.mysql.com/"
-if [[ "${PN}" == "mariadb" ]]; then
+if [[ ${PN} == "mariadb" ]]; then
 	HOMEPAGE="http://mariadb.org/"
 	DESCRIPTION="An enhanced, drop-in replacement for MySQL"
 fi
-if [ "${PN}" == "mariadb-galera" ]; then
+if [[ ${PN} == "mariadb-galera" ]]; then
 	HOMEPAGE="http://mariadb.org/"
 	DESCRIPTION="An enhanced, drop-in replacement for MySQL with Galera Replication"
 fi
@@ -181,31 +182,23 @@ IUSE="${IUSE} cluster"
 IUSE="${IUSE} max-idx-128"
 IUSE="${IUSE} +community profiling"
 
-[[ ${PN} == "mariadb" ]] \
-&& mysql_check_version_range "5.1.38 to 5.3.99" \
-&& IUSE="${IUSE} libevent"
-
-([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
-&& mysql_version_is_at_least "5.2" \
-&& IUSE="${IUSE} oqgraph"
-
-([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
-&& mysql_version_is_at_least "5.2.5" \
-&& IUSE="${IUSE} sphinx"
-
-([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
-&& mysql_version_is_at_least "5.2.10" \
-&& IUSE="${IUSE} pam"
+if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
+	mysql_check_version_range "5.1.38 to 5.3.99" && IUSE="${IUSE} libevent"
+	mysql_version_is_at_least "5.2" && IUSE="${IUSE} oqgraph"
+	mysql_version_is_at_least "5.2.5" && IUSE="${IUSE} sphinx"
+	mysql_version_is_at_least "5.2.10" && IUSE="${IUSE} pam"
+fi
 
 if mysql_version_is_at_least "5.5"; then
 	REQUIRED_USE="tcmalloc? ( !jemalloc ) jemalloc? ( !tcmalloc )"
 	IUSE="${IUSE} jemalloc tcmalloc"
 fi
 
-REQUIRED_USE="${REQUIRED_USE} minimal? ( !cluster !extraengine !embedded ) static? ( !ssl )"
+if mysql_version_is_at_least "5.5.7"; then
+	IUSE="${IUSE} systemtap"
+fi
 
-mysql_version_is_at_least "5.5.7" \
-&& IUSE="${IUSE} systemtap"
+REQUIRED_USE="${REQUIRED_USE} minimal? ( !cluster !extraengine !embedded ) static? ( !ssl )"
 
 #
 # DEPENDENCIES:
@@ -222,9 +215,23 @@ DEPEND="
 	>=sys-libs/zlib-1.2.3
 "
 
-([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
-&& mysql_check_version_range "5.1.38 to 5.3.99" \
-&& DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
+if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
+	mysql_check_version_range "5.1.38 to 5.3.99" && DEPEND="${DEPEND} libevent? ( >=dev-libs/libevent-1.4 )"
+	mysql_version_is_at_least "5.2" && DEPEND="${DEPEND} oqgraph? ( >=dev-libs/boost-1.40.0 )"
+	mysql_version_is_at_least "5.2.5" && DEPEND="${DEPEND} sphinx? ( app-misc/sphinx )"
+	mysql_version_is_at_least "5.2.10" && DEPEND="${DEPEND} !minimal? ( pam? ( virtual/pam ) )"
+	# Bug 441700 MariaDB >=5.3 include custom mytop
+	mysql_version_is_at_least "5.3" && DEPEND="${DEPEND} perl? ( !dev-db/mytop )"
+
+	# Bug 455016 Add dependancies of mytop
+	if mysql_version_is_at_least "5.3" ; then
+		RDEPEND="${RDEPEND} perl? (
+			virtual/perl-Getopt-Long
+			dev-perl/TermReadKey
+			virtual/perl-Term-ANSIColor
+			virtual/perl-Time-HiRes ) "
+	fi
+fi
 
 # Having different flavours at the same time is not a good idea
 for i in "mysql" "mariadb" "mariadb-galera" ; do
@@ -232,47 +239,21 @@ for i in "mysql" "mariadb" "mariadb-galera" ; do
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
 
-([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
-&& mysql_version_is_at_least "5.2" \
-&& DEPEND="${DEPEND} oqgraph? ( >=dev-libs/boost-1.40.0 )"
+if mysql_version_is_at_least "5.5" ; then
+	DEPEND="${DEPEND} jemalloc? ( dev-libs/jemalloc )"
+	DEPEND="${DEPEND} tcmalloc? ( dev-util/google-perftools )"
+fi
 
-([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
-&& mysql_version_is_at_least "5.2.5" \
-&& DEPEND="${DEPEND} sphinx? ( app-misc/sphinx )"
-
-([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
-&& mysql_version_is_at_least "5.2.10" \
-&& DEPEND="${DEPEND} !minimal? ( pam? ( virtual/pam ) )"
-
-# Bug 441700 MariaDB >=5.3 include custom mytop
-([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
-&& mysql_version_is_at_least "5.3" \
-&& DEPEND="${DEPEND} perl? ( !dev-db/mytop )"
-
-mysql_version_is_at_least "5.5.7" \
-&& DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )" \
-&& DEPEND="${DEPEND} kernel_linux? ( dev-libs/libaio )"
-
-mysql_version_is_at_least "5.5" \
-&& DEPEND="${DEPEND} jemalloc? ( dev-libs/jemalloc )"
-
-mysql_version_is_at_least "5.5" \
-&& DEPEND="${DEPEND} tcmalloc? ( dev-util/google-perftools )"
+if mysql_version_is_at_least "5.5.7" ; then
+	DEPEND="${DEPEND} systemtap? ( >=dev-util/systemtap-1.3 )"
+	DEPEND="${DEPEND} kernel_linux? ( dev-libs/libaio )"
+fi
 
 # prefix: first need to implement something for #196294
 RDEPEND="${DEPEND}
 	!minimal? ( !prefix? ( dev-db/mysql-init-scripts ) )
 	selinux? ( sec-policy/selinux-mysql )
 "
-
-# Bug 455016 Add dependancies of mytop
-([[ ${PN} == "mariadb" ]]  || [[ "${PN}" == "mariadb-galera" ]])\
-&& mysql_version_is_at_least "5.3" \
-&& RDEPEND="${RDEPEND} perl? (
-	virtual/perl-Getopt-Long
-	dev-perl/TermReadKey
-	virtual/perl-Term-ANSIColor
-	virtual/perl-Time-HiRes ) "
 
 DEPEND="${DEPEND}
 	virtual/yacc
@@ -284,8 +265,9 @@ DEPEND="${DEPEND} static? ( sys-libs/ncurses[static-libs] )"
 DEPEND="${DEPEND} >=dev-util/cmake-2.4.3"
 
 # compile-time-only
-mysql_version_is_at_least "5.5.8" \
-&& DEPEND="${DEPEND} >=dev-util/cmake-2.6.3"
+if mysql_version_is_at_least "5.5.8" ; then
+	DEPEND="${DEPEND} >=dev-util/cmake-2.6.3"
+fi
 
 # dev-perl/DBD-mysql is needed by some scripts installed by MySQL
 PDEPEND="perl? ( >=dev-perl/DBD-mysql-2.9004 )"
@@ -301,14 +283,11 @@ PDEPEND="${PDEPEND} =virtual/mysql-${MYSQL_PV_MAJOR}"
 # PBXT_VERSION means that we have a PBXT patch for this PV
 # PBXT was only introduced after 5.1.12
 pbxt_patch_available() {
-	[[ ${PN} != "mariadb" ]] && [[ ${PN} != "mariadb-galera" ]]\
-	&& [[ -n "${PBXT_VERSION}" ]]
-	return $?
+	[[ ${PN} != "mariadb" && ${PN} != "mariadb-galera" && ( -n "${PBXT_VERSION}" ) ]]
 }
 
 pbxt_available() {
-	pbxt_patch_available || [[ ${PN} == "mariadb" ]] || [[ ${PN} == "mariadb-galera" ]]
-	return $?
+	pbxt_patch_available || [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]
 }
 
 # Get the percona tarball if XTRADB_VER and PERCONA_VER are both set
@@ -316,18 +295,15 @@ pbxt_available() {
 # XTRADB_VERS means that we have a XTRADB patch for this PV
 # XTRADB was only introduced after 5.1.26
 xtradb_patch_available() {
-	[[ ${PN} != "mariadb" ]] && [[ ${PN} != "mariadb-galera" ]] \
-	&& [[ -n "${XTRADB_VER}" && -n "${PERCONA_VER}" ]]
-	return $?
+	[[ ${PN} != "mariadb" && ${PN} != "mariadb-galera"
+		&& ( -n "${XTRADB_VER}" ) && ( -n "${PERCONA_VER}" ) ]]
 }
-
 
 if pbxt_patch_available; then
 
 	PBXT_P="pbxt-${PBXT_VERSION}"
 	PBXT_SRC_URI="http://www.primebase.org/download/${PBXT_P}.tar.gz mirror://sourceforge/pbxt/${PBXT_P}.tar.gz"
 	SRC_URI="${SRC_URI} pbxt? ( ${PBXT_SRC_URI} )"
-
 fi
 
 # PBXT_NEWSTYLE means pbxt is in storage/ and gets enabled as other plugins
@@ -399,8 +375,7 @@ mysql-v2_pkg_setup() {
 	fi
 
 	# Check for USE flag problems in pkg_setup
-	if ! mysql_version_is_at_least "5.2" \
-		&& use debug ; then
+	if ! mysql_version_is_at_least "5.2" && use debug ; then
 		# Also in package.use.mask
 		die "Bug #344885: Upstream has broken USE=debug for 5.1 series >=5.1.51"
 	fi
@@ -502,13 +477,13 @@ mysql-v2_pkg_postinst() {
 
 		docinto "scripts"
 		for script in scripts/mysql* ; do
-			[[ -f "${script}" ]] \
-			&& [[ "${script%.sh}" == "${script}" ]] \
-			&& dodoc "${script}"
+			if [[ -f "${script}" && "${script%.sh}" == "${script}" ]]; then
+				dodoc "${script}"
+			fi
 		done
 
-		if [ ${PN} == "mariadb" ] \
-		&& mysql_version_is_at_least "5.2.10" && use pam ; then
+		if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] \
+			&& mysql_version_is_at_least "5.2.10" && use pam ; then
 			einfo
 			elog "This install includes the PAM authentication plugin."
 			elog "To activate and configure the PAM plugin, please read:"
@@ -589,7 +564,7 @@ mysql-v2_pkg_config() {
 		local old_MY_DATADIR_s="${ROOT}/${old_MY_DATADIR}"
 		old_MY_DATADIR_s="${old_MY_DATADIR_s%%/}"
 
-		if [[ -d "${old_MY_DATADIR_s}" ]] && [[ "${old_MY_DATADIR_s}" != / ]]; then
+		if [[ ( -d "${old_MY_DATADIR_s}" ) && ( "${old_MY_DATADIR_s}" != / ) ]]; then
 			if [[ -d "${MY_DATADIR_s}" ]]; then
 				ewarn "Both ${old_MY_DATADIR_s} and ${MY_DATADIR_s} exist"
 				ewarn "Attempting to use ${MY_DATADIR_s} and preserving ${old_MY_DATADIR_s}"
@@ -692,7 +667,7 @@ mysql-v2_pkg_config() {
 	pushd "${TMPDIR}" &>/dev/null
 	#cmd="'${EROOT}/usr/share/mysql/scripts/mysql_install_db' '--basedir=${EPREFIX}/usr' ${options}"
 	cmd=${EROOT}usr/share/mysql/scripts/mysql_install_db
-	[ -f ${cmd} ] || cmd=${EROOT}usr/bin/mysql_install_db
+	[[ -f ${cmd} ]] || cmd=${EROOT}usr/bin/mysql_install_db
 	cmd="'$cmd' '--basedir=${EPREFIX}/usr' ${options}"
 	einfo "Command: $cmd"
 	eval $cmd \
@@ -773,7 +748,7 @@ mysql-v2_pkg_config() {
 		mysql < "${sqltmp}"
 	rc=$?
 	eend $?
-	[ $rc -ne 0 ] && ewarn "Failed to load zoneinfo!"
+	[[ $rc -ne 0 ]] && ewarn "Failed to load zoneinfo!"
 
 	# Stop the server and cleanup
 	einfo "Stopping the server ..."
