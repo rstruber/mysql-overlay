@@ -1,6 +1,6 @@
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-db/mariadb/mariadb-5.5.29.ebuild,v 1.1 2013/02/13 00:47:45 robbat2 Exp $
+# $Header: $
 
 EAPI="4"
 MY_EXTRAS_VER="20130120-0100Z"
@@ -28,7 +28,7 @@ RDEPEND="${RDEPEND}"
 # Official test instructions:
 # USE='berkdb -cluster embedded extraengine perl ssl community' \
 # FEATURES='test userpriv -usersandbox' \
-# ebuild mariadb-X.X.XX.ebuild \
+# ebuild mariadb-galera-X.X.XX.ebuild \
 # digest clean package
 src_test() {
 
