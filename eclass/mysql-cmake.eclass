@@ -179,7 +179,7 @@ configure_cmake_standard() {
 		mycmakeargs+=( $(cmake-utils_use_with pbxt PBXT_STORAGE_ENGINE) )
 	fi
 
-	if [ "${PN}" == "mariadb" ]; then
+	if [[ ${PN} == "mariadb" ]]; then
 		mycmakeargs+=(
 			$(cmake-utils_use_with oqgraph OQGRAPH_STORAGE_ENGINE)
 			$(cmake-utils_use_with sphinx SPHINX_STORAGE_ENGINE)
@@ -189,7 +189,12 @@ configure_cmake_standard() {
 		if ! use pam ; then
 			mycmakeargs+=( -DAUTH_PAM_DISABLED=1 )
 		fi
+	fi
 
+	if [[ ${PN} == "percona-server" ]]; then
+		mycmakeargs+=(
+			$(cmake-utils_use_with pam)
+		)
 	fi
 }
 

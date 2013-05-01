@@ -116,7 +116,7 @@ mysql_version_is_at_least "5.1.50" || die "This eclass should only be used with 
 if [[ -z ${SERVER_URI} ]]; then
 	[[ -z ${MY_PV} ]] && MY_PV="${PV//_/-}"
 	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
-		MARIA_FULL_PV="$(replace_version_separator 3 '-' ${MY_PV})"
+		MARIA_FULL_PV=$(replace_version_separator 3 '-' ${MY_PV})
 		MARIA_FULL_P="${PN}-${MARIA_FULL_PV}"
 		SERVER_URI="
 		http://ftp.osuosl.org/pub/mariadb/${MARIA_FULL_P}/kvm-tarbake-jaunty-x86/${MARIA_FULL_P}.tar.gz
@@ -129,6 +129,13 @@ if [[ -z ${SERVER_URI} ]]; then
 		if [[ ${PN} == "mariadb-galera" ]]; then
 			MY_SOURCEDIR="${PN%%-galera}-${MARIA_FULL_PV}"
 		fi
+	elif [[ ${PN} == "percona-server" ]]; then
+		PERCONA_PN="Percona-Server"
+		MIRROR_PV=$(get_version_component_range 1-2 ${PV})
+		MY_PV=$(get_version_component_range 1-3 ${PV})
+		MY_PATCH=$(get_version_component_range 4 ${PV})
+		SERVER_URI="http://www.percona.com/redir/downloads/${PERCONA_PN}-${MIRROR_PV}/LATEST/source/${PERCONA_PN}-${MY_PV}-rel30.${MY_PATCH}.tar.gz"
+#		http://www.percona.com/redir/downloads/Percona-Server-5.5/LATEST/source/Percona-Server-5.5.30-rel30.2.tar.gz
 	else
 		URI_DIR="MySQL"
 		URI_FILE="mysql"
@@ -161,6 +168,10 @@ fi
 if [[ ${PN} == "mariadb-galera" ]]; then
 	HOMEPAGE="http://mariadb.org/"
 	DESCRIPTION="An enhanced, drop-in replacement for MySQL with Galera Replication"
+fi
+if [[ ${PN} == "percona-server" ]]; then
+	HOMEPAGE="http://www.percona.com/software/percona-server"
+	DESCRIPTION="An enhanced, drop-in replacement fro MySQL from the Percona team"
 fi
 LICENSE="GPL-2"
 SLOT="0"
@@ -196,6 +207,10 @@ fi
 
 if mysql_version_is_at_least "5.5.7"; then
 	IUSE="${IUSE} systemtap"
+fi
+
+if [[ ${PN} == "percona-server" ]]; then
+	mysql_version_is_at_least "5.5.10" && IUSE="${IUSE} pam"
 fi
 
 REQUIRED_USE="${REQUIRED_USE} minimal? ( !cluster !extraengine !embedded ) static? ( !ssl )"
@@ -234,7 +249,7 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 fi
 
 # Having different flavours at the same time is not a good idea
-for i in "mysql" "mariadb" "mariadb-galera" ; do
+for i in "mysql" "mariadb" "mariadb-galera" "percona-server"; do
 	[[ ${i} == ${PN} ]] ||
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
