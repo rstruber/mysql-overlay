@@ -237,15 +237,6 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	mysql_version_is_at_least "5.2.10" && DEPEND="${DEPEND} !minimal? ( pam? ( virtual/pam ) )"
 	# Bug 441700 MariaDB >=5.3 include custom mytop
 	mysql_version_is_at_least "5.3" && DEPEND="${DEPEND} perl? ( !dev-db/mytop )"
-
-	# Bug 455016 Add dependancies of mytop
-	if mysql_version_is_at_least "5.3" ; then
-		RDEPEND="${RDEPEND} perl? (
-			virtual/perl-Getopt-Long
-			dev-perl/TermReadKey
-			virtual/perl-Term-ANSIColor
-			virtual/perl-Time-HiRes ) "
-	fi
 fi
 
 # Having different flavours at the same time is not a good idea
@@ -269,6 +260,17 @@ RDEPEND="${DEPEND}
 	!minimal? ( !prefix? ( dev-db/mysql-init-scripts ) )
 	selinux? ( sec-policy/selinux-mysql )
 "
+
+if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
+	# Bug 455016 Add dependencies of mytop
+	if mysql_version_is_at_least "5.3" ; then
+		RDEPEND="${RDEPEND} perl? (
+			virtual/perl-Getopt-Long
+			dev-perl/TermReadKey
+			virtual/perl-Term-ANSIColor
+			virtual/perl-Time-HiRes ) "
+	fi
+fi
 
 DEPEND="${DEPEND}
 	virtual/yacc
