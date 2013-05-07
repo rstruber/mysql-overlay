@@ -18,4 +18,5 @@ DEPEND=""
 RDEPEND="|| (
 	=dev-db/mysql-${PV}*[embedded=,minimal=,static=]
 	=dev-db/mariadb-${PV}*[embedded=,minimal=,static=]
+	=dev-db/percona-server-${PV}*[embedded=,minimal=,static=]
 )"
