@@ -1,0 +1,5 @@
+*galera-23.2.4 (14 May 2013)
+
+  14 May 2013;  <grknight@lavabit.com> +files/disable-tests.patch,
+  +files/garb.cnf, +files/garb.sh, +galera-23.2.4.ebuild, +metadata.xml:
+  Add required runtime-only library for mariadb-galera
