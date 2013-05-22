@@ -1,0 +1,5 @@
+*mariadb-native-client-1.0 (22 May 2013)
+
+  22 May 2013;  <grknight@lavabit.com> +files/multilib-install.patch,
+  +mariadb-native-client-1.0.ebuild, +metadata.xml:
+  Add new C library for MySQL
