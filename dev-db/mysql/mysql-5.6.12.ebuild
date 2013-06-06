@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-MY_EXTRAS_VER="live"
+MY_EXTRAS_VER="20130606-1725Z"
 MY_PV="${PV//_alpha_pre/-m}"
 MY_PV="${MY_PV//_/-}"
 
@@ -19,7 +19,7 @@ IUSE="$IUSE"
 EGIT_REPO_URI="git://git.overlays.gentoo.org/proj/mysql-extras.git"
 
 # REMEMBER: also update eclass/mysql*.eclass before committing!
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-linux"
 
 # When MY_EXTRAS is bumped, the index should be revised to exclude these.
 EPATCH_EXCLUDE=''
@@ -112,6 +112,8 @@ src_test() {
 		[[ -z "$failures" ]] || die "Test failures: $failures"
 		einfo "Tests successfully completed"
 
+		# Need to clean up slightly
+		find "${TESTDIR}" -type s -delete
 	else
 
 		einfo "Skipping server tests due to minimal build."
