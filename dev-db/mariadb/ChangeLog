@@ -2,6 +2,11 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mariadb-10.0.3 (12 Jun 2013)
+
+  12 Jun 2013; Robin H. Johnson <robbat2@gentoo.org> +mariadb-10.0.3.ebuild:
+  Bump, tests still running for now.
+
 *mariadb-5.5.31 (28 May 2013)
 
   28 May 2013; Robin H. Johnson <robbat2@gentoo.org> +mariadb-5.5.31.ebuild:
