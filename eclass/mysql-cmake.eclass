@@ -258,7 +258,7 @@ mysql-cmake_src_configure() {
 		-DINSTALL_SQLBENCHDIR=share/mysql
 		-DINSTALL_SUPPORTFILESDIR=${EPREFIX}/usr/share/mysql
 		-DWITH_COMMENT="Gentoo Linux ${PF}"
-		-DWITHOUT_UNIT_TESTS=1
+		$(cmake-utils_use_with test UNIT_TESTS)
 	)
 
 	# Bug 412851
