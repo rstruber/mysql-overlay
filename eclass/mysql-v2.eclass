@@ -228,6 +228,7 @@ DEPEND="
 	>=sys-apps/texinfo-4.7-r1
 	>=sys-libs/readline-4.1
 	>=sys-libs/zlib-1.2.3
+	!dev-db/mariadb-native-client[mysqlcompat]
 "
 
 if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then

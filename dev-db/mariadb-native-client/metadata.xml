@@ -3,5 +3,6 @@
 <pkgmetadata>
 <herd>mysql</herd>
 <use>
+<flag name='mysqlcompat'>Enable mysqlclient library symbolic links</flag>
 </use>
 </pkgmetadata>

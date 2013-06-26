@@ -14,6 +14,10 @@ fi
 
 inherit cmake-multilib eutils "${VCS_INHERIT}"
 
+MULTILIB_WRAPPED_HEADERS+=(
+	/usr/include/mariadb/my_config.h
+)
+
 DESCRIPTION="Client Library for C is used to connect applications developed in C/C++ to MariaDB/MySQL databases"
 HOMEPAGE="http://mariadb.org/"
 SRC_URI="
@@ -24,20 +28,33 @@ SRC_URI="
 LICENSE="LGPL-2.1"
 
 SLOT="0"
-KEYWORDS="~amd64 ~x86"
-IUSE="doc static-libs"
+KEYWORDS=""
+IUSE="doc +mysqlcompat +ssl static-libs"
 
-RDEPEND="dev-libs/openssl"
+RDEPEND="sys-libs/zlib
+	ssl? ( dev-libs/openssl )
+	mysqlcompat? (
+		!dev-db/mysql
+		!dev-db/mysql-cluster
+		!dev-db/mariadb
+		!dev-db/mariadb-galera
+		!dev-db/percona-server
+	)"
 DEPEND="${RDEPEND}
 	doc? ( app-text/xmlto )"
 
 src_prepare() {
-	epatch "${FILESDIR}/multilib-install.patch"
+	sed -i 	-e "s~DESTINATION \"lib/mariadb~DESTINATION \"\$\{CMAKE_INSTALL_LIBDIR\}~" \
+		-e "s~DESTINATION lib/mariadb~DESTINATION \$\{CMAKE_INSTALL_LIBDIR\}~" \
+		"${S}/libmariadb/CMakeLists.txt"
 }
 
 src_configure() {
 	mycmakeargs+=(
 		-DMYSQL_UNIX_ADDR="${EPREFIX}/var/run/mysqld/mysqld.sock"
+		-DWITH_EXTERNAL_ZLIB=ON
+		$(cmake-utils_use_with ssl OPENSSL)
+		$(cmake-utils_use_with mysqlcompat MYSQLCOMPAT)
 		$(cmake-utils_use_build doc DOCS)
 	)
 	cmake-multilib_src_configure
@@ -45,12 +62,13 @@ src_configure() {
 
 src_install() {
 	strip_static_libraries() {
-		einfo "IN ${T}/usr/$(get_libdir)"
-		rm "${T}/usr/$(get_libdir)/mariadb/libmariadbclient.a"
+		rm "${ED}/usr/$(get_libdir)/libmariadbclient.a"
+		use mysqlcompat && rm "${ED}/usr/$(get_libdir)/libmysqlclient.a"
 	}
 
 	cmake-multilib_src_install
 	if ! use static-libs ; then
 		multilib_foreach_abi strip_static_libraries
 	fi
+	dodoc README
 }
