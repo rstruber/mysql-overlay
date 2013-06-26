@@ -301,10 +301,12 @@ PDEPEND="${PDEPEND} =virtual/mysql-${MYSQL_PV_MAJOR}"
 # PBXT was only introduced after 5.1.12
 pbxt_patch_available() {
 	[[ ${PN} != "mariadb" && ${PN} != "mariadb-galera" && ( -n "${PBXT_VERSION}" ) ]]
+	return $?
 }
 
 pbxt_available() {
 	pbxt_patch_available || [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]
+	return $?
 }
 
 # Get the percona tarball if XTRADB_VER and PERCONA_VER are both set
@@ -314,6 +316,7 @@ pbxt_available() {
 xtradb_patch_available() {
 	[[ ${PN} != "mariadb" && ${PN} != "mariadb-galera"
 		&& ( -n "${XTRADB_VER}" ) && ( -n "${PERCONA_VER}" ) ]]
+	return $?
 }
 
 if pbxt_patch_available; then
