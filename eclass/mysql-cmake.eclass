@@ -407,15 +407,12 @@ mysql-cmake_src_install() {
 		done
 	fi
 
-	cat <<-EOF > "${T}"/40mysql
+	cat <<-EOF > "${T}"/80mysql-libdir
 	LDPATH="${EPREFIX}/usr/$(get_libdir)/mysql"
 	EOF
-	doenvd "${T}"/40mysql
+	doenvd "${T}"/80mysql-libdir
 
 	#Remove mytop if perl is not selected
 	[[ ${PN} == "mariadb" ]] && ! use perl \
 	&& rm -f "${ED}/usr/bin/mytop"
-
-	# Install env file so that programs can find libmysqlclient
-	doenvd "${FILESDIR}/80${PN}-libdir"
 }
