@@ -382,7 +382,7 @@ mysql-cmake_src_install() {
 		fi
 
 		diropts "-m0755"
-		for folder in "${MY_LOGDIR#${EPREFIX}}" "/var/run/mysqld" ; do
+		for folder in "${MY_LOGDIR#${EPREFIX}}" ; do
 			dodir "${folder}"
 			keepdir "${folder}"
 			chown -R mysql:mysql "${ED}/${folder}"
@@ -406,6 +406,11 @@ mysql-cmake_src_install() {
 			[[ ( -f $script ) && ( ${script%.sh} == ${script} ) ]] && dodoc "${script}"
 		done
 	fi
+
+	cat <<-EOF > "${T}"/40mysql
+	LDPATH="${EPREFIX}/usr/$(get_libdir)/mysql"
+	EOF
+	doenvd "${T}"/40mysql
 
 	#Remove mytop if perl is not selected
 	[[ ${PN} == "mariadb" ]] && ! use perl \
