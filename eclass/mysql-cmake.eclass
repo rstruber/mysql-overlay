@@ -415,4 +415,7 @@ mysql-cmake_src_install() {
 	#Remove mytop if perl is not selected
 	[[ ${PN} == "mariadb" ]] && ! use perl \
 	&& rm -f "${ED}/usr/bin/mytop"
+
+	# Install env file so that programs can find libmysqlclient
+	doenvd "${FILESDIR}/80${PN}-libdir"
 }
