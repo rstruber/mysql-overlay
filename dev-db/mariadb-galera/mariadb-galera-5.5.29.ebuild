@@ -4,6 +4,7 @@
 
 EAPI="4"
 MY_EXTRAS_VER="20130120-0100Z"
+WSREP_REVISION="23"
 
 # Build system
 BUILD="cmake"

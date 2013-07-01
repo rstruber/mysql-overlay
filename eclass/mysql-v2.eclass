@@ -273,6 +273,12 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	fi
 fi
 
+if [[ ${PN} == "mariadb-galera" ]] ; then
+	RDEPEND="${RDEPEND} 
+		>=sys-cluster/galera-${WSREP_REVISION:0}.0
+	"
+fi
+
 DEPEND="${DEPEND}
 	virtual/yacc
 "
