@@ -196,6 +196,17 @@ configure_cmake_standard() {
 			$(cmake-utils_use_with pam)
 		)
 	fi
+
+	if [[ ${PN} == "mysql-cluster" ]]; then
+		# TODO: This really should include the following options,
+		# but the memcached package doesn't install the files it seeks.
+		# -DWITH_BUNDLED_MEMCACHED=OFF
+		# -DMEMCACHED_HOME=${EPREFIX}/usr
+		mycmakeargs+=(
+			-DWITH_BUNDLED_LIBEVENT=OFF
+			$(cmake-utils_use_with java NDB_JAVA)
+		)
+	fi
 }
 
 #

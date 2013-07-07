@@ -218,6 +218,10 @@ if [[ ${PN} == "percona-server" ]]; then
 	mysql_version_is_at_least "5.5.10" && IUSE="${IUSE} pam"
 fi
 
+if [[ ${PN} == "mysql-cluster" ]] ; then
+	mysql_version_is_at_least "7.2.9" && IUSE="${IUSE} java"
+fi
+
 REQUIRED_USE="${REQUIRED_USE} minimal? ( !cluster !extraengine !embedded ) static? ( !ssl )"
 
 #
@@ -261,6 +265,13 @@ if mysql_version_is_at_least "5.5.7" ; then
 	DEPEND="${DEPEND} kernel_linux? ( dev-libs/libaio )"
 fi
 
+if [[ ${PN} == "mysql-cluster" ]] ; then
+	# TODO: This really should include net-misc/memcached
+	# but the package does not install the files it seeks.
+	mysql_version_is_at_least "7.2.3" && \
+		DEPEND="${DEPEND} dev-libs/libevent"
+fi
+
 # prefix: first need to implement something for #196294
 RDEPEND="${DEPEND}
 	!minimal? ( !prefix? ( dev-db/mysql-init-scripts ) )
@@ -282,6 +293,11 @@ if [[ ${PN} == "mariadb-galera" ]] ; then
 	RDEPEND="${RDEPEND} 
 		>=sys-cluster/galera-${WSREP_REVISION:0}.0
 	"
+fi
+
+if [[ ${PN} == "mysql-cluster" ]] ; then
+	has java ${IUSE} && RDEPEND="${RDEPEND} virtual/jre" && \
+		DEPEND="${DEPEND} virtual/jdk"
 fi
 
 DEPEND="${DEPEND}
