@@ -154,12 +154,12 @@ configure_cmake_standard() {
 		mycmakeargs+=( -DWITH_SSL=bundled )
 	fi
 
-	if mysql_version_is_at_least "5.5" && use jemalloc; then
-		mycmakeargs+=( -DCMAKE_EXE_LINKER_FLAGS='-ljemalloc' -DWITH_SAFEMALLOC=OFF )
+	if use jemalloc; then
+		mycmakeargs+=( -DWITH_SAFEMALLOC=OFF )
 	fi
 
-	if mysql_version_is_at_least "5.5" && use tcmalloc; then
-		mycmakeargs+=( -DCMAKE_EXE_LINKER_FLAGS='-ltcmalloc' -DWITH_SAFEMALLOC=OFF )
+	if use tcmalloc; then
+		mycmakeargs+=( -DWITH_SAFEMALLOC=OFF )
 	fi
 
 	# Storage engines
@@ -237,6 +237,13 @@ mysql-cmake_src_prepare() {
 	[[ -f ${i} ]] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
 
 	rm -f "scripts/mysqlbug"
+	if use jemalloc; then
+		echo "TARGET_LINK_LIBRARIES(mysqld jemalloc)" >> "${S}/sql/CMakeLists.txt"
+	fi
+
+	if use tcmalloc; then
+		echo "TARGET_LINK_LIBRARIES(mysqld tcmalloc)" >> "${S}/sql/CMakeLists.txt"
+	fi
 	epatch_user
 }
 
