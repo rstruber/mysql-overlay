@@ -2,15 +2,16 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-EAPI=2
+EAPI=4
 MY_EXTRAS_VER="live"
+BUILD="autotools"
 
 # PBXT
 PBXT_VERSION='1.0.11-6-pre-ga'
 # XtraDB
 PERCONA_VER='5.1.45-10' XTRADB_VER='1.0.6-10'
 
-inherit toolchain-funcs mysql
+inherit toolchain-funcs mysql-v2
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
 

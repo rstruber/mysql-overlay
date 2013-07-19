@@ -391,9 +391,12 @@ mysql-autotools_src_prepare() {
 	i="${S}"/storage/innodb_plugin/plug.in
 	[[ -f ${i} ]] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
 
-	# Additional checks, remove bundled zlib
-	rm -f "${S}/zlib/"*.[ch]
-	sed -i -e "s/zlib\/Makefile dnl/dnl zlib\/Makefile/" "${S}/configure.in"
+	# Additional checks, remove bundled zlib (Cluster needs this, for static
+	# memory management in zlib, leave available for Cluster)
+	if [[ "${PN}" != "mysql-cluster" ]] ; then
+		rm -f "${S}/zlib/"*.[ch]
+		sed -i -e "s/zlib\/Makefile dnl/dnl zlib\/Makefile/" "${S}/configure.in"
+	fi
 	rm -f "scripts/mysqlbug"
 
 	# Make charsets install in the right place

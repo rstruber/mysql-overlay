@@ -83,6 +83,14 @@ fi
 # mysql_upgrade.
 MYSQL_PV_MAJOR="$(get_version_component_range 1-2 ${PV})"
 
+# Cluster is a special case...
+if [[ "${PN}" == "mysql-cluster" ]]; then
+	case $PV in
+		6.1*|7.0*|7.1*) MYSQL_PV_MAJOR=5.1 ;;
+		7.2*|7.3*) MYSQL_PV_MAJOR=5.5 ;;
+	esac
+fi
+
 # @ECLASS-VARIABLE: MYSQL_VERSION_ID
 # @DESCRIPTION:
 # MYSQL_VERSION_ID will be:
