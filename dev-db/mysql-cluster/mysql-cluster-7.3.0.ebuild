@@ -11,7 +11,7 @@ BUILD="cmake"
 # XtraDB
 #PERCONA_VER='5.1.45-10' XTRADB_VER='1.0.6-10'
 
-inherit toolchain-funcs mysql-v2
+inherit toolchain-funcs java-pkg-opt-2 mysql-v2
 # only to make repoman happy. it is really set in the eclass
 IUSE="$IUSE"
 

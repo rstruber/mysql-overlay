@@ -229,10 +229,6 @@ if [[ ${PN} == "percona-server" ]]; then
 	mysql_version_is_at_least "5.5.10" && IUSE="${IUSE} pam"
 fi
 
-if [[ ${PN} == "mysql-cluster" ]] ; then
-	mysql_version_is_at_least "7.2.9" && IUSE="${IUSE} java"
-fi
-
 REQUIRED_USE="${REQUIRED_USE} minimal? ( !cluster !extraengine !embedded ) static? ( !ssl )"
 
 #
@@ -307,8 +303,8 @@ if [[ ${PN} == "mariadb-galera" ]] ; then
 fi
 
 if [[ ${PN} == "mysql-cluster" ]] ; then
-	has java ${IUSE} && RDEPEND="${RDEPEND} virtual/jre" && \
-		DEPEND="${DEPEND} virtual/jdk"
+       mysql_version_is_at_least "7.2.9" && RDEPEND="${RDEPEND} java? ( >=virtual/jre-1.6 )" && \
+               DEPEND="${DEPEND} java? ( >=virtual/jdk-1.6 )"
 fi
 
 DEPEND="${DEPEND}
@@ -448,6 +444,11 @@ mysql-v2_pkg_setup() {
 		ewarn "5.1 series should NOT be put into production. In the near"
 		ewarn "future, it will be disabled from building."
 	fi
+
+	if [[ ${PN} == "mysql-cluster" ]] ; then
+		mysql_version_is_at_least "7.2.9" && java-pkg-opt-2_pkg_setup
+	fi
+
 }
 
 # @FUNCTION: mysql-v2_src_unpack
@@ -470,6 +471,9 @@ mysql-v2_src_unpack() {
 # Apply patches to the source code and remove unneeded bundled libs.
 mysql-v2_src_prepare() {
 	${BUILD_INHERIT}_src_prepare "$@"
+	if [[ ${PN} == "mysql-cluster" ]] ; then
+		mysql_version_is_at_least "7.2.9" && java-pkg-opt-2_src_prepare
+	fi
 }
 
 # @FUNCTION: mysql-v2_src_configure
@@ -497,6 +501,9 @@ mysql-v2_src_install() {
 # @DESCRIPTION:
 # Create the user and groups for mysql - die if that fails.
 mysql-v2_pkg_preinst() {
+	if [[ ${PN} == "mysql-cluster" ]] ; then
+		mysql_version_is_at_least "7.2.9" && java-pkg-opt-2_pkg_preinst
+	fi
 	enewgroup mysql 60 || die "problem adding 'mysql' group"
 	enewuser mysql 60 -1 /dev/null mysql || die "problem adding 'mysql' user"
 }
