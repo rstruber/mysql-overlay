@@ -2,6 +2,9 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: /var/cvsroot/gentoo-x86/dev-db/myodbc/ChangeLog,v 1.33 2013/05/10 08:17:39 patrick Exp $
 
+  24 Jul 2013; Brian Evans <grknight@lavabit.com> myodbc-5.2.5.ebuild:
+  [myodbc] Remove as-needed hack by adding a library to installer/CMakeLists.txt
+
   10 May 2013; Patrick Lauer <patrick@gentoo.org> myodbc-5.1.6.ebuild:
   Fix src_prepare
 

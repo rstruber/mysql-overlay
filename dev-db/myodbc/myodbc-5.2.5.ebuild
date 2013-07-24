@@ -24,15 +24,13 @@ S=${WORKDIR}/${MY_P}
 # Careful!
 DRIVER_NAME="${PN}-${SLOT}"
 
-pkg_setup() {
-	# TODO: find out how to not have this and fix the CMake build
-	append-ldflags $(no-as-needed)
-}
-
 src_prepare() {
 	# Remove Tests
 	sed -i -e "s/ADD_SUBDIRECTORY(test)//" \
 		"${S}/CMakeLists.txt"
+	# Fix as-needed on the installer binary
+	echo "TARGET_LINK_LIBRARIES(myodbc-installer odbc)" >> "${S}/installer/CMakeLists.txt"
+	# Patch document path so it doesn't install files to /usr
 	epatch "${FILESDIR}/cmake-doc-path.patch"
 }
 
