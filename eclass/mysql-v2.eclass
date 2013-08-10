@@ -27,6 +27,9 @@ case ${BUILD} in
 	"cmake")
 		BUILD_INHERIT="mysql-cmake"
 		;;
+	"cmake-multilib")
+		BUILD_INHERIT="mysql-cmake-multilib"
+		;;
 	"autotools")
 		BUILD_INHERIT="mysql-autotools"
 
@@ -185,7 +188,7 @@ case "${BUILD}" in
 	"autotools")
 		IUSE="big-tables debug embedded minimal +perl selinux ssl static test"
 		;;
-	"cmake")
+	"cmake"*)
 		IUSE="debug embedded minimal +perl selinux ssl static test"
 		;;
 esac
