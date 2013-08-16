@@ -2,6 +2,13 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mysql-5.5.33 (16 Aug 2013)
+
+  16 Aug 2013; Brian Evans <grknight@tuffmail.com> +mysql-5.5.33.ebuild:
+  Version bump w/ failing tests Failing test(s): rpl.rpl_deadlock_innodb
+  main.plugin_auth main.mysqladmin main.mysqlhotcopy_archive
+  main.mysqlhotcopy_myisam
+
 *mysql-5.6.12 (06 Jun 2013)
 
   06 Jun 2013; Robin H. Johnson <robbat2@gentoo.org> +mysql-5.6.12.ebuild,
