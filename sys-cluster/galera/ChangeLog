@@ -1,3 +1,9 @@
+*galera-23.2.4-r1 (21 Aug 2013)
+
+  21 Aug 2013; Brian Evans <grknight@tuffmail.com> +galera-23.2.4-r1.ebuild,
+  -galera-23.2.4.ebuild, files/garb.sh:
+  [sys-cluster/galera] Revbump to fix issues report in Bug 466706 Comment 14
+
 *galera-23.2.4 (14 May 2013)
 
   14 May 2013;  <grknight@lavabit.com> +files/disable-tests.patch,

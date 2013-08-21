@@ -1,58 +1,63 @@
 #!/sbin/runscript
-#
-# Copyright (C) 2012 Codership Oy <info@codership.com>
-# Modified by: Brian Evans <grknight@lavabit.com> for OpenRC
-# $Header: $
+# Copyright 1999-2013 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
 
 depend() {
-	need net
-}
-
-stop() {
-	ebegin $"Shutting down "${SVCNAME}" "
-	start-stop-daemon --stop --quiet --oknodo --retry TERM/30/KILL/5 \
-		                  --pidfile $PIDFILE
-	eend $?
+	use net
+	after mysql
 }
 
 start() {
-	local rcode
+	ebegin "Starting ${SVCNAME}"
 
-	# Check that node addresses are configured
-	if [ -z "$GALERA_NODES" ]; then
+	if [ -z "${GALERA_NODES}" ]; then
 		eerror "List of GALERA_NODES is not configured"
-		return 6
-	fi
-	if [ -z "$GALERA_GROUP" ]; then
-		eerror "GALERA_GROUP name is not configured" 
-		return 6
-	fi
-
-	GALERA_PORT=${GALERA_PORT:-4567}
-
-	# Find a working node
-	for ADDRESS in ${GALERA_NODES} 0; do
-		HOST=$(echo $ADDRESS | cut -d \: -f 1 )
-		PORT=$(echo $ADDRESS | cut -d \: -f 2 )
-		PORT=${PORT:-$GALERA_PORT}
-		nc -z $HOST $PORT >/dev/null && break
-	done
-	if [ ${ADDRESS} == "0" ]; then
-		eerror "None of the nodes in $GALERA_NODES is accessible"
 		return 1
 	fi
 
-	OPTIONS="-d -a gcomm://$ADDRESS"
-	[ -n "$GALERA_GROUP" ]   && OPTIONS="$OPTIONS -g $GALERA_GROUP"
-	[ -n "$GALERA_OPTIONS" ] && OPTIONS="$OPTIONS -o $GALERA_OPTIONS"
-	[ -n "$LOG_FILE" ]       && OPTIONS="$OPTIONS -l $LOG_FILE"
+	if [ -z "${GALERA_GROUP}" ]; then
+		eerror "GALERA_GROUP name is not configured"
+		return 1
+	fi
 
-	ebegin "Starting ${SVCNAME} "
-	start-stop-daemon --start --quiet --background \
-			--pidfile "${PIDFILE}" --make-pidfile \
-	                  --exec /usr/bin/garbd -- $OPTIONS
-	rcode=$?
-	# Hack: sleep a bit to give garbd some time to fork
-	sleep 1
-	eend $rcode
+	GALERA_PORT="${GALERA_PORT:-4567}"
+
+	for ADDRESS in ${GALERA_NODES} 0; do
+		HOST=$(echo $ADDRESS | cut -d \: -f 1 )
+		PORT=$(echo $ADDRESS | cut -d \: -f 2 )
+		if [[ "${HOST}" == "${PORT}" ]]; then
+			PORT=${GALERA_PORT}
+		fi
+		PORT=${PORT:-$GALERA_PORT}
+		nc -z ${HOST} ${PORT} > /dev/null &&  break
+	done
+	if [ ${ADDRESS} == "0" ]; then
+		eerror "None of the nodes in GALERA_NODES is accessible"
+		return 1
+	fi
+
+	OPTIONS="-a gcomm://${ADDRESS} -g ${GALERA_GROUP}"
+	[ -n "${GALERA_OPTIONS}" ] && OPTIONS="${OPTIONS} -o ${GALERA_OPTIONS}"
+        [ -n "${LOG_FILE}" ]       && OPTIONS="${OPTIONS} -l ${LOG_FILE}"
+
+	start-stop-daemon \
+		--start \
+		--exec /usr/bin/garbd \
+		--pidfile "${PIDFILE}" \
+		--make-pidfile \
+		--user garbd \
+		--group garbd \
+		--background \
+		-- ${OPTIONS}
+	eend $?
 }
+
+stop() {
+	ebegin "Stopping ${SVCNAME}"
+	start-stop-daemon \
+		--stop \
+		--exec /usr/bin/garbd \
+		--pidfile "${PIDFILE}"
+	eend $?
+}
+

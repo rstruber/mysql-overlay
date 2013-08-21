@@ -38,10 +38,17 @@ RDEPEND="${RDEPEND}
 
 S="${WORKDIR}/${MY_P}"
 
+pkg_preinst() {
+	if use garbd ; then
+		enewgroup garbd
+		enewuser garbd
+	fi
+}
+
 src_prepare() {
 	#Remove bundled dev-cpp/asio
 	rm -fr "${S}/asio"
-	#Remove Werror from build file, no way to disable
+	#Remove Werror from build file, no way to disable. Also, respect LDFLAGS.
 	sed -i	-e "s/-Werror //" \
 		-e "s/LINKFLAGS = link_arch/LINKFLAGS = link_arch + ' ' + os.environ['LDFLAGS']/" \
 		"${S}/SConstruct"
@@ -70,8 +77,8 @@ src_install() {
 	dodoc scripts/packages/README scripts/packages/README-MySQL
 	if use garbd ; then
 		dobin garb/garbd
-		newconfd "${FILESDIR}/garbd.cnf" garbd
-		newinitd "${FILESDIR}/garbd.sh" garbd
+		newconfd "${FILESDIR}/garb.cnf" garbd
+		newinitd "${FILESDIR}/garb.sh" garbd
 	fi
 	exeinto /usr/$(get_libdir)/${PN}
 	doexe libgalera_smm.so
