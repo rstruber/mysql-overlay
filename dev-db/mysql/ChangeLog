@@ -2,6 +2,12 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mysql-5.6.13 (26 Aug 2013)
+
+  26 Aug 2013; Brian Evans <grknight@tuffmail.com> +mysql-5.6.13.ebuild:
+  [dev-db/mysql] Version bump to 5.6.13.  Failing test(s):
+  rpl.rpl_spec_variables similar to bug 473002
+
 *mysql-5.5.33 (16 Aug 2013)
 
   16 Aug 2013; Brian Evans <grknight@tuffmail.com> +mysql-5.5.33.ebuild:
