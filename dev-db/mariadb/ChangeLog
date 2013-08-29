@@ -2,6 +2,11 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+  29 Aug 2013; Brian Evans <grknight@tuffmail.com> -mariadb-5.1.66.ebuild,
+  -mariadb-5.2.13.ebuild, -mariadb-5.3.11.ebuild, -mariadb-5.5.28a.ebuild,
+  -mariadb-5.5.29.ebuild, -mariadb-5.5.30.ebuild:
+  [dev-db/mariadb] Trim old
+
 *mariadb-5.5.32 (19 Jul 2013)
 
   19 Jul 2013; Brian Evans <grknight@lavabit.com> +mariadb-5.5.32.ebuild:
