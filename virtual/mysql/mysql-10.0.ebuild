@@ -14,7 +14,7 @@ KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86
 IUSE="embedded minimal static"
 
 DEPEND=""
-# TODO: add Drizzle and MariaDB here
+# TODO: add Drizzle here
 RDEPEND="|| (
 	=dev-db/mariadb-${PV}*[embedded=,minimal=,static=]
 )"
