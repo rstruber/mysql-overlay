@@ -3,21 +3,26 @@
 # $Header: $
 
 EAPI=5
-inherit flag-o-matic eutils versionator cmake-utils
+inherit cmake-utils eutils flag-o-matic versionator
 
 MAJOR="$(get_version_component_range 1-2 $PV)"
 MY_PN="mysql-connector-odbc"
 MY_P="${MY_PN}-${PV/_p/r}-src"
+
 DESCRIPTION="ODBC driver for MySQL"
 HOMEPAGE="http://www.mysql.com/products/myodbc/"
 SRC_URI="mirror://mysql/Downloads/Connector-ODBC/${MAJOR}/${MY_P}.tar.gz"
 RESTRICT="primaryuri"
+
 LICENSE="GPL-2"
 SLOT="${MAJOR}"
 KEYWORDS="~amd64 ~ppc ~x86"
 IUSE=""
-RDEPEND=">=virtual/mysql-4.1
-		 dev-db/unixODBC"
+
+RDEPEND="
+	dev-db/unixODBC
+	>=virtual/mysql-4.1
+"
 DEPEND="${DEPEND} ${RDEPEND}"
 S=${WORKDIR}/${MY_P}
 
@@ -28,21 +33,28 @@ src_prepare() {
 	# Remove Tests
 	sed -i -e "s/ADD_SUBDIRECTORY(test)//" \
 		"${S}/CMakeLists.txt"
+
 	# Fix as-needed on the installer binary
 	echo "TARGET_LINK_LIBRARIES(myodbc-installer odbc)" >> "${S}/installer/CMakeLists.txt"
+
 	# Patch document path so it doesn't install files to /usr
 	epatch "${FILESDIR}/cmake-doc-path.patch"
 }
 
 src_configure() {
 	# The RPM_BUILD flag does nothing except install to /usr/lib64 when "x86_64"
-	mycmakeargs+=( -DWITH_UNIXODBC=1 -DRPM_BUILD=1 
-		-DMYSQL_LIB="$(mysql_config --variable=pkglibdir)/libmysqlclient_r.so" )
+	mycmakeargs+=(
+		-DWITH_UNIXODBC=1
+		-DRPM_BUILD=1
+		-DMYSQL_LIB="$(mysql_config --variable=pkglibdir)/libmysqlclient_r.so"
+	)
+
 	cmake-utils_src_configure
 }
 
 src_install() {
 	cmake-utils_src_install
+
 	dodir /usr/share/${PN}-${SLOT}
 	for i in odbc.ini odbcinst.ini; do
 		einfo "Building $i"
@@ -57,11 +69,13 @@ src_install() {
 }
 
 pkg_config() {
+
 	[ "${ROOT}" != "/" ] && \
-	die 'Sorry, non-standard ROOT setting is not supported :-('
+		die 'Sorry, non-standard ROOT setting is not supported :-('
 
 	local msg='MySQL ODBC driver'
 	local drivers=$(/usr/bin/odbcinst -q -d)
+
 	if echo $drivers | grep -vq "^\[${DRIVER_NAME}\]$" ; then
 		ebegin "Installing ${msg}"
 		/usr/bin/odbcinst -i -d -f /usr/share/${PN}-${SLOT}/odbcinst.ini
@@ -86,6 +100,7 @@ pkg_config() {
 }
 
 pkg_postinst() {
+
 	elog "If this is a new install, please run the following command"
 	elog "to configure the MySQL ODBC drivers and sources:"
 	elog "emerge --config =${CATEGORY}/${PF}"
