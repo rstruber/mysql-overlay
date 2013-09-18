@@ -2,6 +2,14 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mariadb-5.5.33 (18 Sep 2013)
+
+  18 Sep 2013; Brian Evans <grknight@tuffmail.com> +mariadb-5.5.33.ebuild,
+  metadata.xml:
+  [mariadb] Bump to version 5.5.33 PBXT was removed upstream TokuDB was added.
+  TokuDB only builds on amd64 according to author. jemalloc was added by
+  upstream. Small hack in cmake to use system lib.
+
   29 Aug 2013; Brian Evans <grknight@tuffmail.com> -mariadb-5.1.66.ebuild,
   -mariadb-5.2.13.ebuild, -mariadb-5.3.11.ebuild, -mariadb-5.5.28a.ebuild,
   -mariadb-5.5.29.ebuild, -mariadb-5.5.30.ebuild:
