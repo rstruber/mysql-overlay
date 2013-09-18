@@ -214,6 +214,8 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
 	mysql_version_is_at_least "5.2" && IUSE="${IUSE} oqgraph"
 	mysql_version_is_at_least "5.2.5" && IUSE="${IUSE} sphinx"
 	mysql_version_is_at_least "5.2.10" && IUSE="${IUSE} pam"
+	mysql_version_is_at_least "10.0.5" && IUSE="${IUSE} tokudb"
+	mysql_check_version_range "5.5.33 to 5.5.99" && IUSE="${IUSE} tokudb"
 fi
 
 if mysql_version_is_at_least "5.5"; then
@@ -254,6 +256,10 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	mysql_version_is_at_least "5.2.10" && DEPEND="${DEPEND} !minimal? ( pam? ( virtual/pam ) )"
 	# Bug 441700 MariaDB >=5.3 include custom mytop
 	mysql_version_is_at_least "5.3" && DEPEND="${DEPEND} perl? ( !dev-db/mytop )"
+	has tokudb ${IUSE} && DEPEND="${DEPEND} tokudb? (
+		>=sys-devel/gcc-4.7[lto]
+		app-arch/xz-utils
+	)"
 fi
 
 # Having different flavours at the same time is not a good idea
@@ -340,7 +346,7 @@ pbxt_patch_available() {
 }
 
 pbxt_available() {
-	pbxt_patch_available || [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]
+	pbxt_patch_available || ( [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && mysql_check_version_range "5.1 to 5.5.32" )
 	return $?
 }
 
@@ -447,6 +453,12 @@ mysql-v2_pkg_setup() {
 
 	if [[ ${PN} == "mysql-cluster" ]] ; then
 		mysql_version_is_at_least "7.2.9" && java-pkg-opt-2_pkg_setup
+	fi
+
+	if has tokudb ${IUSE} && use tokudb && [[ $(gcc-version) < 4.7 ]] ; then
+		eerror "${PN} with tokudb needs to be built with gcc-4.7 or later."
+		eerror "Please use gcc-config to switch to gcc-4.7 or later version."
+		die
 	fi
 
 }
