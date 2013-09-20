@@ -67,12 +67,17 @@ mysql-cmake_disable_test() {
 	fi
 }
 
+# @FUNCTION: mysql-cmake_use_plugin
+# @DESCRIPTION:
+# Helper function to enable/disable plugins by use flags
+# cmake-utils_use_with is not enough as some references check WITH_ (0|1)
+# and some check WITHOUT_. Also, this can easily extend to non-storage plugins.
 mysql-cmake_use_plugin() {
 	[[ -z $2 ]] && die "mysql-cmake_use_plugin <USE flag> <flag name>"
 	if use $1 ; then
 		echo "-DWITH_$2=1"
 	else
-		echo "-DWITHOUT_$2=1"
+		echo "-DWITHOUT_$2=1 -DWITH_$2=0"
 	fi
 }
 
