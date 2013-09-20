@@ -72,7 +72,7 @@ mysql-cmake_use_plugin() {
 	if use $1 ; then
 		echo "-DWITH_$2=1"
 	else
-		echo "-D$2_DISABLED=1"
+		echo "-DWITHOUT_$2=1"
 	fi
 }
 
@@ -197,10 +197,10 @@ configure_cmake_standard() {
 			$(mysql-cmake_use_plugin pam AUTH_PAM)
 		)
 
-		#Disable bundled copy of jemalloc
-		mycmakeargs+=( -DWITH_JEMALLOC=no )
 		if use jemalloc ; then
-			mycmakeargs+=( -DLIBJEMALLOC="jemalloc" )
+			mycmakeargs+=( -DWITH_JEMALLOC="system" )
+		else
+			mycmakeargs+=( -DWITH_JEMALLOC=no )
 		fi
 	fi
 
@@ -259,13 +259,6 @@ mysql-cmake_src_prepare() {
 	fi
 
 	if has tokudb ${IUSE} ; then
-		# Don't build TokuDB unless requested in configure
-		# Upstream bug https://mariadb.atlassian.net/browse/MDEV-5021
-		if [[ "${PV}" == "5.5.33" ]] ; then
-			sed -i 's/"x86_64" AND/"x86_64" AND WITH_TOKUDB AND/' \
-				"${S}/storage/tokudb/CMakeLists.txt" || die "sed failed for tokudb CMakeLists.txt"
-		fi
-
 		# Don't build bundled xz-utils
 		rm -f "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake" 
 		touch "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake" 
