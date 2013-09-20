@@ -2,6 +2,13 @@
 # Copyright 1999-2013 Gentoo Foundation; Distributed under the GPL v2
 # $Header: $
 
+*mariadb-5.5.33a (20 Sep 2013)
+
+  20 Sep 2013; Brian Evans <grknight@tuffmail.com> +mariadb-5.5.33a.ebuild,
+  -mariadb-5.5.33.ebuild:
+  [mariadb] Version Bump to 5.5.33a All tests pass Fix crashes upstream Remove
+  hacks for jemalloc and tokudb per upstream
+
 *mariadb-5.5.33 (18 Sep 2013)
 
   18 Sep 2013; Brian Evans <grknight@tuffmail.com> +mariadb-5.5.33.ebuild,
