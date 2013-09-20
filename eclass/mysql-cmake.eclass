@@ -188,7 +188,7 @@ configure_cmake_standard() {
 		mycmakeargs+=( $(cmake-utils_use_with pbxt PBXT_STORAGE_ENGINE) )
 	fi
 
-	if [[ ${PN} == "mariadb" ]]; then
+	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
 		mycmakeargs+=(
 			$(mysql-cmake_use_plugin oqgraph OQGRAPH)
 			$(mysql-cmake_use_plugin sphinx SPHINX)
@@ -309,7 +309,7 @@ mysql-cmake_src_configure() {
 	# Bug 412851
 	# MariaDB requires this flag to compile with GPLv3 readline linked
 	# Adds a warning about redistribution to configure
-	if [[ ${PN} == "mariadb" ]] ; then
+	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 		mycmakeargs+=( -DNOT_FOR_DISTRIBUTION=1 )
 	fi
 
@@ -371,7 +371,7 @@ mysql-cmake_src_install() {
 	dosym "/usr/bin/mysqlcheck" "/usr/bin/mysqloptimize"
 
 	# Create a mariadb_config symlink
-	[[ ${PN} == "mariadb" ]] && dosym "/usr/bin/mysql_config" "/usr/bin/mariadb_config"
+	[[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && dosym "/usr/bin/mysql_config" "/usr/bin/mariadb_config"
 
 	# INSTALL_LAYOUT=STANDALONE causes cmake to create a /usr/data dir
 	rm -Rf "${ED}/usr/data"
@@ -458,6 +458,6 @@ mysql-cmake_src_install() {
 	doenvd "${T}"/80mysql-libdir
 
 	#Remove mytop if perl is not selected
-	[[ ${PN} == "mariadb" ]] && ! use perl \
+	[[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && ! use perl \
 	&& rm -f "${ED}/usr/bin/mytop"
 }
