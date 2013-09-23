@@ -17,4 +17,5 @@ DEPEND=""
 # TODO: add Drizzle and MariaDB here
 RDEPEND="|| (
 	=dev-db/mysql-${PV}*[embedded=,minimal=,static=]
+	=dev-db/percona-server-${PV}*[embedded=,minimal=,static=]
 )"
