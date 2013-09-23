@@ -144,9 +144,11 @@ if [[ -z ${SERVER_URI} ]]; then
 		PERCONA_PN="Percona-Server"
 		MIRROR_PV=$(get_version_component_range 1-2 ${PV})
 		MY_PV=$(get_version_component_range 1-3 ${PV})
-		MY_PATCH=$(get_version_component_range 4 ${PV})
-		SERVER_URI="http://www.percona.com/redir/downloads/${PERCONA_PN}-${MIRROR_PV}/LATEST/source/${PERCONA_PN}-${MY_PV}-rel30.${MY_PATCH}.tar.gz"
+		PERCONA_RELEASE=$(get_version_component_range 4-5 ${PV})
+		PERCONA_RC=$(get_version_component_range 6 ${PV})
+		SERVER_URI="http://www.percona.com/redir/downloads/${PERCONA_PN}-${MIRROR_PV}/${PERCONA_PN}-${MY_PV}-${PERCONA_RC}${PERCONA_RELEASE}/source/${PERCONA_PN}-${MY_PV}-${PERCONA_RC:-rel}${PERCONA_RELEASE}.tar.gz"
 #		http://www.percona.com/redir/downloads/Percona-Server-5.5/LATEST/source/Percona-Server-5.5.30-rel30.2.tar.gz
+#		http://www.percona.com/redir/downloads/Percona-Server-5.6/Percona-Server-5.6.13-rc60.5/source/Percona-Server-5.6.13-rc60.5.tar.gz
 	else
 		if [[ "${PN}" == "mysql-cluster" ]] ; then
 			URI_DIR="MySQL-Cluster"
