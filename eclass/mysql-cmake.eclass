@@ -162,6 +162,10 @@ configure_cmake_standard() {
 		$(cmake-utils_use_enable systemtap DTRACE)
 	)
 
+	if use static; then
+		mycmakeargs+=( -DWITH_PIC=1 )
+	fi
+
 	if use ssl; then
 		mycmakeargs+=( -DWITH_SSL=system )
 	else
