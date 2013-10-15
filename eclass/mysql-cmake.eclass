@@ -227,7 +227,7 @@ configure_cmake_standard() {
 		fi
 	fi
 
-	if [[ ${PN} == "percona-server" ]]; then
+	if [[ ${PN} == "percona-server" || ${PN} == "percona-xtradb-cluster" ]]; then
 		mycmakeargs+=(
 			$(cmake-utils_use_with pam)
 		)
@@ -324,6 +324,10 @@ mysql-cmake_src_configure() {
 		-DWITH_COMMENT="Gentoo Linux ${PF}"
 		$(cmake-utils_use_with test UNIT_TESTS)
 	)
+
+	if [[ ${PN} == "percona-xtradb-cluster" ]] ; then
+		mycmakeargs+=( -DWITH_WSREP=1 )
+	fi
 
 	# Bug 412851
 	# MariaDB requires this flag to compile with GPLv3 readline linked

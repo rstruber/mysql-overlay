@@ -1,0 +1,41 @@
+[client]
+port            = 3306
+socket          = /var/run/mysqld/mysqld.sock
+
+
+[mysqld]
+basedir         = /usr
+datadir         = /var/lib/mysql
+socket          = /var/run/mysqld/mysqld.sock
+pid-file        = /var/run/mysqld/mysqld.pid
+log-error       = /var/log/mysql/mysqld.err
+lc-messages-dir = /usr/share/mysql
+user            = mysql
+
+tmp_table_size = 24M
+tmpdir         = /tmp/
+
+# Cluster hosts
+wsrep_cluster_address=gcomm://
+
+# Path to Galera library
+wsrep_provider=/usr/lib64/galera/libgalera_smm.so
+
+# In order for Galera to work correctly binlog format should be ROW
+binlog_format=ROW
+
+# MyISAM storage engine has only experimental support
+default_storage_engine=InnoDB
+
+# This is a recommended tuning variable for performance
+innodb_locks_unsafe_for_binlog=1
+
+# This changes how InnoDB autoincrement locks are managed and is a requirement for Galera
+innodb_autoinc_lock_mode=2
+
+# SST method
+wsrep_sst_method=xtrabackup
+#wsrep_sst_auth="USERNAME:PASSWORD"
+
+# Cluster name
+#wsrep_cluster_name=

@@ -9,13 +9,13 @@ MY_P="${PN}-${PV}-src"
 inherit scons-utils multilib toolchain-funcs base versionator
 DESCRIPTION="Synchronous multi-master replication engine that provides its service through wsrep API"
 HOMEPAGE="http://www.codership.org/"
-SRC_URI="https://launchpad.net/${PN}/$(get_version_component_range 2).x/${PV}/+download/${MY_P}.tar.gz"
+SRC_URI="https://launchpad.net/${PN}/${PV:0:1}.x/${PV}/+download/${MY_P}.tar.gz"
 LICENSE="GPL-3"
 
 SLOT="0"
 
 KEYWORDS="~x86 ~amd64"
-IUSE="garbd ssl test"
+IUSE="garbd ssl"
 
 RDEPEND="
 	 ssl? ( dev-libs/openssl )
@@ -56,9 +56,6 @@ src_prepare() {
 	if ! use garbd ; then
 		rm -fr "${S}/garb"
 	fi
-#	if ! use test ; then
-#		epatch "${FILESDIR}/disable-tests-${PV}.patch"
-#	fi
 }
 
 src_configure() {
@@ -66,7 +63,6 @@ src_configure() {
 	tc-export CXX
 	myesconsargs=(
 		$(use_scons ssl ssl 1 0)
-		$(use_scons test tests 1 0)
 	)
 }
 
@@ -84,3 +80,4 @@ src_install() {
 	exeinto /usr/$(get_libdir)/${PN}
 	doexe libgalera_smm.so
 }
+

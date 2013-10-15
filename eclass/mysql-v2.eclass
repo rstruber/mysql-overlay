@@ -141,16 +141,23 @@ if [[ -z ${SERVER_URI} ]]; then
 		if [[ ${PN} == "mariadb-galera" ]]; then
 			MY_SOURCEDIR="${PN%%-galera}-${MARIA_FULL_PV}"
 		fi
-	elif [[ ${PN} == "percona-server" ]]; then
-		PERCONA_PN="Percona-Server"
+	elif [[ ${PN} == "percona-server" || ${PN} == "percona-xtradb-cluster" ]]; then
+		if [[ ${PN} == "percona-server" ]]; then
+			PERCONA_PN="Percona-Server"
+		else
+			PERCONA_PN="Percona-XtraDB-Cluster"
+		fi
 		MIRROR_PV=$(get_version_component_range 1-2 ${PV})
 		MY_PV=$(get_version_component_range 1-3 ${PV})
-		PERCONA_RELEASE=$(get_version_component_range 4-5 ${PV})
+		PERCONA_RELEASE=$(get_version_component_range 4-6 ${PV})
 		PERCONA_RC=$(get_version_component_range 6 ${PV})
 		mysql_version_is_at_least "5.6" && PERCONA_RC=${PERCONA_RC:-rel}
-		SERVER_URI="http://www.percona.com/redir/downloads/${PERCONA_PN}-${MIRROR_PV}/${PERCONA_PN}-${MY_PV}-${PERCONA_RC}${PERCONA_RELEASE}/source/${PERCONA_PN}-${MY_PV}-${PERCONA_RC:-rel}${PERCONA_RELEASE}.tar.gz"
-#		http://www.percona.com/redir/downloads/Percona-Server-5.5/LATEST/source/Percona-Server-5.5.30-rel30.2.tar.gz
-#		http://www.percona.com/redir/downloads/Percona-Server-5.6/Percona-Server-5.6.13-rc60.5/source/Percona-Server-5.6.13-rc60.5.tar.gz
+
+		if [[ ${PN} == "percona-xtradb-cluster" ]]; then
+			SERVER_URI="http://www.percona.com/redir/downloads/${PERCONA_PN}/${MY_PV}-${PERCONA_RELEASE}/source/${PERCONA_PN}-${MY_PV}.tar.gz"
+		else
+			SERVER_URI="http://www.percona.com/redir/downloads/${PERCONA_PN}-${MIRROR_PV}/${PERCONA_PN}-${MY_PV}-${PERCONA_RC}${PERCONA_RELEASE}/source/${PERCONA_PN}-${MY_PV}-${PERCONA_RC:-rel}${PERCONA_RELEASE}.tar.gz"
+		fi
 	else
 		if [[ "${PN}" == "mysql-cluster" ]] ; then
 			URI_DIR="MySQL-Cluster"
@@ -193,6 +200,10 @@ if [[ ${PN} == "percona-server" ]]; then
 	HOMEPAGE="http://www.percona.com/software/percona-server"
 	DESCRIPTION="An enhanced, drop-in replacement fro MySQL from the Percona team"
 fi
+if [[ ${PN} == "percona-xtradb-cluster" ]]; then
+	HOMEPAGE="http://www.percona.com/software/percona-xtradb-cluster"
+	DESCRIPTION="An enhanced, drop-in replacement fro MySQL from the Percona team with Galera Replication"
+fi
 LICENSE="GPL-2"
 SLOT="0"
 
@@ -234,7 +245,7 @@ if mysql_version_is_at_least "5.5.7"; then
 	IUSE="${IUSE} systemtap"
 fi
 
-if [[ ${PN} == "percona-server" ]]; then
+if [[ ${PN} == "percona-server" || ${PN} == "percona-xtradb-cluster" ]]; then
 	mysql_version_is_at_least "5.5.10" && IUSE="${IUSE} pam"
 fi
 
@@ -266,7 +277,7 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 fi
 
 # Having different flavours at the same time is not a good idea
-for i in "mysql" "mariadb" "mariadb-galera" "percona-server" "mysql-cluster" ; do
+for i in "mysql" "mariadb" "mariadb-galera" "percona-server" "percona-xtradb-cluster" "mysql-cluster" ; do
 	[[ ${i} == ${PN} ]] ||
 	DEPEND="${DEPEND} !dev-db/${i}"
 done
@@ -312,8 +323,8 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	fi
 fi
 
-if [[ ${PN} == "mariadb-galera" ]] ; then
-	RDEPEND="${RDEPEND} 
+if [[ ${PN} == "mariadb-galera" || ${PN} == "percona-xtradb-cluster" ]] ; then
+	RDEPEND="${RDEPEND}
 		>=sys-cluster/galera-${WSREP_REVISION:0}.0
 	"
 fi

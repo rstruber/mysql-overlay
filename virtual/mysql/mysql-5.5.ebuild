@@ -20,4 +20,5 @@ RDEPEND="|| (
 	=dev-db/mysql-${PV}*[embedded=,minimal=,static=]
 	=dev-db/percona-server-${PV}*[embedded=,minimal=,static=]
 	=dev-db/mariadb-galera-${PV}*[embedded=,minimal=,static=]
+	=dev-db/percona-xtradb-cluster-${PV}*[embedded=,minimal=,static=]
 )"
