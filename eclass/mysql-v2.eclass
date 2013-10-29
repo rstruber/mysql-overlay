@@ -199,7 +199,7 @@ case "${BUILD}" in
 	"autotools")
 		IUSE="big-tables debug embedded minimal +perl selinux ssl static test"
 		;;
-	"cmake"*)
+	cmake*)
 		IUSE="debug embedded minimal +perl selinux ssl static test"
 		;;
 esac
@@ -259,10 +259,6 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 	mysql_version_is_at_least "5.2.10" && DEPEND="${DEPEND} !minimal? ( pam? ( virtual/pam ) )"
 	# Bug 441700 MariaDB >=5.3 include custom mytop
 	mysql_version_is_at_least "5.3" && DEPEND="${DEPEND} perl? ( !dev-db/mytop )"
-	has tokudb ${IUSE} && DEPEND="${DEPEND} tokudb? (
-		>=sys-devel/gcc-4.7[lto]
-		app-arch/xz-utils
-	)"
 fi
 
 # Having different flavours at the same time is not a good idea
