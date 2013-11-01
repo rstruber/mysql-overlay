@@ -74,6 +74,7 @@ S="${WORKDIR}/mysql"
 if [[ ${MY_EXTRAS_VER} == "live" ]]; then
 	EGIT_PROJECT=mysql-extras
 	EGIT_REPO_URI="git://git.overlays.gentoo.org/proj/mysql-extras.git"
+	RESTRICT="userpriv"
 fi
 
 # @ECLASS-VARIABLE: MYSQL_PV_MAJOR
