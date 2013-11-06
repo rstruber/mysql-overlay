@@ -244,15 +244,18 @@ mysql-cmake_src_prepare() {
 
 	cd "${S}"
 
-	# Apply the patches for this MySQL version
-	EPATCH_SUFFIX="patch"
-	mkdir -p "${EPATCH_SOURCE}" || die "Unable to create epatch directory"
-	# Clean out old items
-	rm -f "${EPATCH_SOURCE}"/*
-	# Now link in right patches
-	mysql_mv_patches
-	# And apply
-	epatch
+	if [[ ${MY_EXTRAS_VER} != none ]]; then
+
+		# Apply the patches for this MySQL version
+		EPATCH_SUFFIX="patch"
+		mkdir -p "${EPATCH_SOURCE}" || die "Unable to create epatch directory"
+		# Clean out old items
+		rm -f "${EPATCH_SOURCE}"/*
+		# Now link in right patches
+		mysql_mv_patches
+		# And apply
+		epatch
+	fi
 
 	# last -fPIC fixup, per bug #305873
 	i="${S}"/storage/innodb_plugin/plug.in
@@ -269,8 +272,8 @@ mysql-cmake_src_prepare() {
 
 	if has tokudb ${IUSE} ; then
 		# Don't build bundled xz-utils
-		rm -f "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake" 
-		touch "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake" 
+		rm -f "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake"
+		touch "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake"
 	fi
 
 	epatch_user
