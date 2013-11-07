@@ -12,8 +12,8 @@
 # @DESCRIPTION:
 # The mysql-cmake.eclass provides the support to build the mysql
 # ebuilds using the cmake build system. This eclass provides
-# the src_unpack, src_prepare, src_configure, src_compile, scr_install,
-# pkg_preinst, pkg_postinst, pkg_config and pkg_postrm phase hooks.
+# the src_prepare, src_configure, src_compile, and src_install
+# phase hooks.
 
 inherit cmake-utils flag-o-matic multilib prefix
 
@@ -210,6 +210,20 @@ configure_cmake_standard() {
 			mycmakeargs+=( -DWITH_JEMALLOC="system" )
 		else
 			mycmakeargs+=( -DWITH_JEMALLOC=no )
+		fi
+
+		if mysql_version_is_at_least 10.0.5 ; then
+			# CassandraSE needs Apache Thrift which is not in portage
+			# TODO: Add use and deps for Connect SE external deps
+			mycmakeargs+=(
+				-DWITHOUT_CASSANDRA=1 -DWITH_CASSANDRA=0
+				$(mysql-cmake_use_plugin extraengine SEQUENCE)
+				$(mysql-cmake_use_plugin extraengine SPIDER)
+				$(mysql-cmake_use_plugin extraengine CONNECT)
+				-DCONNECT_WITH_MYSQL=1
+				-DCONNECT_WITH_LIBXML=0
+				-DCONNECT_WITH_ODBC=0
+			)
 		fi
 	fi
 

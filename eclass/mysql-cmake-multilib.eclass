@@ -67,6 +67,20 @@ mysql-cmake-multilib_disable_test() {
 	fi
 }
 
+# @FUNCTION: mysql-cmake_use_plugin
+# @DESCRIPTION:
+# Helper function to enable/disable plugins by use flags
+# cmake-utils_use_with is not enough as some references check WITH_ (0|1)
+# and some check WITHOUT_. Also, this can easily extend to non-storage plugins.
+mysql-cmake_use_plugin() {
+	[[ -z $2 ]] && die "mysql-cmake_use_plugin <USE flag> <flag name>"
+	if use $1 ; then
+		echo "-DWITH_$2=1"
+	else
+		echo "-DWITHOUT_$2=1 -DWITH_$2=0"
+	fi
+}
+
 # @FUNCTION: configure_cmake_locale
 # @DESCRIPTION:
 # Helper function to configure locale cmake options
@@ -148,6 +162,10 @@ configure_cmake_standard() {
 		$(cmake-utils_use_enable systemtap DTRACE)
 	)
 
+	if use static; then
+		mycmakeargs+=( -DWITH_PIC=1 )
+	fi
+
 	if use ssl; then
 		mycmakeargs+=( -DWITH_SSL=system )
 	else
@@ -179,15 +197,33 @@ configure_cmake_standard() {
 		mycmakeargs+=( $(cmake-utils_use_with pbxt PBXT_STORAGE_ENGINE) )
 	fi
 
-	if [[ ${PN} == "mariadb" ]]; then
+	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
 		mycmakeargs+=(
-			$(cmake-utils_use_with oqgraph OQGRAPH_STORAGE_ENGINE)
-			$(cmake-utils_use_with sphinx SPHINX_STORAGE_ENGINE)
-			$(cmake-utils_use_with extraengine FEDERATEDX_STORAGE_ENGINE)
+			$(mysql-cmake_use_plugin oqgraph OQGRAPH)
+			$(mysql-cmake_use_plugin sphinx SPHINX)
+			$(mysql-cmake_use_plugin extraengine FEDERATEDX)
+			$(mysql-cmake_use_plugin tokudb TOKUDB)
+			$(mysql-cmake_use_plugin pam AUTH_PAM)
 		)
 
-		if ! use pam ; then
-			mycmakeargs+=( -DAUTH_PAM_DISABLED=1 )
+		if use jemalloc ; then
+			mycmakeargs+=( -DWITH_JEMALLOC="system" )
+		else
+			mycmakeargs+=( -DWITH_JEMALLOC=no )
+		fi
+
+		if mysql_version_is_at_least 10.0.5 ; then
+			# CassandraSE needs Apache Thrift which is not in portage
+			# TODO: Add use and deps for Connect SE external deps
+			mycmakeargs+= (
+				-DWITHOUT_CASSANDRA=1 -DWITH_CASSANDRA=0
+				$(mysql-cmake_use_plugin extraengine SEQUENCE)
+				$(mysql-cmake_use_plugin extraengine SPIDER)
+				$(mysql-cmake_use_plugin extraengine CONNECT)
+				-DCONNECT_WITH_MYSQL=1
+				-DCONNECT_WITH_LIBXML=0
+				-DCONNECT_WITH_ODBC=0
+			)
 		fi
 	fi
 
@@ -240,13 +276,20 @@ mysql-cmake-multilib_src_prepare() {
 	[[ -f ${i} ]] && sed -i -e '/CFLAGS/s,-prefer-non-pic,,g' "${i}"
 
 	rm -f "scripts/mysqlbug"
-	if use jemalloc; then
+	if use jemalloc && ! ( [[ ${PN} == "mariadb" ]] && mysql_version_is_at_least "5.5.33"  ); then
 		echo "TARGET_LINK_LIBRARIES(mysqld jemalloc)" >> "${S}/sql/CMakeLists.txt"
 	fi
 
 	if use tcmalloc; then
 		echo "TARGET_LINK_LIBRARIES(mysqld tcmalloc)" >> "${S}/sql/CMakeLists.txt"
 	fi
+
+	if has tokudb ${IUSE} ; then
+		# Don't build bundled xz-utils
+		rm -f "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake"
+		touch "${S}/storage/tokudb/ft-index/cmake_modules/TokuThirdParty.cmake"
+	fi
+
 	epatch_user
 }
 
@@ -282,7 +325,7 @@ _cmake-multilib_src_configure() {
 	# Bug 412851
 	# MariaDB requires this flag to compile with GPLv3 readline linked
 	# Adds a warning about redistribution to configure
-	if [[ ${PN} == "mariadb" ]] ; then
+	if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 		mycmakeargs+=( -DNOT_FOR_DISTRIBUTION=1 )
 	fi
 
@@ -345,7 +388,7 @@ mysql-cmake-multilib_src_compile() {
 }
 
 _mysql-cmake-multilib_src_install() {
-	
+
 	debug-print-function ${FUNCNAME} "$@"
 
 	# Make sure the vars are correctly initialized
@@ -364,7 +407,7 @@ _mysql-cmake-multilib_src_install() {
 	dosym "/usr/bin/mysqlcheck" "/usr/bin/mysqloptimize"
 
 	# Create a mariadb_config symlink
-	[[ ${PN} == "mariadb" ]] && dosym "/usr/bin/mysql_config" "/usr/bin/mariadb_config"
+	[[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && dosym "/usr/bin/mysql_config" "/usr/bin/mariadb_config"
 
 	# INSTALL_LAYOUT=STANDALONE causes cmake to create a /usr/data dir
 	rm -Rf "${ED}/usr/data"
@@ -451,7 +494,7 @@ _mysql-cmake-multilib_src_install() {
 	doenvd "${T}"/80mysql-libdir
 
 	#Remove mytop if perl is not selected
-	[[ ${PN} == "mariadb" ]] && ! use perl \
+	[[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] && ! use perl \
 	&& rm -f "${ED}/usr/bin/mytop"
 }
 
