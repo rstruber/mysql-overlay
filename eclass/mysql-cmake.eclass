@@ -221,8 +221,8 @@ configure_cmake_standard() {
 				$(mysql-cmake_use_plugin extraengine SPIDER)
 				$(mysql-cmake_use_plugin extraengine CONNECT)
 				-DCONNECT_WITH_MYSQL=1
-				-DCONNECT_WITH_LIBXML=0
-				-DCONNECT_WITH_ODBC=0
+				$(cmake-utils_use xml CONNECT_WITH_LIBXML2)
+				$(cmake-utils_use odbc CONNECT_WITH_ODBC)
 			)
 		fi
 	fi

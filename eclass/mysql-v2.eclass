@@ -218,12 +218,13 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
 	mysql_version_is_at_least "5.2" && IUSE="${IUSE} oqgraph"
 	mysql_version_is_at_least "5.2.5" && IUSE="${IUSE} sphinx"
 	mysql_version_is_at_least "5.2.10" && IUSE="${IUSE} pam"
-	mysql_version_is_at_least "10.0.5" && IUSE="${IUSE} tokudb"
+	mysql_version_is_at_least "10.0.5" && IUSE="${IUSE} tokudb odbc xml" && \
+		REQUIRED_USE="odbc? ( extraengine ) xml? ( extraengine )"
 	mysql_check_version_range "5.5.33 to 5.5.99" && IUSE="${IUSE} tokudb"
 fi
 
 if mysql_version_is_at_least "5.5"; then
-	REQUIRED_USE="tcmalloc? ( !jemalloc ) jemalloc? ( !tcmalloc )"
+	REQUIRED_USE="${REQUIRED_USE} tcmalloc? ( !jemalloc ) jemalloc? ( !tcmalloc )"
 	IUSE="${IUSE} jemalloc tcmalloc"
 fi
 
@@ -299,6 +300,13 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]] ; then
 			dev-perl/TermReadKey
 			virtual/perl-Term-ANSIColor
 			virtual/perl-Time-HiRes ) "
+	fi
+
+	if mysql_version_is_at_least "10.0.5" ; then
+		RDEPEND="${RDEPEND}
+			odbc? ( dev-db/unixODBC )
+			xml? ( dev-libs/libxml2 )
+			"
 	fi
 fi
 
