@@ -218,9 +218,11 @@ if [[ ${PN} == "mariadb" || ${PN} == "mariadb-galera" ]]; then
 	mysql_version_is_at_least "5.2" && IUSE="${IUSE} oqgraph"
 	mysql_version_is_at_least "5.2.5" && IUSE="${IUSE} sphinx"
 	mysql_version_is_at_least "5.2.10" && IUSE="${IUSE} pam"
+	# 5.5.33 and 10.0.5 add TokuDB. Authors strongly recommend jemalloc or perfomance suffers
 	mysql_version_is_at_least "10.0.5" && IUSE="${IUSE} tokudb odbc xml" && \
-		REQUIRED_USE="odbc? ( extraengine ) xml? ( extraengine )"
-	mysql_check_version_range "5.5.33 to 5.5.99" && IUSE="${IUSE} tokudb"
+		REQUIRED_USE="odbc? ( extraengine ) xml? ( extraengine ) tokudb? ( jemalloc )"
+	mysql_check_version_range "5.5.33 to 5.5.99" && IUSE="${IUSE} tokudb" && \
+		REQUIRED_USE="tokudb? ( jemalloc )"
 fi
 
 if mysql_version_is_at_least "5.5"; then
